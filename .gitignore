@@ -73,6 +73,3 @@ Plugins/**/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-Builds/
-Content/UnsortedSFX/Ambient/SW_OldHouse.uasset
-/Content/DataAsset/EnvPack
