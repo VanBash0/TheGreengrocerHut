@@ -5,6 +5,9 @@
 #include "StructUtils/InstancedStruct.h"
 #include "Materials/MaterialInterface.h"
 #include "Engine/StaticMesh.h"
+
+#define SUBSTANCE_FRAMEWORK_INCLUDED
+#include "SubstanceGraphInstance.h"
 #include "SympromsStructs.generated.h"
 
 USTRUCT(BlueprintType)
@@ -20,14 +23,16 @@ enum class EMaterialParamType : uint8
     Vector
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETextureChannel : uint8
 {
-    R,
-    G,
-    B,
-    A
+    None = 0        UMETA(Hidden),
+    R = 1 << 0,
+    G = 1 << 1,
+    B = 1 << 2,
+    A = 1 << 3
 };
+ENUM_CLASS_FLAGS(ETextureChannel)
 
 USTRUCT(BlueprintType)
 struct FMaterialParam
@@ -57,6 +62,9 @@ struct FVisualOverlay : public FVisualBase
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UMaterialInterface> Material = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETextureChannel LayerChannel = ETextureChannel::R;
