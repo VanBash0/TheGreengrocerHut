@@ -16,13 +16,6 @@ struct FVisualBase
     GENERATED_BODY()
 };
 
-UENUM(BlueprintType)
-enum class EMaterialParamType : uint8
-{
-    Scalar,
-    Vector
-};
-
 UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETextureChannel : uint8
 {
@@ -34,26 +27,37 @@ enum class ETextureChannel : uint8
 };
 ENUM_CLASS_FLAGS(ETextureChannel)
 
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EBodyPart : uint8
+{
+    None        UMETA(Hidden),
+    Arm,
+    Leg,
+    Body,
+    Eyes,
+    Mouth,
+    Ears,
+    Nose,
+    Hair,
+    Face
+};
+ENUM_CLASS_FLAGS(EBodyPart)
+
 USTRUCT(BlueprintType)
-struct FMaterialParam
+struct FBodyPart : public FTableRowBase
 {
     GENERATED_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Type", MakeStructureDefaultValue = "NewEnumerator0"))
+    EBodyPart Type;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FName ParamName;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Mesh", MakeStructureDefaultValue = "None"))
+    TObjectPtr<UStaticMesh> Mesh;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EMaterialParamType Type = EMaterialParamType::Scalar;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float ScalarValue = 0.f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FLinearColor VectorValue = FLinearColor::White;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTexture> TextureValue = nullptr;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "RGB_Mask", MakeStructureDefaultValue = "None"))
+    TObjectPtr<UTexture2D> RGB_Mask;
 };
+
 
 USTRUCT(BlueprintType)
 struct FVisualOverlay : public FVisualBase
@@ -61,16 +65,13 @@ struct FVisualOverlay : public FVisualBase
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UMaterialInterface> Material = nullptr;
+    TObjectPtr<UMaterialInterface> Material;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETextureChannel LayerChannel = ETextureChannel::R;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<FMaterialParam> Params;
 };
 
 USTRUCT(BlueprintType)
@@ -79,7 +80,7 @@ struct FVisualDeformation : public FVisualBase
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UStaticMesh> ReplacementMesh = nullptr;
+    FBodyPart OverrideBody;
 };
 
 USTRUCT(BlueprintType)
@@ -87,14 +88,8 @@ struct FS_SymptomRow : public FTableRowBase
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FText Name;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FText Description;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UObject> HealIngredient = nullptr;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Type", MakeStructureDefaultValue = "NewEnumerator0"))
+    EBodyPart Type;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExcludeBaseStruct))
     TInstancedStruct<FVisualBase> Visual;
