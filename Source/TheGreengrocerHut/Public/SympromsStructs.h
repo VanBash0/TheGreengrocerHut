@@ -10,13 +10,7 @@
 #include "SubstanceGraphInstance.h"
 #include "SympromsStructs.generated.h"
 
-USTRUCT(BlueprintType)
-struct FVisualBase
-{
-    GENERATED_BODY()
-};
-
-UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+UENUM(BlueprintType, Meta = (Bitflags = "true", UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETextureChannel : uint8
 {
     None = 0        UMETA(Hidden),
@@ -27,10 +21,20 @@ enum class ETextureChannel : uint8
 };
 ENUM_CLASS_FLAGS(ETextureChannel)
 
+inline FVector4 TextureChannelToVector4(ETextureChannel channels)
+{
+    return FVector4(
+        EnumHasAnyFlags(channels, ETextureChannel::R) ? 1.0f : 0.0f,
+        EnumHasAnyFlags(channels, ETextureChannel::G) ? 1.0f : 0.0f, 
+        EnumHasAnyFlags(channels, ETextureChannel::B) ? 1.0f : 0.0f, 
+        EnumHasAnyFlags(channels, ETextureChannel::A) ? 1.0f : 0.0f
+    );
+}
+
 UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EBodyPart : uint8
 {
-    None        UMETA(Hidden),
+    None UMETA(Hidden),
     Arm,
     Leg,
     Body,
@@ -39,7 +43,8 @@ enum class EBodyPart : uint8
     Ears,
     Nose,
     Hair,
-    Face
+    Face,
+    MAX UMETA(Hidden)
 };
 ENUM_CLASS_FLAGS(EBodyPart)
 
@@ -58,6 +63,11 @@ public:
     TObjectPtr<UTexture2D> RGB_Mask;
 };
 
+USTRUCT(BlueprintType)
+struct FVisualBase
+{
+    GENERATED_BODY()
+};
 
 USTRUCT(BlueprintType)
 struct FVisualOverlay : public FVisualBase
