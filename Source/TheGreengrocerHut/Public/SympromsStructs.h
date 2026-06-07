@@ -84,7 +84,7 @@ struct FVisualDeformation : public FVisualBase
 };
 
 USTRUCT(BlueprintType)
-struct FS_SymptomRow : public FTableRowBase
+struct FSymptomRow : public FTableRowBase
 {
     GENERATED_BODY()
 
