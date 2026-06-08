@@ -3,6 +3,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "SubstanceGraphInstance.h"
 #include "SubstanceOutputData.h"
+#include "SubstanceCoreHelpers.h"
 #include "SubstanceConfigLibrary.h"
 
 void USymptomViewerLogic::BeginDestroy()
@@ -14,6 +15,12 @@ void USymptomViewerLogic::BeginDestroy()
 			entry.SubstanceInstance->ConditionalBeginDestroy();
 			entry.SubstanceInstance = nullptr;
 		}
+
+        if (entry.MeshComponent)
+        {
+            entry.MeshComponent->ConditionalBeginDestroy();
+            entry.MeshComponent = nullptr;
+        }
 	}
 
 	for (auto& kv : _bodyParts)
@@ -31,12 +38,26 @@ void USymptomViewerLogic::BeginDestroy()
 	Super::BeginDestroy();
 }
 
-void USymptomViewerLogic::InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable, UDataTable* substanceConfigTable)
+void USymptomViewerLogic::InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable)
 {
 	_rootMesh = rootMesh;
+
 	_symptomsTable = symptomsTable;
-	_defaultBodyPartTable = defaultBodyPartTable;
-    _substanceConfigTable = substanceConfigTable;
+    _defaultBodyPartTable = defaultBodyPartTable;
+
+    for (int partIndex = 1; partIndex < (int)EBodyPart::MAX; partIndex++)
+    {
+        EBodyPart partType = static_cast<EBodyPart>(partIndex);
+
+        FBodyPartData bodyData = {};
+        bodyData.BaseMeshComp = NewObject<UStaticMeshComponent>(this);
+        bodyData.BaseMeshComp->SetCastShadow(false);
+        bodyData.BaseMeshComp->SetupAttachment(_rootMesh);
+        bodyData.BaseMeshComp->RegisterComponent();
+        bodyData.BaseMeshComp->SetVisibility(false);
+        
+        _bodyParts.Add(partType, bodyData);
+    }
 }
 
 void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
@@ -66,6 +87,8 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
         }
     }
 
+    TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> graphToRender;
+
     for (int partIndex = 1; partIndex < (int)EBodyPart::MAX; partIndex++)
     {
         EBodyPart partType = static_cast<EBodyPart>(partIndex);
@@ -73,56 +96,34 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
         FBodyPartData* bodyData = &_bodyParts.FindOrAdd(partType);
 
         TArray<FSymptomRow>* partSymptoms = symptomsByPart.Find(partType);
-
-        FName RowName = FName(StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType));
-        FBodyPart* tableRow = _defaultBodyPartTable->FindRow<FBodyPart>(RowName, TEXT("GetBodyPart"));
+        auto visual = SelectBodySymptomsByType(partSymptoms ? *partSymptoms : TArray<FSymptomRow>());
 
         UStaticMesh* meshToUse = nullptr;
         UTexture2D* maskToUse = nullptr;
-        TArray<FVisualOverlay> overlays;
 
-        if (partSymptoms && partSymptoms->Num() > 0)
+        if (visual.first.first)
         {
-            auto visual = SelectBodySymptomsByType(*partSymptoms);
-
-            if (visual.first.first)
-            {
-                meshToUse = visual.first.second.OverrideBody.Mesh;
-                maskToUse = visual.first.second.OverrideBody.RGB_Mask;
-            }
-            else if (tableRow)
+            meshToUse = visual.first.second.OverrideBody.Mesh;
+            maskToUse = visual.first.second.OverrideBody.RGB_Mask;
+        }
+        else
+        {
+            FName RowName = FName(StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType));
+            FBodyPart* tableRow = _defaultBodyPartTable->FindRow<FBodyPart>(RowName, TEXT("GetBodyPart"));
+            if (tableRow)
             {
                 meshToUse = tableRow->Mesh;
                 maskToUse = tableRow->RGB_Mask;
             }
-
-            overlays = visual.second;
-        }
-        else if (tableRow)
-        {
-            meshToUse = tableRow->Mesh;
-            maskToUse = tableRow->RGB_Mask;
-        }
-
-        if (!bodyData->BaseMeshComp)
-        {
-            bodyData->BaseMeshComp = NewObject<UStaticMeshComponent>(this);
-            bodyData->BaseMeshComp->SetCastShadow(false);
-            bodyData->BaseMeshComp->SetupAttachment(_rootMesh);
-            bodyData->BaseMeshComp->RegisterComponent();
         }
 
         bodyData->BaseMeshComp->SetStaticMesh(meshToUse);
-        bodyData->BaseMeshComp->SetVisibility(false);
 
-        for (const FVisualOverlay& overlay : overlays)
+        for (const FVisualOverlay& overlay : visual.second)
         {
             FVisualOverlayPoolEntry* element = GetPoolEntry(bodyData->BaseMeshComp, overlay.Material);
 
             if (!element || !element->MeshComponent) { continue; }
-            
-            element->MeshComponent->SetStaticMesh(meshToUse);
-            element->MeshComponent->SetVisibility(false);
 
             if (element->DynamicMaterial)
             {
@@ -130,87 +131,104 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
                 element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
             }
 
+            bodyData->OverlayEntries.Add(element);
+
             if (!overlay.SubstanceGraph) { continue; }
+
+            USubstanceGraphInstance* newGraph = CopyGraphAndSetMaterial(overlay.SubstanceGraph, overlay.Material, element->DynamicMaterial);
+
+            if (newGraph && newGraph->Instance)
+            {
+                graphToRender.Add(newGraph->Instance);
+                element->SubstanceInstance = newGraph;
+            }
+        }
+
+        bodyData->Hide();
+    }
+
+    Substance::Helpers::RenderSync(graphToRender, true);
+}
+
+USubstanceGraphInstance* USymptomViewerLogic::CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial)
+{
+    USubstanceGraphInstance* newGraph = graph->Duplicate();
+
+    if (!newGraph) { return nullptr; }
+
+    newGraph->ConditionalPostLoad();
+    newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
+    newGraph->SetInputInt("$randomseed", TArray<int32>{  FMath::RandRange(0, 100000) });
+    newGraph->CreateOutputs();
+
+    TArray<FString> outputNames = newGraph->GetOutputNames();
+    for (const FString& outputName : outputNames)
+    {
+        newGraph->EnableOutput(outputName, true);
+    }
+
+    TMap<FName, FString> mapping;
+    if (mainMaterial && graph)
+    {
+        TArray<FMaterialParameterInfo> textureParams;
+        TArray<FGuid> textureGuids;
+        mainMaterial->GetAllTextureParameterInfo(textureParams, textureGuids);
+
+        for (const FMaterialParameterInfo& param : textureParams)
+        {
+            UTexture* TextureValue = nullptr;
+            mainMaterial->GetTextureParameterValue(param, TextureValue);
+
+            if (!TextureValue) { continue; }
             
-            USubstanceGraphInstance* newGraph = overlay.SubstanceGraph->Duplicate();
-
-            if (!newGraph) { continue; }
-            
-            newGraph->ConditionalPostLoad();
-
-            newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
-
-            newGraph->CreateOutputs();
-
-            TArray<FString> outputNames = newGraph->GetOutputNames();
-            for (const FString& outputName : outputNames)
+            for (auto& OutputPair : graph->OutputInstances)
             {
-                newGraph->EnableOutput(outputName, true);
+                USubstanceOutputData* OutputData = OutputPair.Value;
+                if (!OutputData) { continue; }
+
+                UTexture2D* OutputTexture = Cast<UTexture2D>(OutputData->GetData());
+                if (!OutputTexture || OutputTexture != TextureValue) { continue; }
+                
+                SubstanceAir::OutputInstance* OutputInstance = Substance::Helpers::GetSubstanceOutputByID(graph, OutputPair.Key);
+
+                if (!OutputInstance) { break; }
+
+                FString OutputIdentifier = FString(OutputInstance->mDesc.mIdentifier.c_str());
+                mapping.Add(param.Name, OutputIdentifier);
+
+                break;
             }
-
-            newGraph->SetInputInt("$randomseed", TArray<int32>{  FMath::RandRange(0, 100000) });
-            newGraph->ApplyPreset(TEXT("DEFAULT"));
-            newGraph->RenderSync();
-
-            FSubstanceMaterialConfig* FoundConfig = nullptr;
-            UMaterialInterface* OverlayParentMaterial = nullptr;
-
-            if (overlay.Material)
-            {
-                UMaterialInstance* MatInstance = Cast<UMaterialInstance>(overlay.Material);
-                if (MatInstance && MatInstance->Parent)
-                {
-                    OverlayParentMaterial = MatInstance->Parent;
-                }
-            }
-
-            if (_substanceConfigTable && OverlayParentMaterial)
-            {
-                TArray<FName> RowNames = _substanceConfigTable->GetRowNames();
-
-                for (const FName& ConfigRowName : RowNames)
-                {
-                    FSubstanceMaterialConfig* Config = _substanceConfigTable->FindRow<FSubstanceMaterialConfig>(ConfigRowName, TEXT(""));
-                    if (Config && Config->ParentMaterial == OverlayParentMaterial)
-                    {
-                        FoundConfig = Config;
-                        break;
-                    }
-                }
-            }
-
-            if (FoundConfig && FoundConfig->TextureMappings.Num() > 0)
-            {
-                for (const FSubstanceTextureMapping& Mapping : FoundConfig->TextureMappings)
-                {
-                    for (auto& OutputPair : newGraph->OutputInstances)
-                    {
-                        USubstanceOutputData* OutputData = OutputPair.Value;
-                        if (OutputData)
-                        {
-                            UObject* DataObject = OutputData->GetData();
-                            UTexture2D* OutputTexture = Cast<UTexture2D>(DataObject);
-
-                            if (OutputTexture)
-                            {
-                                FString TextureName = OutputTexture->GetName().ToLower();
-                                if (TextureName.Contains(Mapping.SubstanceOutputName.ToLower()))
-                                {
-                                    if (element->DynamicMaterial)
-                                    {
-                                        element->DynamicMaterial->SetTextureParameterValue(Mapping.MaterialParameterName, OutputTexture);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            element->SubstanceInstance = newGraph;
         }
     }
+
+    if (mapping.Num() == 0) { return newGraph; }
+
+    for (auto& map : mapping)
+    {
+        FName ParamName = map.Key;
+        FString OutputIdentifier = map.Value;
+
+        for (auto& OutputPair : newGraph->OutputInstances)
+        {
+            USubstanceOutputData* OutputData = OutputPair.Value;
+            if (!OutputData) { continue; }
+            
+            UTexture2D* OutputTexture = Cast<UTexture2D>(OutputData->GetData());
+            if (!OutputTexture) { continue; }
+           
+            SubstanceAir::OutputInstance* OutputInstance = Substance::Helpers::GetSubstanceOutputByID(newGraph, OutputPair.Key);
+            if (!OutputInstance) { continue; }
+            
+            FString NewOutputIdentifier = FString(OutputInstance->mDesc.mIdentifier.c_str());
+            if (NewOutputIdentifier != OutputIdentifier) { continue; }
+            
+            dimMaterial->SetTextureParameterValue(ParamName, OutputTexture);
+
+            break;
+        }
+    }
+
+    return newGraph;
 }
 
 void USymptomViewerLogic::ShowBodyPart(const EBodyPart& partType)
@@ -306,7 +324,8 @@ FVisualOverlayPoolEntry* USymptomViewerLogic::GetPoolEntry(UStaticMeshComponent*
 
             if (root && entry.MeshComponent)
             {
-                entry.MeshComponent->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+                entry.MeshComponent->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
+                entry.MeshComponent->SetStaticMesh(root->GetStaticMesh());
             }
 
             return &entry;
@@ -323,6 +342,7 @@ FVisualOverlayPoolEntry* USymptomViewerLogic::GetPoolEntry(UStaticMeshComponent*
     if (root)
     {
         newEntry.MeshComponent->SetupAttachment(root);
+        newEntry.MeshComponent->SetStaticMesh(root->GetStaticMesh());
     }
     newEntry.MeshComponent->RegisterComponent();
 

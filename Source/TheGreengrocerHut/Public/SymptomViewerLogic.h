@@ -40,7 +40,7 @@ public:
 	virtual void BeginDestroy() override;
 
 	UFUNCTION(BlueprintCallable)
-	void InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable, UDataTable* substanceConfigTable);
+	void InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable);
 
 	UFUNCTION(BlueprintCallable)
 	void SetNewSymptoms(const TArray<FName>& symptomNames);
@@ -51,12 +51,14 @@ private:
 	void Reset();
 	FVisualOverlayPoolEntry* GetPoolEntry(UStaticMeshComponent* root, UMaterialInterface* material);
 
+	USubstanceGraphInstance* CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial);
+
 	const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> SelectBodySymptomsByType(const TArray<FSymptomRow>& symptoms);
 
 	UStaticMeshComponent* _rootMesh = nullptr;
+
 	UDataTable* _symptomsTable;
 	UDataTable* _defaultBodyPartTable;
-	UDataTable* _substanceConfigTable;
 
 	TMap<EBodyPart, FBodyPartData> _bodyParts;
 	TArray<FVisualOverlayPoolEntry> _pool;
