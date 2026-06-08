@@ -3,6 +3,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "SubstanceGraphInstance.h"
 #include "SubstanceOutputData.h"
+#include "SubstanceConfigLibrary.h"
 
 void USymptomViewerLogic::BeginDestroy()
 {
@@ -30,11 +31,12 @@ void USymptomViewerLogic::BeginDestroy()
 	Super::BeginDestroy();
 }
 
-void USymptomViewerLogic::InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable)
+void USymptomViewerLogic::InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable, UDataTable* substanceConfigTable)
 {
 	_rootMesh = rootMesh;
 	_symptomsTable = symptomsTable;
 	_defaultBodyPartTable = defaultBodyPartTable;
+    _substanceConfigTable = substanceConfigTable;
 }
 
 void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
@@ -117,89 +119,96 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
         {
             FVisualOverlayPoolEntry* element = GetPoolEntry(bodyData->BaseMeshComp, overlay.Material);
 
-            if (element && element->MeshComponent)
+            if (!element || !element->MeshComponent) { continue; }
+            
+            element->MeshComponent->SetStaticMesh(meshToUse);
+            element->MeshComponent->SetVisibility(false);
+
+            if (element->DynamicMaterial)
             {
-                element->MeshComponent->SetStaticMesh(meshToUse);
-                element->MeshComponent->SetVisibility(false);
+                element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Chanel")), TextureChannelToVector4(overlay.LayerChannel));
+                element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
+            }
 
-                if (element->DynamicMaterial)
+            if (!overlay.SubstanceGraph) { continue; }
+            
+            USubstanceGraphInstance* newGraph = overlay.SubstanceGraph->Duplicate();
+
+            if (!newGraph) { continue; }
+            
+            newGraph->ConditionalPostLoad();
+
+            newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
+
+            newGraph->CreateOutputs();
+
+            TArray<FString> outputNames = newGraph->GetOutputNames();
+            for (const FString& outputName : outputNames)
+            {
+                newGraph->EnableOutput(outputName, true);
+            }
+
+            newGraph->SetInputInt("$randomseed", TArray<int32>{  FMath::RandRange(0, 100000) });
+            newGraph->ApplyPreset(TEXT("DEFAULT"));
+            newGraph->RenderSync();
+
+            FSubstanceMaterialConfig* FoundConfig = nullptr;
+            UMaterialInterface* OverlayParentMaterial = nullptr;
+
+            if (overlay.Material)
+            {
+                UMaterialInstance* MatInstance = Cast<UMaterialInstance>(overlay.Material);
+                if (MatInstance && MatInstance->Parent)
                 {
-                    element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Chanel")), TextureChannelToVector4(overlay.LayerChannel));
-                    element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
+                    OverlayParentMaterial = MatInstance->Parent;
                 }
+            }
 
-                if (overlay.SubstanceGraph)
+            if (_substanceConfigTable && OverlayParentMaterial)
+            {
+                TArray<FName> RowNames = _substanceConfigTable->GetRowNames();
+
+                for (const FName& ConfigRowName : RowNames)
                 {
-                    USubstanceGraphInstance* newGraph = overlay.SubstanceGraph->Duplicate();
-
-                    if (newGraph)
+                    FSubstanceMaterialConfig* Config = _substanceConfigTable->FindRow<FSubstanceMaterialConfig>(ConfigRowName, TEXT(""));
+                    if (Config && Config->ParentMaterial == OverlayParentMaterial)
                     {
-                        newGraph->ConditionalPostLoad();
+                        FoundConfig = Config;
+                        break;
+                    }
+                }
+            }
 
-                        newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
-
-                        newGraph->CreateOutputs();
-
-                        TArray<FString> outputNames = newGraph->GetOutputNames();
-
-                        for (const FString& outputName : outputNames)
+            if (FoundConfig && FoundConfig->TextureMappings.Num() > 0)
+            {
+                for (const FSubstanceTextureMapping& Mapping : FoundConfig->TextureMappings)
+                {
+                    for (auto& OutputPair : newGraph->OutputInstances)
+                    {
+                        USubstanceOutputData* OutputData = OutputPair.Value;
+                        if (OutputData)
                         {
-                            newGraph->EnableOutput(outputName, true);
-                        }
+                            UObject* DataObject = OutputData->GetData();
+                            UTexture2D* OutputTexture = Cast<UTexture2D>(DataObject);
 
-                        int32 RandomSeed = FMath::RandRange(0, 100000000);
-                        newGraph->SetInputInt("$randomseed", TArray<int32>{ RandomSeed });
-
-                        newGraph->ApplyPreset(TEXT("DEFAULT"));
-
-                        newGraph->RenderSync();
-
-                        TMap<FString, FName> Mapping;
-                        Mapping.Add(TEXT("basecolor"), FName(TEXT("BaseColor")));
-                        Mapping.Add(TEXT("normal"), FName(TEXT("Normal")));
-                        Mapping.Add(TEXT("roughness"), FName(TEXT("Roughness")));
-
-                        UE_LOG(LogTemp, Error, TEXT("    [SUBSTANCE] OutputInstances.Num(): %d"), newGraph->OutputInstances.Num());
-
-                        for (const FString& outputName : outputNames)
-                        {
-                            FString outputNameLower = outputName.ToLower();
-
-                            FName* OurParamName = Mapping.Find(outputNameLower);
-
-                            if (OurParamName)
+                            if (OutputTexture)
                             {
-                                for (auto& OutputPair : newGraph->OutputInstances)
+                                FString TextureName = OutputTexture->GetName().ToLower();
+                                if (TextureName.Contains(Mapping.SubstanceOutputName.ToLower()))
                                 {
-                                    USubstanceOutputData* OutputData = OutputPair.Value;
-                                    if (OutputData)
+                                    if (element->DynamicMaterial)
                                     {
-                                        UObject* DataObject = OutputData->GetData();
-                                        UTexture2D* OutputTexture = Cast<UTexture2D>(DataObject);
-
-                                        if (OutputTexture)
-                                        {
-                                            FString TextureName = OutputTexture->GetName().ToLower();
-                                            if (TextureName.Contains(outputNameLower))
-                                            {
-                                                if (element->DynamicMaterial)
-                                                {
-                                                    element->DynamicMaterial->SetTextureParameterValue(*OurParamName, OutputTexture);
-                                                }
-                                                break;
-                                            }
-                                        }
+                                        element->DynamicMaterial->SetTextureParameterValue(Mapping.MaterialParameterName, OutputTexture);
                                     }
+                                    break;
                                 }
                             }
                         }
-
-                        element->SubstanceInstance = newGraph;
                     }
                 }
-
-                bodyData->OverlayEntries.Add(element);
             }
+
+            element->SubstanceInstance = newGraph;
         }
     }
 }

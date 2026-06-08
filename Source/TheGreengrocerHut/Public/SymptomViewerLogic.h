@@ -40,7 +40,7 @@ public:
 	virtual void BeginDestroy() override;
 
 	UFUNCTION(BlueprintCallable)
-	void InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable*  defaultBodyPartTable);
+	void InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable, UDataTable* substanceConfigTable);
 
 	UFUNCTION(BlueprintCallable)
 	void SetNewSymptoms(const TArray<FName>& symptomNames);
@@ -56,6 +56,7 @@ private:
 	UStaticMeshComponent* _rootMesh = nullptr;
 	UDataTable* _symptomsTable;
 	UDataTable* _defaultBodyPartTable;
+	UDataTable* _substanceConfigTable;
 
 	TMap<EBodyPart, FBodyPartData> _bodyParts;
 	TArray<FVisualOverlayPoolEntry> _pool;
