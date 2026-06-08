@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "SympromsStructs.h"
+#include "SubstanceCoreHelpers.h"
 #include "SymptomViewerLogic.generated.h"
 
 struct FVisualOverlayPoolEntry
@@ -10,7 +11,6 @@ struct FVisualOverlayPoolEntry
 	bool bIsInUse = false;
 
 	UStaticMeshComponent* MeshComponent = nullptr;
-
 	UMaterialInstanceDynamic* DynamicMaterial = nullptr;
 
 	USubstanceGraphInstance* SubstanceInstance = nullptr;
@@ -47,6 +47,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ShowBodyPart(const EBodyPart& partType);
+
 private:
 	void Reset();
 	FVisualOverlayPoolEntry* GetPoolEntry(UStaticMeshComponent* root, UMaterialInterface* material);
@@ -62,4 +63,11 @@ private:
 
 	TMap<EBodyPart, FBodyPartData> _bodyParts;
 	TArray<FVisualOverlayPoolEntry> _pool;
+	
+private:
+	void RenderTick();
+
+	FTimerHandle _renderTimerHandle;
+
+	TArray<USubstanceGraphInstance*> _toRender;
 };

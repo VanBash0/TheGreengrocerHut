@@ -1,41 +1,49 @@
 #include "SymptomViewerLogic.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+
 #include "SubstanceGraphInstance.h"
 #include "SubstanceOutputData.h"
 #include "SubstanceCoreHelpers.h"
-#include "SubstanceConfigLibrary.h"
 
 void USymptomViewerLogic::BeginDestroy()
 {
-	for (FVisualOverlayPoolEntry& entry : _pool)
-	{
-		if (entry.SubstanceInstance)
-		{
-			entry.SubstanceInstance->ConditionalBeginDestroy();
-			entry.SubstanceInstance = nullptr;
-		}
+    UWorld* World = GEngine->GetWorldFromContextObject(_rootMesh, EGetWorldErrorMode::LogAndReturnNull);
+    if (World)
+    {
+        World->GetTimerManager().ClearTimer(_renderTimerHandle);
+    }
+
+    for (FVisualOverlayPoolEntry& entry : _pool)
+    {
+        if (entry.SubstanceInstance)
+        {
+            entry.SubstanceInstance->ConditionalBeginDestroy();
+            entry.SubstanceInstance = nullptr;
+        }
 
         if (entry.MeshComponent)
         {
             entry.MeshComponent->ConditionalBeginDestroy();
             entry.MeshComponent = nullptr;
         }
-	}
+    }
 
-	for (auto& kv : _bodyParts)
-	{
-		if (kv.Value.BaseMeshComp)
-		{
-			kv.Value.BaseMeshComp->ConditionalBeginDestroy();
-			kv.Value.BaseMeshComp = nullptr;
-		}
-	}
+    for (auto& kv : _bodyParts)
+    {
+        if (kv.Value.BaseMeshComp)
+        {
+            kv.Value.BaseMeshComp->ConditionalBeginDestroy();
+            kv.Value.BaseMeshComp = nullptr;
+        }
+    }
 
-	_bodyParts.Empty();
-	_pool.Empty();
+    _bodyParts.Empty();
+    _pool.Empty();
+    _toRender.Empty();
 
-	Super::BeginDestroy();
+    Super::BeginDestroy();
 }
 
 void USymptomViewerLogic::InitializePool(UStaticMeshComponent* rootMesh, UDataTable* symptomsTable, UDataTable* defaultBodyPartTable)
@@ -87,7 +95,7 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
         }
     }
 
-    TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> graphToRender;
+    _toRender.Empty();
 
     for (int partIndex = 1; partIndex < (int)EBodyPart::MAX; partIndex++)
     {
@@ -137,9 +145,9 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
 
             USubstanceGraphInstance* newGraph = CopyGraphAndSetMaterial(overlay.SubstanceGraph, overlay.Material, element->DynamicMaterial);
 
-            if (newGraph && newGraph->Instance)
+            if (newGraph)
             {
-                graphToRender.Add(newGraph->Instance);
+                _toRender.Add(newGraph);
                 element->SubstanceInstance = newGraph;
             }
         }
@@ -147,7 +155,73 @@ void USymptomViewerLogic::SetNewSymptoms(const TArray<FName>& symptomNames)
         bodyData->Hide();
     }
 
-    Substance::Helpers::RenderSync(graphToRender, true);
+    TArray<SubstanceAir::GraphInstanceSPtr> toAsync;
+    for (const auto& g : _toRender) { toAsync.Add(g->Instance); }
+    Substance::Helpers::RenderAsync(toAsync);
+
+    if (!_toRender.IsEmpty())
+    {
+        UWorld* World = GEngine->GetWorldFromContextObject(_rootMesh, EGetWorldErrorMode::LogAndReturnNull);
+        if (World)
+        {
+            FTimerDelegate Del;
+            Del.BindLambda([this]() { this->RenderTick(); });
+            World->GetTimerManager().SetTimer(_renderTimerHandle, Del, 0.001f, true);
+        }
+    }
+}
+
+void USymptomViewerLogic::RenderTick()
+{
+    if (_toRender.IsEmpty())
+    {
+        UWorld* World = GEngine->GetWorldFromContextObject(_rootMesh, EGetWorldErrorMode::LogAndReturnNull);
+        if (World)
+        {
+            World->GetTimerManager().ClearTimer(_renderTimerHandle);
+        }
+        return;
+    }
+
+    TArray<USubstanceGraphInstance*> completed;
+
+    for (USubstanceGraphInstance* graph : _toRender)
+    {
+        if (!graph || !graph->Instance) { continue; }
+
+        bool ready = false;
+        for (auto& pair : graph->OutputInstances)
+        {
+            if (!pair.Value) { continue; }
+
+            UTexture2D* tex = Cast<UTexture2D>(pair.Value->GetData());
+            if (tex && tex->GetPlatformData() && tex->GetPlatformData()->Mips.Num() > 4)
+            {
+                ready = true;
+                break;
+            }
+        }
+
+        if (ready) completed.Add(graph);
+    }
+
+    for (USubstanceGraphInstance* graph : completed)
+    {
+        for (auto& pair : graph->OutputInstances)
+        {
+            SubstanceAir::OutputInstance* output = Substance::Helpers::GetSubstanceOutputByID(graph, pair.Key);
+            if (output)
+            {
+                output->flagAsDirty();
+            }
+        }
+
+        TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> singleGraph;
+        singleGraph.Add(graph->Instance);
+        Substance::Helpers::RenderSync(singleGraph, true);
+
+        _toRender.Remove(graph);
+    }
 }
 
 USubstanceGraphInstance* USymptomViewerLogic::CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial)
@@ -233,6 +307,68 @@ USubstanceGraphInstance* USymptomViewerLogic::CopyGraphAndSetMaterial(USubstance
 
 void USymptomViewerLogic::ShowBodyPart(const EBodyPart& partType)
 {
+    FBodyPartData* activeBodyData = _bodyParts.Find(partType);
+    if (activeBodyData)
+    {
+        TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> graphsToForceRender;
+
+        for (FVisualOverlayPoolEntry* entry : activeBodyData->OverlayEntries)
+        {
+            if (!entry || !entry->SubstanceInstance || !entry->SubstanceInstance->Instance) { continue; }
+
+            if (_toRender.Contains(entry->SubstanceInstance))
+            {
+                graphsToForceRender.Add(entry->SubstanceInstance->Instance);
+            }
+        }
+
+        if (graphsToForceRender.Num() > 0)
+        {
+            for (auto& graph : graphsToForceRender)
+            {
+                for (int32 i = _toRender.Num() - 1; i >= 0; --i)
+                {
+                    if (_toRender[i] && _toRender[i]->Instance == graph)
+                    {
+                        _toRender.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
+            for (auto& graph : graphsToForceRender)
+            {
+                USubstanceGraphInstance* substanceGraph = nullptr;
+                for (auto& kv : _bodyParts)
+                {
+                    for (FVisualOverlayPoolEntry* entry : kv.Value.OverlayEntries)
+                    {
+                        if (entry && entry->SubstanceInstance && entry->SubstanceInstance->Instance == graph)
+                        {
+                            substanceGraph = entry->SubstanceInstance;
+                            break;
+                        }
+                    }
+                    if (substanceGraph) break;
+                }
+
+                if (substanceGraph)
+                {
+                    for (auto& pair : substanceGraph->OutputInstances)
+                    {
+                        SubstanceAir::OutputInstance* output = Substance::Helpers::GetSubstanceOutputByID(substanceGraph, pair.Key);
+                        if (output)
+                        {
+                            output->flagAsDirty();
+                        }
+                    }
+                }
+            }
+
+            Substance::Helpers::RenderSync(graphsToForceRender, true);
+        }
+    }
+
     for (auto& kv : _bodyParts)
     {
         if (kv.Key == partType)
@@ -274,33 +410,41 @@ const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> USy
 
 void USymptomViewerLogic::Reset()
 {
-	for (FVisualOverlayPoolEntry& entry : _pool)
-	{
-		entry.bIsInUse = false;
+    UWorld* World = GEngine->GetWorldFromContextObject(_rootMesh, EGetWorldErrorMode::LogAndReturnNull);
+    if (World)
+    {
+        World->GetTimerManager().ClearTimer(_renderTimerHandle);
+    }
 
-		if (entry.DynamicMaterial)
-		{
-			entry.DynamicMaterial->MarkAsGarbage();
-			entry.DynamicMaterial = nullptr;
-		}
+    for (FVisualOverlayPoolEntry& entry : _pool)
+    {
+        entry.bIsInUse = false;
 
-		if (entry.MeshComponent)
-		{
-			entry.MeshComponent->SetVisibility(false);
-			entry.MeshComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		}
+        if (entry.DynamicMaterial)
+        {
+            entry.DynamicMaterial->MarkAsGarbage();
+            entry.DynamicMaterial = nullptr;
+        }
 
-		if (entry.SubstanceInstance)
-		{
-			entry.SubstanceInstance->MarkAsGarbage();
-			entry.SubstanceInstance = nullptr;
-		}
-	}
+        if (entry.MeshComponent)
+        {
+            entry.MeshComponent->SetVisibility(false);
+            entry.MeshComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+        }
 
-	for (auto& kv : _bodyParts)
-	{
-		kv.Value.OverlayEntries.Empty();
-	}
+        if (entry.SubstanceInstance)
+        {
+            entry.SubstanceInstance->MarkAsGarbage();
+            entry.SubstanceInstance = nullptr;
+        }
+    }
+
+    for (auto& kv : _bodyParts)
+    {
+        kv.Value.OverlayEntries.Empty();
+    }
+
+    _toRender.Empty();
 }
 
 FVisualOverlayPoolEntry* USymptomViewerLogic::GetPoolEntry(UStaticMeshComponent* root, UMaterialInterface* material)
