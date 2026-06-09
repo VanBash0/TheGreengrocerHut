@@ -201,67 +201,7 @@ void ASymptomViewer::SetNewSymptoms(const TArray<FName>& symptomNames)
 
 void ASymptomViewer::ShowBodyPart(const EBodyPart& partType)
 {
-    FBodyPartData* activeBodyData = _bodyParts.Find(partType);
-    if (activeBodyData)
-    {
-        TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> graphsToForceRender;
-
-        for (FVisualOverlayPoolEntry* entry : activeBodyData->OverlayEntries)
-        {
-            if (!entry || !entry->SubstanceInstance || !entry->SubstanceInstance->Instance) { continue; }
-
-            if (_toRender.Contains(entry->SubstanceInstance))
-            {
-                graphsToForceRender.Add(entry->SubstanceInstance->Instance);
-            }
-        }
-
-        if (graphsToForceRender.Num() > 0)
-        {
-            for (auto& graph : graphsToForceRender)
-            {
-                for (int32 i = _toRender.Num() - 1; i >= 0; --i)
-                {
-                    if (_toRender[i] && _toRender[i]->Instance == graph)
-                    {
-                        _toRender.RemoveAt(i);
-                        break;
-                    }
-                }
-            }
-
-            for (auto& graph : graphsToForceRender)
-            {
-                USubstanceGraphInstance* substanceGraph = nullptr;
-                for (auto& kv : _bodyParts)
-                {
-                    for (FVisualOverlayPoolEntry* entry : kv.Value.OverlayEntries)
-                    {
-                        if (entry && entry->SubstanceInstance && entry->SubstanceInstance->Instance == graph)
-                        {
-                            substanceGraph = entry->SubstanceInstance;
-                            break;
-                        }
-                    }
-                    if (substanceGraph) break;
-                }
-
-                if (substanceGraph)
-                {
-                    for (auto& pair : substanceGraph->OutputInstances)
-                    {
-                        SubstanceAir::OutputInstance* output = Substance::Helpers::GetSubstanceOutputByID(substanceGraph, pair.Key);
-                        if (output)
-                        {
-                            output->flagAsDirty();
-                        }
-                    }
-                }
-            }
-
-            Substance::Helpers::RenderSync(graphsToForceRender, true);
-        }
-    }
+    if (IsRendering()) { return; }
 
     for (auto& kv : _bodyParts)
     {
