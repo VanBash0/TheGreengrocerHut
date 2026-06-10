@@ -12,8 +12,13 @@ ASymptomViewer::ASymptomViewer()
 {
     PrimaryActorTick.bCanEverTick = false;
 
-    CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SYMPTOM_ROOT"));
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
+
+    SymptomRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT_SYMPTOM"));
+    SymptomRoot->SetupAttachment(RootComponent);
+    SymptomRoot->SetRelativeLocation(FVector::ZeroVector);
+    SymptomRoot->SetRelativeRotation(FRotator::ZeroRotator);
+
 }
 
 void ASymptomViewer::BeginPlay()
@@ -83,7 +88,7 @@ void ASymptomViewer::InitializeViewer()
         FBodyPartData bodyData = {};
         bodyData.BaseMeshComp = NewObject<UStaticMeshComponent>(this);
         bodyData.BaseMeshComp->SetCastShadow(false);
-        bodyData.BaseMeshComp->SetupAttachment(RootComponent);
+        bodyData.BaseMeshComp->SetupAttachment(SymptomRoot);
         bodyData.BaseMeshComp->RegisterComponent();
         bodyData.BaseMeshComp->SetVisibility(false);
 
@@ -418,15 +423,13 @@ FVisualOverlayPoolEntry* ASymptomViewer::GetPoolEntry(UStaticMeshComponent* root
 //RENDERER
 void ASymptomViewer::RenderTick()
 {
-    UE_LOG(LogTemp, Error, TEXT("TICK"));
-
     if (_toRender.IsEmpty())
     {
         if (GetWorld())
         {
             GetWorld()->GetTimerManager().ClearTimer(_renderTimerHandle);
         }
-        UE_LOG(LogTemp, Error, TEXT("READY"));
+
         OnRenderComplete.Broadcast();
 
         return;

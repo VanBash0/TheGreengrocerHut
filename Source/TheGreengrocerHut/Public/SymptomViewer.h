@@ -66,6 +66,9 @@ public:
     UDataTable* DefaultBodyPartTable;
 
 public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Symptom Viewer")
+    USceneComponent* SymptomRoot;
+
     UPROPERTY(BlueprintAssignable, Category = "Symptom Viewer|Events", meta = (DisplayName = "On Render Complete", ToolTip = "Fires when all Substance textures are fully rendered and ready"))
     FOnRenderComplete OnRenderComplete;
 
