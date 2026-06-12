@@ -98,7 +98,7 @@ void ASymptomViewer::InitializeViewer()
     UE_LOG(LogTemp, Error, TEXT("Viewer initialized with %d body parts"), _bodyParts.Num());
 }
 
-void ASymptomViewer::SetNewSymptoms(const TArray<FName>& symptomNames)
+void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
 {
     Reset();
 
@@ -117,7 +117,7 @@ void ASymptomViewer::SetNewSymptoms(const TArray<FName>& symptomNames)
     FString ContextString = TEXT("Getting Symptom Data");
     TMap<EBodyPart, TArray<FSymptomRow>> symptomsByPart;
 
-    for (const FName& name : symptomNames)
+    for (const FName& name : newClient.Symptoms)
     {
         if (FSymptomRow* symptom = SymptomsTable->FindRow<FSymptomRow>(name, ContextString))
         {
@@ -204,13 +204,13 @@ void ASymptomViewer::SetNewSymptoms(const TArray<FName>& symptomNames)
     }
 }
 
-void ASymptomViewer::ShowBodyPart(const EBodyPart& partType)
+void ASymptomViewer::ShowBodyPart_Implementation(const EBodyPart& PartType)
 {
     if (IsRendering()) { return; }
 
     for (auto& kv : _bodyParts)
     {
-        if (kv.Key == partType)
+        if (kv.Key == PartType)
         {
             kv.Value.Show();
         }

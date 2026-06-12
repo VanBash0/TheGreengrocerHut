@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "SympromsStructs.h"
+#include "ClientStruct.h"
 #include "SubstanceCoreHelpers.h"
 #include "SymptomViewer.generated.h"
 
@@ -46,11 +47,13 @@ public:
     virtual void BeginDestroy() override;
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Symptom Viewer")
-    void SetNewSymptoms(const TArray<FName>& SymptomNames);
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Symptom Viewer")
+    void SetNewSymptoms(const FClient& newClient);
+    virtual void SetNewSymptoms_Implementation(const FClient& newClient);
 
-    UFUNCTION(BlueprintCallable, Category = "Symptom Viewer")
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Symptom Viewer")
     void ShowBodyPart(const EBodyPart& PartType);
+    virtual void ShowBodyPart_Implementation(const EBodyPart& PartType);
 
     UFUNCTION(BlueprintCallable, Category = "Symptom Viewer")
     void Reset();
