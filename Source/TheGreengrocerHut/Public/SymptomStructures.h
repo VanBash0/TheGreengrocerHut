@@ -6,6 +6,8 @@
 #include "Materials/MaterialInterface.h"
 #include "Engine/StaticMesh.h"
 
+#include "IngredientStructures.h"
+
 #define SUBSTANCE_FRAMEWORK_INCLUDED
 #include "SubstanceGraphInstance.h"
 #include "SymptomStructures.generated.h"
@@ -100,6 +102,18 @@ struct FSymptomRow : public FTableRowBase
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Type", MakeStructureDefaultValue = "NewEnumerator0"))
     EBodyPart Type;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FText Name;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FText Description;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TObjectPtr<UTexture2D> Icon;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "IngredientFunctionLibrary.GetIngredientRowNames"))
+    FName IngredientRowName;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExcludeBaseStruct))
     TInstancedStruct<FVisualBase> Visual;
