@@ -112,8 +112,8 @@ struct FSymptomRow : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TObjectPtr<UTexture2D> Icon;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "IngredientFunctionLibrary.GetIngredientRowNames"))
-    FName IngredientRowName;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FIngredientRowNameRef IngredientRow;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExcludeBaseStruct))
     TInstancedStruct<FVisualBase> Visual;
