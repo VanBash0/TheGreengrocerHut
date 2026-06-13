@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/DataTable.h"
-#include "IngredientContainer.generated.h"
+#include "IngredientStructures.generated.h"
 
 UCLASS(BlueprintType)
 class UIngredientContainer : public UDataAsset

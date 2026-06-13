@@ -8,7 +8,7 @@
 
 #define SUBSTANCE_FRAMEWORK_INCLUDED
 #include "SubstanceGraphInstance.h"
-#include "SympromsStructs.generated.h"
+#include "SymptomStructures.generated.h"
 
 UENUM(BlueprintType, Meta = (Bitflags = "true", UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETextureChannel : uint8

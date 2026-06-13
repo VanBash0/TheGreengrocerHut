@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "SympromsStructs.h"
+#include "SymptomStructures.h"
 #include "ClientStruct.h"
 #include "SubstanceCoreHelpers.h"
 #include "SymptomViewer.generated.h"
