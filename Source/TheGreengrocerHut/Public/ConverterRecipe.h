@@ -14,6 +14,7 @@ struct FConverterRecipe
 
     UPROPERTY(BlueprintReadWrite)
     FIngredient To;
+
     UPROPERTY(BlueprintReadWrite)
     int UseAmount = 0;
 };
