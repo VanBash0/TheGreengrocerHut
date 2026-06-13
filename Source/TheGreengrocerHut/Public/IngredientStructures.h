@@ -62,3 +62,12 @@ struct FIngredient : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Ingredient")
     FTermsOfUse TermsOfUse;
 };
+
+USTRUCT(BlueprintType)
+struct FIngredientRowNameRef
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName RowName;
+};
