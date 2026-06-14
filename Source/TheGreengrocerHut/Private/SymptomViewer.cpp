@@ -147,7 +147,7 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
         else
         {
             FName RowName = FName(StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType));
-            FBodyPart* tableRow = DefaultBodyPartTable->FindRow<FBodyPart>(RowName, TEXT("GetBodyPart"));
+            FDefaultBodyPart* tableRow = DefaultBodyPartTable->FindRow<FDefaultBodyPart>(RowName, TEXT("GetBodyPart"));
             if (tableRow)
             {
                 meshToUse = tableRow->Mesh;

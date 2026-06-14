@@ -51,18 +51,29 @@ enum class EBodyPart : uint8
 ENUM_CLASS_FLAGS(EBodyPart)
 
 USTRUCT(BlueprintType)
-struct FBodyPart : public FTableRowBase
+struct FBodyPartViewData : public FTableRowBase
 {
     GENERATED_BODY()
-public:
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Type", MakeStructureDefaultValue = "NewEnumerator0"))
-    EBodyPart Type;
 
+public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Mesh", MakeStructureDefaultValue = "None"))
     TObjectPtr<UStaticMesh> Mesh;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "RGB_Mask", MakeStructureDefaultValue = "None"))
     TObjectPtr<UTexture2D> RGB_Mask;
+};
+
+USTRUCT(BlueprintType)
+struct FDefaultBodyPart : public FBodyPartViewData
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Type", MakeStructureDefaultValue = "NewEnumerator0"))
+    EBodyPart Type;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TObjectPtr<UTexture2D> Icon;
 };
 
 USTRUCT(BlueprintType)
@@ -92,7 +103,7 @@ struct FVisualDeformation : public FVisualBase
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FBodyPart OverrideBody;
+    FBodyPartViewData OverrideBody;
 };
 
 USTRUCT(BlueprintType)
