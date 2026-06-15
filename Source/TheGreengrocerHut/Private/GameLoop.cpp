@@ -4,6 +4,12 @@
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
+
+    const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
+    if (ProjectSettings)
+    {
+        GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
+    }
 }
 
 void UGameLoop::Deinitialize()
@@ -53,11 +59,9 @@ void UGameLoop::TriggerStateEvent(EGameState State)
     }
 }
 
-void UGameLoop::SetNewState(const EGameState& NewState)
+void UGameLoop::SetNewState(EGameState NewState)
 {
-    if (NewState == CurrentState) {
-        return;
-    }
+    if (NewState == CurrentState) { return; }
 
     CurrentState = NewState;
     OnGameStateChanged.Broadcast();

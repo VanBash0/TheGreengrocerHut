@@ -25,6 +25,13 @@ void ASymptomViewer::BeginPlay()
 {
     Super::BeginPlay();
 
+    const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
+    if (ProjectSettings)
+    {
+        SymptomsTable = ProjectSettings->SymptomTable.LoadSynchronous();
+        DefaultBodyPartTable = ProjectSettings->DefaultBodyPartTable.LoadSynchronous();
+    }
+
     if (!SymptomsTable || !DefaultBodyPartTable)
     {
         UE_LOG(LogTemp, Error, TEXT("Tables not assigned!"));

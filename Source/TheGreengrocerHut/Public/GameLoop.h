@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Engine/DeveloperSettings.h"
+#include "GameSettings.h"
 #include "GameLoop.generated.h"
 
 UENUM(BlueprintType)
@@ -29,7 +31,7 @@ public:
     virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
     UFUNCTION(BlueprintCallable, Category = "GameLoop")
-    void SetNewState(const EGameState& NewState);
+    void SetNewState(EGameState NewState);
 
     UPROPERTY(BlueprintReadOnly)
     EGameState CurrentState = EGameState::None;
@@ -41,6 +43,10 @@ public:
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnCompleteQuest;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayEnd;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameEnd;
+
+public:
+    UPROPERTY(BlueprintReadOnly, Category = "Settings")
+    TObjectPtr<UGameSettings> GameSettings;
 
 private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;

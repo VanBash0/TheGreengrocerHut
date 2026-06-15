@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "SymptomStructures.h"
 #include "ClientStruct.h"
+#include "GameSettings.h"
 #include "SubstanceCoreHelpers.h"
 #include "SymptomViewer.generated.h"
 
@@ -62,11 +63,11 @@ public:
     bool IsRendering() const { return _toRender.Num() > 0; }
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Symptom Viewer", meta = (ToolTip = "Table containing symptom data rows"))
-    UDataTable* SymptomsTable;
+    UPROPERTY(BlueprintReadOnly, Category = "Settings")
+    TObjectPtr<UDataTable> SymptomsTable;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Symptom Viewer", meta = (ToolTip = "Table containing default body part meshes & masks"))
-    UDataTable* DefaultBodyPartTable;
+    UPROPERTY(BlueprintReadOnly, Category = "Settings")
+    TObjectPtr<UDataTable> DefaultBodyPartTable;
 
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Symptom Viewer")
