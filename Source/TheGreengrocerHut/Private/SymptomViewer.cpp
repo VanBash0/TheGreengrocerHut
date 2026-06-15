@@ -165,7 +165,7 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
 
             if (element->DynamicMaterial)
             {
-                element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Chanel")), TextureChannelToVector4(overlay.LayerChannel));
+                element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Channel")), TextureChannelToVector4(overlay.LayerChannel));
                 element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
             }
 
