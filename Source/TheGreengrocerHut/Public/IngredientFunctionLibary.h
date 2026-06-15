@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "IngredientStructures.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "ConverterRecipe.h"
 #include "IngredientFunctionLibary.generated.h"
 
 UCLASS(BlueprintType)
