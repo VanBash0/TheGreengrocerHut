@@ -9,12 +9,21 @@ struct FConverterRecipe
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadWrite)
-    FIngredient From;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FIngredientRowNameRef From;
 
-    UPROPERTY(BlueprintReadWrite)
-    FIngredient To;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FIngredientRowNameRef To;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int UseAmount = 0;
 };
+
+//USTRUCT(BlueprintType)
+//struct FIngredientArray
+//{
+//    GENERATED_BODY()
+//
+//    UPROPERTY(BlueprintReadonly)
+//    TArray<FName> IngredientNames;
+//};
