@@ -23,13 +23,16 @@ enum class ETextureChannel : uint8
 };
 ENUM_CLASS_FLAGS(ETextureChannel)
 
-inline FVector4 TextureChannelToVector4(ETextureChannel channels)
+inline FVector4 TextureChannelToVector4(const TArray<ETextureChannel>& channels)
 {
+    uint8 mask = 0;
+    for (ETextureChannel c : channels) { mask |= (uint8)c; }
+
     return FVector4(
-        EnumHasAnyFlags(channels, ETextureChannel::R) ? 1.0f : 0.0f,
-        EnumHasAnyFlags(channels, ETextureChannel::G) ? 1.0f : 0.0f, 
-        EnumHasAnyFlags(channels, ETextureChannel::B) ? 1.0f : 0.0f, 
-        EnumHasAnyFlags(channels, ETextureChannel::A) ? 1.0f : 0.0f
+        (mask & 1) ? 1.0f : 0.0f,
+        (mask & 2) ? 1.0f : 0.0f,
+        (mask & 4) ? 1.0f : 0.0f,
+        (mask & 8) ? 1.0f : 0.0f
     );
 }
 
@@ -94,7 +97,7 @@ struct FVisualOverlay : public FVisualBase
     TObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETextureChannel LayerChannel = ETextureChannel::R;
+    TArray<ETextureChannel> LayerChannel = { ETextureChannel::R };
 };
 
 USTRUCT(BlueprintType)
