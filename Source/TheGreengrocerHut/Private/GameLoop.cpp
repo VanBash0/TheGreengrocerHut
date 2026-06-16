@@ -28,10 +28,15 @@ bool UGameLoop::ShouldCreateSubsystem(UObject* Outer) const
 
     FString WorldName = World->GetName();
 
+#if WITH_EDITOR
+    if (WorldName.Contains(TEXT("LOBBY_LEVEL")))
+        return false;
+    return true;
+#else
     if (WorldName.Contains(TEXT("GAME_LEVEL")))
         return true;
-
     return false;
+#endif
 }
 
 const TMap<EGameState, UGameLoop::StateDelegatePtr> UGameLoop::StateEventMap = InitStateEventMap();

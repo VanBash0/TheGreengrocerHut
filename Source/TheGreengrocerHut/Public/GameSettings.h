@@ -42,4 +42,19 @@ class UGameSettings : public UDataAsset
 public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredient/Priority")
     TMap<int32, FPriorityData> IngredientPriorityData;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings",
+        meta = (DisplayName = "Steepness", ToolTip = "Чем больше значение, тем резче переход к генерации большего числа симптомов",
+            ClampMin = "0.0", UIMin = "0.0"))
+    float Steepness;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings",
+        meta = (DisplayName = "Midpoint", ToolTip = "День, в который достигается временная сложность 50%",
+            ClampMin = "1", UIMin = "1"))
+    int Midpoint;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings",
+        meta = (DisplayName = "Max New Symptoms", ToolTip = "Максимальное число новых симптомов, попадающих в пулл дня",
+            ClampMin = "1", UIMin = "1"))
+    int MaxNewSymptoms;
 };
