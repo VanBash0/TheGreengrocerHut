@@ -22,10 +22,13 @@ public:
 private:
     void InitializeVariables(const UGameSettings& GameSettings, const FClientsGeneratorData& ClientsGeneratorData);
     void UpdateSymptomPool();
+    void InitializeClients();
 
-    float InfectionRateNormalized;
-    float ProgressionMultiplier;
-    TArray<FName> UnlockedSymptoms;
-    FClientsGeneratorData GeneratorData;
-    const UGameSettings* SettingsData;
+    TArray<FClient> clients;
+    TArray<FClient> demons;
+
+    float infectionRateNormalized;
+    float progressionMultiplier;
+    FClientsGeneratorData generatorData;
+    const UGameSettings* settingsData;
 };
