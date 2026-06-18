@@ -14,7 +14,7 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 
     ClientsGenerator* clientsGenerator = new ClientsGenerator();
     FClientsGeneratorData data; // ПОМЕНЯТЬ!
-    clientsGenerator->GenerateClients(ProjectSettings, GameSettings, data);
+    clients_ = clientsGenerator->GenerateClients(ProjectSettings, GameSettings, data);
     delete clientsGenerator;
 }
 
@@ -77,4 +77,22 @@ void UGameLoop::SetNewState(EGameState NewState)
     CurrentState = NewState;
     OnGameStateChanged.Broadcast();
     TriggerStateEvent(CurrentState);
+}
+
+FClient UGameLoop::GetCurrentClient() const
+{
+    return clients_[currentClientIndex_];
+}
+
+void UGameLoop::IncrementCurrentClient()
+{
+    if (CurrentState == EGameState::WaitForClient) {
+        if (currentClientIndex_ < clients_.Num() - 1) {
+            currentClientIndex_++;
+            SetNewState(EGameState::SpawnClient);
+        }
+        else {
+            SetNewState(EGameState::DayEnd);
+        }
+    }
 }

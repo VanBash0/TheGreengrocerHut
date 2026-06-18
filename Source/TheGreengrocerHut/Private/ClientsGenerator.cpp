@@ -1,8 +1,17 @@
 #include "ClientsGenerator.h"
 #include "SymptomStructures.h"
 
+namespace
+{
+    struct FSymptomCandidate
+    {
+        FName Name;
+        float Weight;
+    };
+}
+
 void ClientsGenerator::InitializeVariables(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
-    const FClientsGeneratorData& ClientsGeneratorData)
+    FClientsGeneratorData& ClientsGeneratorData)
 {
     generatorData = ClientsGeneratorData;
     projectSettings = ProjectSettings;
@@ -49,14 +58,6 @@ void ClientsGenerator::InitializeClients()
     }
 }
 
-void ClientsGenerator::FillSymptoms()
-{
-    int clientsNum = clients.Num();
-    for (int i = 0; i < clientsNum; ++i) {
-        GenerateSymptomsForClient(clients[i]);
-    }
-}
-
 bool ClientsGenerator::TryHandleTutorialDay()
 {
     int tutorialDayCount = projectSettings->TutorialDaysTable->GetRowMap().Num();
@@ -80,17 +81,48 @@ bool ClientsGenerator::TryHandleTutorialDay()
     return false;
 }
 
+void ClientsGenerator::FillSymptoms()
+{
+    int clientsNum = clients.Num();
+    for (int i = 0; i < clientsNum; ++i) {
+        GenerateSymptomsForClient(clients[i]);
+    }
+}
+
 void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
     TArray<FName> occupiedSymptoms;
     TSet<EBodyPart> occupiedParts;
     occupiedParts.Reserve(static_cast<int32>(EBodyPart::MAX));
+    TArray<FSymptomCandidate> symptomCandidates;
     for (auto& symptom : client.Symptoms) {
-        
+        symptomCandidates.Reset();
+        float totalWeight = 0.0f;
+
+        for (const auto& unlockedSymptom : unlockedSymptoms) {
+            auto symptomData = unlockedSymptom.Value;
+            EBodyPart bodyPart = symptomData.BodyPart;
+
+            float currentWeight = symptomData.Weight;
+            if (currentWeight <= 0.0f || occupiedParts.Contains(bodyPart)) {
+                continue;
+            }
+
+            FName symptomName = unlockedSymptom.Key;
+            symptomCandidates.Emplace(symptomName, currentWeight);
+            totalWeight += currentWeight;
+            occupiedParts.Add(bodyPart);
+        }
+
+        if (symptomCandidates.Num() == 0 || totalWeight <= 0.0f) {
+            break;
+        }
+
+
     }
 }
 
 TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
-    const FClientsGeneratorData& ClientsGeneratorData)
+    FClientsGeneratorData& ClientsGeneratorData)
 {
     InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
 

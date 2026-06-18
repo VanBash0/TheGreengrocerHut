@@ -44,13 +44,21 @@ public:
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayEnd;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameEnd;
 
-public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
+
+    UFUNCTION(BlueprintCallable, Category = "GameLoop")
+    FClient GetCurrentClient() const;
+
+    UFUNCTION(BlueprintCallable, Category = "GameLoop")
+    void IncrementCurrentClient();
 
 private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;
     static const TMap<EGameState, StateDelegatePtr> StateEventMap;
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
     void TriggerStateEvent(EGameState State);
+
+    TArray<FClient> clients_;
+    int currentClientIndex_ = 0;
 };
