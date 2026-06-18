@@ -39,10 +39,10 @@ struct FClientsGeneratorData
 class THEGREENGROCERHUT_API ClientsGenerator
 {
 public:
-    TArray<FClient> GenerateClients(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+    TArray<FClient> GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
         const FClientsGeneratorData& ClientsGeneratorData);
 private:
-    void InitializeVariables(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+    void InitializeVariables(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
         const FClientsGeneratorData& ClientsGeneratorData);
     void UpdateSymptomPool();
     void InitializeClients();

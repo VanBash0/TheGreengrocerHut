@@ -1,5 +1,6 @@
 #include "GameLoop.h"
 #include "Engine/World.h"
+#include "ClientsGenerator.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -10,6 +11,11 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     {
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
+
+    ClientsGenerator* clientsGenerator = new ClientsGenerator();
+    FClientsGeneratorData data; // ПОМЕНЯТЬ!
+    clientsGenerator->GenerateClients(ProjectSettings, GameSettings, data);
+    delete clientsGenerator;
 }
 
 void UGameLoop::Deinitialize()

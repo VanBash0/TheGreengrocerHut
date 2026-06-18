@@ -1,12 +1,12 @@
 #include "ClientsGenerator.h"
 #include "SymptomStructures.h"
 
-void ClientsGenerator::InitializeVariables(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+void ClientsGenerator::InitializeVariables(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
     const FClientsGeneratorData& ClientsGeneratorData)
 {
     generatorData = ClientsGeneratorData;
-    projectSettings = &ProjectSettings;
-    gameSettings = &GameSettings;
+    projectSettings = ProjectSettings;
+    gameSettings = GameSettings.Get();
     infectionRateNormalized = (generatorData.InfectionRate + 100.f) / 200.f;
     progressionMultiplier = 1 / (1 + FMath::Exp(-1 * gameSettings->Steepness * (generatorData.DayNumber - gameSettings->Midpoint)));
     unlockedSymptoms = ClientsGeneratorData.UnlockedSymptoms;
@@ -81,10 +81,15 @@ bool ClientsGenerator::TryHandleTutorialDay()
 }
 
 void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
-
+    TArray<FName> occupiedSymptoms;
+    TSet<EBodyPart> occupiedParts;
+    occupiedParts.Reserve(static_cast<int32>(EBodyPart::MAX));
+    for (auto& symptom : client.Symptoms) {
+        
+    }
 }
 
-TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
     const FClientsGeneratorData& ClientsGeneratorData)
 {
     InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
