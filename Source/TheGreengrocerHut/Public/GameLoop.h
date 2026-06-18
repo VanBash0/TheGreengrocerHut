@@ -4,6 +4,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Engine/DeveloperSettings.h"
 #include "GameSettings.h"
+#include "ClientStruct.h"
 #include "GameLoop.generated.h"
 
 UENUM(BlueprintType)
@@ -44,14 +45,19 @@ public:
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayEnd;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameEnd;
 
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
+    FClient GetCurrentClient() const { return clients_[currentClientIndex_]; }
+
+    UFUNCTION(BlueprintCallable, Category = "Client")
+    void IncrementCurrentClient();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
+    bool IsFirstClient() const { return currentClientIndex_ == 0; }
+
+public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
-
-    UFUNCTION(BlueprintCallable, Category = "GameLoop")
-    FClient GetCurrentClient() const;
-
-    UFUNCTION(BlueprintCallable, Category = "GameLoop")
-    void IncrementCurrentClient();
 
 private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;
@@ -59,6 +65,7 @@ private:
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
     void TriggerStateEvent(EGameState State);
 
+private:
     TArray<FClient> clients_;
     int currentClientIndex_ = 0;
 };

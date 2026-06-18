@@ -60,19 +60,27 @@ void ClientsGenerator::InitializeClients()
 
 bool ClientsGenerator::TryHandleTutorialDay()
 {
+    if (!projectSettings || !projectSettings->TutorialDaysTable)
+        return false;
+
     int tutorialDayCount = projectSettings->TutorialDaysTable->GetRowMap().Num();
     if (generatorData.DayNumber <= tutorialDayCount) {
         FName rowName = FName(FString::FromInt(generatorData.DayNumber));
         FTutorialDay* tutorialDayData = projectSettings->TutorialDaysTable->FindRow<FTutorialDay>(rowName, TEXT(""));
+
+        if (!tutorialDayData) return false;
+
         clients = tutorialDayData->Clients;
         unlockedSymptoms.Empty();
         for (auto const& client : clients) {
-            auto symptoms = client.Symptoms;
-            for (auto const& symptom : symptoms) {
+            for (auto const& symptom : client.Symptoms) {
+                if (!projectSettings->SymptomTable) continue;
+                FSymptomRow* symptomRow = projectSettings->SymptomTable->FindRow<FSymptomRow>(symptom, TEXT(""));
+                if (!symptomRow) continue;
+
                 FSymptomWithWeightsData symptomData;
                 symptomData.Weight = 1.0f;
                 symptomData.DemonWeight = 1.0f;
-                FSymptomRow* symptomRow = projectSettings->SymptomTable->FindRow<FSymptomRow>(symptom, TEXT(""));
                 symptomData.BodyPart = symptomRow->Type;
             }
         }

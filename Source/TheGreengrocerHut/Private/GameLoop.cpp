@@ -79,11 +79,6 @@ void UGameLoop::SetNewState(EGameState NewState)
     TriggerStateEvent(CurrentState);
 }
 
-FClient UGameLoop::GetCurrentClient() const
-{
-    return clients_[currentClientIndex_];
-}
-
 void UGameLoop::IncrementCurrentClient()
 {
     if (CurrentState == EGameState::WaitForClient) {

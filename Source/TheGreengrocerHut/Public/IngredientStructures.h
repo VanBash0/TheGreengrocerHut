@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/DataTable.h"
+#include "Sound/SoundCue.h"
 #include "IngredientStructures.generated.h"
 
 UCLASS(BlueprintType)
@@ -18,7 +19,7 @@ public:
 	FTransform DecalTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USoundCue* SFX;
+    TObjectPtr<USoundCue> SFX;
 };
 
 USTRUCT(BlueprintType)
