@@ -1,4 +1,5 @@
 #include "ClientsGenerator.h"
+#include "SymptomStructures.h"
 
 void ClientsGenerator::InitializeVariables(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
     const FClientsGeneratorData& ClientsGeneratorData)
@@ -56,17 +57,36 @@ void ClientsGenerator::FillSymptoms()
 
 bool ClientsGenerator::TryHandleTutorialDay()
 {
-    //if (generatorData.DayNumber )
+    int tutorialDayCount = projectSettings->TutorialDaysTable->GetRowMap().Num();
+    if (generatorData.DayNumber <= tutorialDayCount) {
+        FName rowName = FName(FString::FromInt(generatorData.DayNumber));
+        FTutorialDay* tutorialDayData = projectSettings->TutorialDaysTable->FindRow<FTutorialDay>(rowName, TEXT(""));
+        clients = tutorialDayData->Clients;
+        unlockedSymptoms.Empty();
+        for (auto const& client : clients) {
+            auto symptoms = client.Symptoms;
+            for (auto const& symptom : symptoms) {
+                FSymptomWithWeightsData symptomData;
+                symptomData.Weight = 1.0f;
+                symptomData.DemonWeight = 1.0f;
+                FSymptomRow* symptomRow = projectSettings->SymptomTable->FindRow<FSymptomRow>(symptom, TEXT(""));
+                symptomData.BodyPart = symptomRow->Type;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
     const FClientsGeneratorData& ClientsGeneratorData)
 {
+    InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
+
     if (TryHandleTutorialDay()) {
         return clients;
     }
 
-    InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
     UpdateSymptomPool();
     InitializeClients();
     FillSymptoms();

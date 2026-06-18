@@ -11,9 +11,14 @@ struct FSymptomWithWeightsData
 {
     GENERATED_BODY()
 
-    EBodyPart BodyPart;
-    float Weight;
-    float DemonWeight;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    EBodyPart BodyPart = EBodyPart::None;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    float Weight = 1.0f;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    float DemonWeight = 1.0f;
 };
 
 USTRUCT(BlueprintType)
@@ -21,8 +26,13 @@ struct FClientsGeneratorData
 {
     GENERATED_BODY()
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int DayNumber;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     float InfectionRate;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TMap<FName, FSymptomWithWeightsData> UnlockedSymptoms;
 };
 

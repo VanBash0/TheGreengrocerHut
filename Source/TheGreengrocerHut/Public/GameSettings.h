@@ -19,6 +19,9 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
     TSoftObjectPtr<UDataTable> DefaultBodyPartTable;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Data")
+    TSoftObjectPtr<UDataTable> TutorialDaysTable;
 };
 
 USTRUCT(BlueprintType)
