@@ -1,16 +1,19 @@
 #include "ClientsGenerator.h"
 
-void ClientsGenerator::InitializeVariables(const UGameSettings& GameSettings, const FClientsGeneratorData& ClientsGeneratorData)
+void ClientsGenerator::InitializeVariables(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+    const FClientsGeneratorData& ClientsGeneratorData)
 {
     generatorData = ClientsGeneratorData;
-    settingsData = &GameSettings;
+    projectSettings = &ProjectSettings;
+    gameSettings = &GameSettings;
     infectionRateNormalized = (generatorData.InfectionRate + 100.f) / 200.f;
-    progressionMultiplier = 1 / (1 + FMath::Exp(-1 * settingsData->Steepness * (generatorData.DayNumber - settingsData->Midpoint)));
+    progressionMultiplier = 1 / (1 + FMath::Exp(-1 * gameSettings->Steepness * (generatorData.DayNumber - gameSettings->Midpoint)));
+    unlockedSymptoms = ClientsGeneratorData.UnlockedSymptoms;
 }
 
 void ClientsGenerator::UpdateSymptomPool()
 {
-    int NewSymptomsNum = FMath::RandRange(1, settingsData->MaxNewSymptoms);
+    int NewSymptomsNum = FMath::RandRange(1, gameSettings->MaxNewSymptoms);
 
     // TODO: доделать обновление с учетом BPDA_Ingredient
 }
@@ -18,24 +21,25 @@ void ClientsGenerator::UpdateSymptomPool()
 void ClientsGenerator::InitializeClients()
 {
     float quantityMultiplier = FMath::Max(infectionRateNormalized, progressionMultiplier);
-    int clientsNum = FMath::RoundToInt(settingsData->MinClients + (settingsData->MaxClients - settingsData->MinClients) 
+    int clientsNum = FMath::RoundToInt(gameSettings->MinClients + (gameSettings->MaxClients - gameSettings->MinClients) 
         * quantityMultiplier);
-    float expectedValue = settingsData->MinSymptoms + (settingsData->MaxSymptoms - settingsData->MinSymptoms)
+    int demonsNum = FMath::RandRange(0, FMath::Min(gameSettings->MaxDemons, clientsNum));
+    float expectedValue = gameSettings->MinSymptoms + (gameSettings->MaxSymptoms - gameSettings->MinSymptoms)
         * (1 - infectionRateNormalized);
 
+    int peopleNum = clientsNum - demonsNum;
     clients = TArray<FClient>();
-    for (int i = 0; i < clientsNum; ++i) {
+    for (int i = 0; i < peopleNum; ++i) {
         FClient client;
         client.IsDemon = false;
-        int symptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-settingsData->Error, settingsData->Error)),
-            settingsData->MinSymptoms, settingsData->MaxSymptoms);
+        int symptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-gameSettings->Error, gameSettings->Error)),
+            gameSettings->MinSymptoms, gameSettings->MaxSymptoms);
         client.Symptoms.SetNum(symptomCount);
         clients.Add(client);
     }
 
-    int demonsNum = FMath::RandRange(0, FMath::Min(settingsData->MaxDemons, clientsNum));
-    int demonSymptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-settingsData->Error, settingsData->Error)),
-        settingsData->MinSymptoms, settingsData->MaxSymptoms);
+    int demonSymptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-gameSettings->Error, gameSettings->Error)),
+        gameSettings->MinSymptoms, gameSettings->MaxSymptoms);
     demons = TArray<FClient>();
     for (int i = 0; i < demonsNum; ++i) {
         FClient demon;
@@ -45,11 +49,27 @@ void ClientsGenerator::InitializeClients()
     }
 }
 
-TArray<FClient> ClientsGenerator::GenerateClients(const UGameSettings& GameSettings, const FClientsGeneratorData& ClientsGeneratorData)
+void ClientsGenerator::FillSymptoms()
 {
-    InitializeVariables(GameSettings, ClientsGeneratorData);
+    
+}
+
+bool ClientsGenerator::TryHandleTutorialDay()
+{
+    //if (generatorData.DayNumber )
+}
+
+TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,
+    const FClientsGeneratorData& ClientsGeneratorData)
+{
+    if (TryHandleTutorialDay()) {
+        return clients;
+    }
+
+    InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
     UpdateSymptomPool();
     InitializeClients();
+    FillSymptoms();
 
     return clients;
 }
