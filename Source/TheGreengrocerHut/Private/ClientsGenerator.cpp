@@ -41,18 +41,20 @@ void ClientsGenerator::InitializeClients()
 
     int demonSymptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-gameSettings->Error, gameSettings->Error)),
         gameSettings->MinSymptoms, gameSettings->MaxSymptoms);
-    demons = TArray<FClient>();
     for (int i = 0; i < demonsNum; ++i) {
         FClient demon;
         demon.IsDemon = true;
         demon.Symptoms.SetNum(demonSymptomCount);
-        demons.Add(demon);
+        clients.Add(demon);
     }
 }
 
 void ClientsGenerator::FillSymptoms()
 {
-    
+    int clientsNum = clients.Num();
+    for (int i = 0; i < clientsNum; ++i) {
+        GenerateSymptomsForClient(clients[i]);
+    }
 }
 
 bool ClientsGenerator::TryHandleTutorialDay()
@@ -76,6 +78,10 @@ bool ClientsGenerator::TryHandleTutorialDay()
         return true;
     }
     return false;
+}
+
+void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
+
 }
 
 TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings& ProjectSettings, const UGameSettings& GameSettings,

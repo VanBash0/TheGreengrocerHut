@@ -47,11 +47,10 @@ private:
     void UpdateSymptomPool();
     void InitializeClients();
     void FillSymptoms();
-
+    void GenerateSymptomsForClient(FClient& client);
     bool TryHandleTutorialDay();
 
     TArray<FClient> clients;
-    TArray<FClient> demons;
 
     float infectionRateNormalized;
     float progressionMultiplier;
