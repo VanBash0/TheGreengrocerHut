@@ -47,8 +47,13 @@ private:
     void FillSymptoms();
     void GenerateSymptomsForClient(FClient& client);
     bool TryHandleTutorialDay();
+    void GenerateDemonSymptoms(int symptomCount);
+    FName SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon);
 
     TArray<FClient> clients;
+    TArray<FName> demonSymptomsOfDay;
+    int demonsNum;
+    int demonSymptomCount;
 
     float infectionRateNormalized;
     float progressionMultiplier;

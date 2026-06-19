@@ -96,7 +96,7 @@ public:
     float WeightRecoveryRate;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms|Weights",
-        meta = (DisplayName = "Weight Recovery Rate", ToolTip = "Величина, до которой обнуляется вес симптома при его выборе",
+        meta = (DisplayName = "Weight Min Value", ToolTip = "Величина, до которой обнуляется вес симптома при его выборе",
             ClampMin = "0.0", UIMin = "0.0"))
     float WeightMinValue;
 
@@ -104,4 +104,8 @@ public:
         meta = (DisplayName = "Wait Time Range", ToolTip = "Интервал времени ожидания нового клиента"))
     FVector2D WaitClientTimeRange;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms|Weights",
+        meta = (DisplayName = "Max Weight", ToolTip = "Максимальное значение веса симптома",
+            ClampMin = "0.0", UIMin = "0.0"))
+    float MaxWeight;
 };
