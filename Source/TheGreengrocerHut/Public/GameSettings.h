@@ -99,4 +99,9 @@ public:
         meta = (DisplayName = "Weight Recovery Rate", ToolTip = "Величина, до которой обнуляется вес симптома при его выборе",
             ClampMin = "0.0", UIMin = "0.0"))
     float WeightMinValue;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Day Cycle",
+        meta = (DisplayName = "Wait Time Range", ToolTip = "Интервал времени ожидания нового клиента"))
+    FVector2D WaitClientTimeRange;
+
 };

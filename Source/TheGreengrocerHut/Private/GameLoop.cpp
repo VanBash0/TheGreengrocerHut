@@ -81,13 +81,32 @@ void UGameLoop::SetNewState(EGameState NewState)
 
 void UGameLoop::IncrementCurrentClient()
 {
-    if (CurrentState == EGameState::WaitForClient) {
-        if (currentClientIndex_ < clients_.Num() - 1) {
-            currentClientIndex_++;
-            SetNewState(EGameState::SpawnClient);
+    if (CurrentState == EGameState::CompleteQuest)
+    {
+        if (GetWorld()->GetTimerManager().IsTimerActive(ClientSpawnTimerHandle)) { return; }
+
+        if (currentClientIndex_ < clients_.Num() - 1)
+        {
+            SetNewState(EGameState::WaitForClient);
+
+            float SpawnDelay = FMath::RandRange(GameSettings->WaitClientTimeRange.X, GameSettings->WaitClientTimeRange.Y);
+
+            GetWorld()->GetTimerManager().SetTimer(
+                ClientSpawnTimerHandle,
+                [this]()
+                {
+                    currentClientIndex_++;
+                    SetNewState(EGameState::SpawnClient);
+                },
+                SpawnDelay,
+                false
+            );
         }
-        else {
+        else
+        {
             SetNewState(EGameState::DayEnd);
         }
     }
 }
+
+

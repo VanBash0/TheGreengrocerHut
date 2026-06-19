@@ -55,9 +55,14 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
     bool IsFirstClient() const { return currentClientIndex_ == 0; }
 
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
+    TArray<FName> GetDayDemonSymptoms() const { return dayDemonSymptoms_; }
+
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
+
+public:
 
 private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;
@@ -68,4 +73,9 @@ private:
 private:
     TArray<FClient> clients_;
     int currentClientIndex_ = 0;
+
+    TArray<FName> dayDemonSymptoms_;
+
+private:
+    FTimerHandle ClientSpawnTimerHandle;
 };
