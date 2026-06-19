@@ -169,7 +169,7 @@ void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
     {
         float& currentWeight = unlockedSymptom.Value.Weight;
         if (currentWeight > 0.0f) {
-            currentWeight += recoveryRate;
+            currentWeight = FMath::Min(currentWeight + recoveryRate, gameSettings->WeightMinValue);
         }
     }
 }
@@ -198,7 +198,7 @@ void ClientsGenerator::GenerateDemonSymptoms(int symptomCount)
     {
         float& currentWeight = unlockedSymptom.Value.DemonWeight;
         if (currentWeight > 0.0f) {
-            currentWeight += recoveryRate;
+            currentWeight = FMath::Min(currentWeight + recoveryRate, gameSettings->WeightMinValue);
         }
     }
 }

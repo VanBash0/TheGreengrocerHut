@@ -15,6 +15,7 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     ClientsGenerator* clientsGenerator = new ClientsGenerator();
     FClientsGeneratorData data; // ПОМЕНЯТЬ!
     clients_ = clientsGenerator->GenerateClients(ProjectSettings, GameSettings, data);
+    dayDemonSymptoms_ = clientsGenerator->GetDemonSymptoms();
     delete clientsGenerator;
 }
 

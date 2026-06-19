@@ -40,6 +40,7 @@ class THEGREENGROCERHUT_API ClientsGenerator
 {
 public:
     TArray<FClient> GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings, FClientsGeneratorData& ClientsGeneratorData);
+    TArray<FName> GetDemonSymptoms() { return demonSymptomsOfDay; }
 private:
     void InitializeVariables(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings, FClientsGeneratorData& ClientsGeneratorData);
     void UpdateSymptomPool();
