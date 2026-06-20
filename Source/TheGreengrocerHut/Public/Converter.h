@@ -39,4 +39,10 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TArray<FConverterRecipe> RecipeArray;
+
+    UFUNCTION(BlueprintPure)
+    bool ContainsRecipe(FName IngredientRowName);
+
+    UFUNCTION(BlueprintPure)
+    FConverterRecipe GetRecipe(FName IngredientRowName);
 };
