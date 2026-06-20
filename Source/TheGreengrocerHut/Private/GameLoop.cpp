@@ -75,8 +75,10 @@ void UGameLoop::SetNewState(EGameState NewState)
 {
     if (NewState == CurrentState) { return; }
 
+    EGameState oldState = CurrentState;
     CurrentState = NewState;
-    OnGameStateChanged.Broadcast();
+
+    OnGameStateChanged.Broadcast(oldState, NewState);
     TriggerStateEvent(CurrentState);
 }
 

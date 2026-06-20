@@ -19,6 +19,7 @@ enum class EGameState : uint8
     GameEnd UMETA(DisplayName = "Game End")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
 
 UCLASS(BlueprintType, Blueprintable)
@@ -37,7 +38,8 @@ public:
     UPROPERTY(BlueprintReadOnly)
     EGameState CurrentState = EGameState::None;
 
-    UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameStateChanged;
+    UPROPERTY(BlueprintAssignable) FGameStateChangedWithArgs OnGameStateChanged;
+
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayStart;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnWaitClient;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnSpawnClient;
