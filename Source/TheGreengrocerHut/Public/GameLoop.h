@@ -4,7 +4,9 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Engine/DeveloperSettings.h"
 #include "GameSettings.h"
+#include "ClientsGenerator.h"
 #include "ClientStruct.h"
+#include "SaveGameData.h"
 #include "GameLoop.generated.h"
 
 UENUM(BlueprintType)
@@ -17,6 +19,21 @@ enum class EGameState : uint8
     CompleteQuest UMETA(DisplayName = "Complete Quest"),
     DayEnd UMETA(DisplayName = "Day End"),
     GameEnd UMETA(DisplayName = "Game End")
+};
+
+USTRUCT(BlueprintType)
+struct FGameMetrics
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    TMap<FName, FSymptomWithWeightsData> SymptomMetrics;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    int MaxClientSymptomCount;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    bool HasDemonPrevious;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
@@ -49,7 +66,7 @@ public:
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
-    FClient GetCurrentClient() const { return clients_[currentClientIndex_]; }
+    void GetCurrentClient(FClient& client) const { client = _currentDaySnapshot.DayClients[currentClientIndex_]; }
 
     UFUNCTION(BlueprintCallable, Category = "Client")
     void IncrementCurrentClient();
@@ -57,14 +74,15 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
     bool IsFirstClient() const { return currentClientIndex_ == 0; }
 
-    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
-    TArray<FName> GetDayDemonSymptoms() const { return dayDemonSymptoms_; }
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    void GetDaySnapshot(FDaySnapshot& OutSnapshot) const { OutSnapshot = _currentDaySnapshot; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
-
-public:
 
 private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;
@@ -73,10 +91,13 @@ private:
     void TriggerStateEvent(EGameState State);
 
 private:
-    TArray<FClient> clients_;
+    FDaySnapshot _currentDaySnapshot;
+    FGameMetrics _metrics;
+
     int currentClientIndex_ = 0;
 
-    TArray<FName> dayDemonSymptoms_;
+private:
+    TObjectPtr<USaveGameData> _savedData;
 
 private:
     FTimerHandle ClientSpawnTimerHandle;

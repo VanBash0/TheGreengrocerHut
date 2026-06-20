@@ -203,8 +203,7 @@ void ClientsGenerator::GenerateDemonSymptoms(int symptomCount)
     }
 }
 
-TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings,
-    FClientsGeneratorData& ClientsGeneratorData)
+TArray<FClient> ClientsGenerator::GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings, FClientsGeneratorData& ClientsGeneratorData)
 {
     InitializeVariables(ProjectSettings, GameSettings, ClientsGeneratorData);
 

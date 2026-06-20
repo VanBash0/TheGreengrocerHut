@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameLoop.h"
 #include "ClientStruct.h"
+#include "GameSettings.h"
 #include "SymptomStructures.h"
 #include "ClientsGenerator.generated.h"
 

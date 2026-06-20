@@ -1,6 +1,5 @@
 #include "GameLoop.h"
 #include "Engine/World.h"
-#include "ClientsGenerator.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -12,11 +11,11 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
 
-    ClientsGenerator* clientsGenerator = new ClientsGenerator();
+    ClientsGenerator clientsGenerator = ClientsGenerator();
     FClientsGeneratorData data; // ПОМЕНЯТЬ!
-    clients_ = clientsGenerator->GenerateClients(ProjectSettings, GameSettings, data);
-    dayDemonSymptoms_ = clientsGenerator->GetDemonSymptoms();
-    delete clientsGenerator;
+
+    _currentDaySnapshot.DayClients = clientsGenerator.GenerateClients(ProjectSettings, GameSettings, data);
+    _currentDaySnapshot.DemonSymptoms = clientsGenerator.GetDemonSymptoms();
 }
 
 void UGameLoop::Deinitialize()
@@ -88,7 +87,7 @@ void UGameLoop::IncrementCurrentClient()
     {
         if (GetWorld()->GetTimerManager().IsTimerActive(ClientSpawnTimerHandle)) { return; }
 
-        if (currentClientIndex_ < clients_.Num() - 1)
+        if (currentClientIndex_ < _currentDaySnapshot.DayClients.Num() - 1)
         {
             SetNewState(EGameState::WaitForClient);
 
