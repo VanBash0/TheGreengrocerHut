@@ -11,11 +11,9 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
 
-    ClientsGenerator clientsGenerator = ClientsGenerator();
-    FClientsGeneratorData data; // ПОМЕНЯТЬ!
-
-    _currentDaySnapshot.DayClients = clientsGenerator.GenerateClients(ProjectSettings, GameSettings, data);
-    _currentDaySnapshot.DemonSymptoms = clientsGenerator.GetDemonSymptoms();
+    FClientsGeneratorData GeneratorData;
+    ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, GeneratorData);
+    clientsGenerator.Procces(_currentDaySnapshot);
 }
 
 void UGameLoop::Deinitialize()

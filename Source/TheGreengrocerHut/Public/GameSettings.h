@@ -18,6 +18,9 @@ public:
     TSoftObjectPtr<UDataTable> SymptomTable;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
+    TSoftObjectPtr<UDataTable> IngredientTable;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Data")
     TSoftObjectPtr<UDataTable> DefaultBodyPartTable;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")

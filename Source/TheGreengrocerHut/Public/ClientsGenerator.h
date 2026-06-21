@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "ClientStruct.h"
 #include "GameSettings.h"
+#include "SaveGameData.h"
 #include "SymptomStructures.h"
 #include "ClientsGenerator.generated.h"
 
@@ -39,20 +40,26 @@ struct FClientsGeneratorData
 class THEGREENGROCERHUT_API ClientsGenerator
 {
 public:
-    TArray<FClient> GenerateClients(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings, FClientsGeneratorData& ClientsGeneratorData);
-    TArray<FName> GetDemonSymptoms() { return demonSymptomsOfDay; }
+    ClientsGenerator(const UObject* WorldContextObject, 
+                    const UGameProjectSettings* ProjectSettings,
+                    const TObjectPtr<UGameSettings> GameSettings,
+                    FClientsGeneratorData& ClientsGeneratorData);
+
+    void Procces(FDaySnapshot& OutSnapshot);
+
 private:
-    void InitializeVariables(const UGameProjectSettings* ProjectSettings, const TObjectPtr<UGameSettings> GameSettings, FClientsGeneratorData& ClientsGeneratorData);
+    void GenerateDemonSymptoms();
+
     void UpdateSymptomPool();
     void InitializeClients();
     void FillSymptoms();
     void GenerateSymptomsForClient(FClient& client);
     bool TryHandleTutorialDay();
-    void GenerateDemonSymptoms(int symptomCount);
     FName SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon);
 
     TArray<FClient> clients;
     TArray<FName> demonSymptomsOfDay;
+
     int demonsNum;
     int demonSymptomCount;
 
@@ -61,5 +68,6 @@ private:
     FClientsGeneratorData generatorData;
     const UGameSettings* gameSettings;
     const UGameProjectSettings* projectSettings;
+    const UObject* worldContextObject;
     TMap<FName, FSymptomWithWeightsData> unlockedSymptoms;
 };
