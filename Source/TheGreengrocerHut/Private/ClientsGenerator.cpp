@@ -71,9 +71,75 @@ void ClientsGenerator::GenerateDemonSymptoms()
 
 void ClientsGenerator::UpdateSymptomPool()
 {
-    int NewSymptomsNum = FMath::RandRange(1, gameSettings->MaxNewSymptoms);
+    int newSymptomsNum = FMath::RandRange(gameSettings->MinNewSymptoms, gameSettings->MaxNewSymptoms);
 
-    // TODO: доделать обновление с учетом BPDA_Ingredient
+    TArray<FSymptomRow> allSymptoms = UIngredientFunctionLibary::GetAllSymptoms(worldContextObject);
+    TArray<FName> unlockedSymptomNames;
+    for (const auto& symptom : unlockedSymptoms) {
+        unlockedSymptomNames.Add(symptom.Key);
+    }
+
+    TArray<FSymptomRow> lockedSymptoms;
+    for (const FSymptomRow& symptom : allSymptoms)
+    {
+        FName symptomName = FName(*symptom.Name.ToString());
+        if (!unlockedSymptomNames.Contains(symptomName))
+        {
+            lockedSymptoms.Add(symptom);
+        }
+    }
+
+    TMap<EBodyPart, int> partLockedSymptoms;
+    for (const FSymptomRow& symptom : lockedSymptoms)
+    {
+        int* countPtr = partLockedSymptoms.Find(symptom.Type);
+        if (countPtr) (*countPtr)++;
+        else partLockedSymptoms.Add(symptom.Type, 1);
+    }
+
+    TArray<FName> unlockedIngredients;
+    UIngredientFunctionLibary::GetIngredientsBySymptoms(worldContextObject, unlockedSymptomNames, unlockedIngredients);
+    TArray<UConverter*> converters = UIngredientFunctionLibary::GetAllConverters(worldContextObject);
+
+    TArray<FSymptomRow> availableSymptoms;
+    for (const FSymptomRow& symptom : lockedSymptoms) {
+        bool canOpen = false;
+        for (UConverter* converter : converters) {
+            for (const FConverterRecipe& recipe : converter->RecipeArray) {
+                if (recipe.To == symptom.IngredientRow) {                    
+                    if (unlockedIngredients.Contains(recipe.From.RowName)) {
+                        canOpen = true;
+                        break;
+                    }
+                }
+            }
+            if (canOpen) break;
+        }
+        if (canOpen) {
+            availableSymptoms.Add(symptom);
+        }
+    }
+
+    if (availableSymptoms.Num() == 0) return;
+
+    availableSymptoms.Sort([&partLockedSymptoms](const FSymptomRow& A, const FSymptomRow& B) {
+        int CountA = partLockedSymptoms.FindRef(A.Type);
+        int CountB = partLockedSymptoms.FindRef(B.Type);
+        if (CountA != CountB) {
+            return CountA > CountB;
+        }
+        return FMath::RandBool();
+    });
+
+    int numToAdd = FMath::Min(newSymptomsNum, availableSymptoms.Num());
+    for (int i = 0; i < numToAdd; ++i) {
+        FSymptomWithWeightsData newSymptom;
+        newSymptom.BodyPart = availableSymptoms[i].Type;
+        newSymptom.Weight = gameSettings->NewSymptomWeight;
+        newSymptom.DemonWeight = gameSettings->NewDemonSymptomWeight;
+        FName symptomName = FName(availableSymptoms[i].Name.ToString());
+        unlockedSymptoms[symptomName] = newSymptom;
+    }
 }
 
 void ClientsGenerator::InitializeClients()

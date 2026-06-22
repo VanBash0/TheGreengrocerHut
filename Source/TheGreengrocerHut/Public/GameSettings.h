@@ -63,6 +63,11 @@ public:
     int Midpoint;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
+        meta = (DisplayName = "Min New Symptoms", ToolTip = "Минимальное число новых симптомов, попадающих в пулл дня",
+            ClampMin = "1", UIMin = "1"))
+    int MinNewSymptoms;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
         meta = (DisplayName = "Max New Symptoms", ToolTip = "Максимальное число новых симптомов, попадающих в пулл дня",
             ClampMin = "1", UIMin = "1"))
     int MaxNewSymptoms;
@@ -114,4 +119,14 @@ public:
         meta = (DisplayName = "Max Weight", ToolTip = "Максимальное значение веса симптома",
             ClampMin = "0.0", UIMin = "0.0"))
     float MaxWeight;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms|Weights",
+        meta = (DisplayName = "New Symptom Weight", ToolTip = "Вес симптома в день его добавления в пул",
+            ClampMin = "0.0", UIMin = "0.0"))
+    float NewSymptomWeight;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms|Weights",
+        meta = (DisplayName = "New Demon Symptom Weight", ToolTip = "Вес симптома для демона в день его добавления в пул",
+            ClampMin = "0.0", UIMin = "0.0"))
+    float NewDemonSymptomWeight;
 };
