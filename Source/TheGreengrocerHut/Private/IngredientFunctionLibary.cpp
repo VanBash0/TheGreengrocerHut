@@ -11,10 +11,12 @@ void UCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     {
         _ingredientTable = ProjectSettings->IngredientTable.LoadSynchronous();
         _symptomTable = ProjectSettings->SymptomTable.LoadSynchronous();
+        _converterFolderPath = ProjectSettings->ConverterFolderPath;
     }
 
     PopulateIngredientCache();
     PopulateSymptomCache();
+    PopulateConverterCache();
 }
 
 void UCacheSubsystem::Deinitialize()
@@ -26,6 +28,9 @@ void UCacheSubsystem::Deinitialize()
     _symptomTable = nullptr;
     _symptomCache.Empty();
     _symptomCacheLoaded = false;
+
+    _converterCache.Empty();
+    _converterCacheLoaded = false;
 
     Super::Deinitialize();
 }
@@ -76,6 +81,35 @@ void UCacheSubsystem::PopulateSymptomCache()
     _symptomCacheLoaded = true;
 }
 
+void UCacheSubsystem::PopulateConverterCache()
+{
+    if (_converterCacheLoaded) { return; }
+
+    _converterCache.Empty();
+
+    UAssetManager& AssetManager = UAssetManager::Get();
+    TArray<FAssetData> AssetDataList;
+
+    FARFilter Filter;
+    Filter.PackagePaths.Add(FName(*_converterFolderPath));
+    Filter.ClassPaths.Add(UConverter::StaticClass()->GetClassPathName());
+    Filter.bRecursiveClasses = true;
+
+    IAssetRegistry& AssetRegistry = AssetManager.GetAssetRegistry();
+    AssetRegistry.GetAssets(Filter, AssetDataList);
+
+    for (const FAssetData& AssetData : AssetDataList)
+    {
+        UConverter* Converter = Cast<UConverter>(AssetData.GetAsset());
+        if (Converter)
+        {
+            _converterCache.Add(Converter);
+        }
+    }
+
+    _converterCacheLoaded = true;
+}
+
 //GETTERS_INGREDIENT
 const TMap<FName, FIngredient>& UCacheSubsystem::GetIngredientCache()
 {
@@ -97,6 +131,17 @@ const FIngredient* UCacheSubsystem::GetIngredientByRowName(FName RowName)
     return _ingredientCache.Find(RowName);
 }
 
+const FIngredient* UCacheSubsystem::GetIngredientByIndex(int32 Index)
+{
+    if (!_ingredientCacheLoaded) { PopulateIngredientCache(); }
+    if (Index < 0 || Index >= _ingredientCache.Num()) { return nullptr; }
+
+    auto It = _ingredientCache.CreateConstIterator();
+    for (int32 i = 0; i < Index; ++i) { ++It; }
+
+    return &It->Value;
+}
+
 //GETTERS_SYMPTOM
 const TMap<FName, FSymptomRow>& UCacheSubsystem::GetSymptomCache()
 {
@@ -116,6 +161,37 @@ const FSymptomRow* UCacheSubsystem::GetSymptomByRowName(FName RowName)
     }
 
     return _symptomCache.Find(RowName);
+}
+
+const FSymptomRow* UCacheSubsystem::GetSymptomByIndex(int32 Index)
+{
+    if (!_symptomCacheLoaded) { PopulateSymptomCache(); }
+    if (Index < 0 || Index >= _symptomCache.Num()) { return nullptr; }
+
+    auto It = _symptomCache.CreateConstIterator();
+    for (int32 i = 0; i < Index; ++i) { ++It; }
+
+    return &It->Value;
+}
+
+//GETTERS_CONVERTER
+const TArray<TObjectPtr<UConverter>>& UCacheSubsystem::GetConverterCache()
+{
+    if (!_converterCacheLoaded)
+    {
+        PopulateConverterCache();
+    }
+
+    return _converterCache;
+}
+
+const UConverter* UCacheSubsystem::GetConverterByIndex(int32 Index)
+{
+    if (!_converterCacheLoaded) { PopulateConverterCache(); }
+
+    if (!_converterCache.IsValidIndex(Index)) { return nullptr; }
+
+    return _converterCache[Index].Get();
 }
 
 //LIBARY_MAIN
@@ -167,6 +243,55 @@ void UIngredientFunctionLibary::GetTwoStrongestColors(const TArray<FIngredient>&
     OutColor2.A = 1.0f;
 }
 
+void UIngredientFunctionLibary::SelectUnlockedReciep(const TArray<FName>& IngredientNames, const TArray<FConverterRecipe>& AllRecieps, TArray<FConverterRecipe>& OutUnclockedRecieps)
+{
+    OutUnclockedRecieps.Empty();
+
+    for (const FConverterRecipe& Recipe : AllRecieps)
+    {
+        if (IngredientNames.Contains(Recipe.To.RowName))
+        {
+            OutUnclockedRecieps.Add(Recipe);
+        }
+    }
+}
+
+void UIngredientFunctionLibary::GetIngredientsBySymptoms(const UObject* WorldContextObject, const TArray<FName>& SymptomRowNames, TArray<FName>& OutIngredientRowNames)
+{
+    OutIngredientRowNames.Empty();
+
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return;
+
+    const TMap<FName, FSymptomRow>& Symptoms = Cache->GetSymptomCache();
+
+    TSet<FName> ResultSet;
+
+    for (const FName& SymptomName : SymptomRowNames)
+    {
+        const FSymptomRow* Symptom = Symptoms.Find(SymptomName);
+        if (!Symptom) continue;
+
+        const FName& IngredientRowName = Symptom->IngredientRow.RowName;
+        if (!IngredientRowName.IsNone())
+        {
+            ResultSet.Add(IngredientRowName);
+        }
+    }
+
+    OutIngredientRowNames = ResultSet.Array();
+}
+
+TArray<FIngredient> UIngredientFunctionLibary::GetAllIngredients(const UObject* WorldContextObject)
+{
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return {};
+
+    TArray<FIngredient> Result;
+    Cache->GetIngredientCache().GenerateValueArray(Result);
+    return Result;
+}
+
 const FIngredient& UIngredientFunctionLibary::GetIngredientByRowName(const UObject* WorldContextObject, FName RowName, bool& bFound)
 {
     static FIngredient Empty;
@@ -178,13 +303,25 @@ const FIngredient& UIngredientFunctionLibary::GetIngredientByRowName(const UObje
     return Result ? *Result : Empty;
 }
 
-TArray<FIngredient> UIngredientFunctionLibary::GetAllIngredients(const UObject* WorldContextObject)
+const FIngredient& UIngredientFunctionLibary::GetIngredientByIndex(const UObject* WorldContextObject, int32 Index, bool& bFound)
+{
+    static FIngredient Empty;
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) { bFound = false; return Empty; }
+
+    const FIngredient* Result = Cache->GetIngredientByIndex(Index);
+    bFound = Result != nullptr;
+
+    return Result ? *Result : Empty;
+}
+
+TArray<FSymptomRow> UIngredientFunctionLibary::GetAllSymptoms(const UObject* WorldContextObject)
 {
     UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
     if (!Cache) return {};
 
-    TArray<FIngredient> Result;
-    Cache->GetIngredientCache().GenerateValueArray(Result);
+    TArray<FSymptomRow> Result;
+    Cache->GetSymptomCache().GenerateValueArray(Result);
     return Result;
 }
 
@@ -199,12 +336,39 @@ const FSymptomRow& UIngredientFunctionLibary::GetSymptomByRowName(const UObject*
     return Result ? *Result : Empty;
 }
 
-TArray<FSymptomRow> UIngredientFunctionLibary::GetAllSymptoms(const UObject* WorldContextObject)
+const FSymptomRow& UIngredientFunctionLibary::GetSymptomByIndex(const UObject* WorldContextObject, int32 Index, bool& bFound)
+{
+    static FSymptomRow Empty;
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) { bFound = false; return Empty; }
+
+    const FSymptomRow* Result = Cache->GetSymptomByIndex(Index);
+    bFound = Result != nullptr;
+
+    return Result ? *Result : Empty;
+}
+
+TArray<UConverter*> UIngredientFunctionLibary::GetAllConverters(const UObject* WorldContextObject)
 {
     UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
     if (!Cache) return {};
 
-    TArray<FSymptomRow> Result;
-    Cache->GetSymptomCache().GenerateValueArray(Result);
+    TArray<UConverter*> Result;
+    for (const TObjectPtr<UConverter>& Converter : Cache->GetConverterCache())
+    {
+        if (Converter) { Result.Add(Converter.Get()); }
+    }
+
+    return Result;
+}
+
+const UConverter* UIngredientFunctionLibary::GetConverterByIndex(const UObject* WorldContextObject, int32 Index, bool& bFound)
+{
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) { bFound = false; return nullptr; }
+
+    const UConverter* Result = Cache->GetConverterByIndex(Index);
+    bFound = Result != nullptr;
+
     return Result;
 }

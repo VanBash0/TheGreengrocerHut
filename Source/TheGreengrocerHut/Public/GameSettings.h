@@ -25,6 +25,9 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
     TSoftObjectPtr<UDataTable> TutorialDaysTable;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Data")
+    FString ConverterFolderPath;
 };
 
 USTRUCT(BlueprintType)
