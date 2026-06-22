@@ -71,4 +71,9 @@ struct FIngredientRowNameRef
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName RowName;
+
+    bool operator==(const FIngredientRowNameRef& Other) const
+    {
+        return RowName == Other.RowName;
+    }
 };
