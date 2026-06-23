@@ -243,7 +243,7 @@ void UIngredientFunctionLibary::GetTwoStrongestColors(const TArray<FIngredient>&
     OutColor2.A = 1.0f;
 }
 
-void UIngredientFunctionLibary::SelectUnlockedReciep(const TArray<FName>& IngredientNames, const TArray<FConverterRecipe>& AllRecieps, TArray<FConverterRecipe>& OutUnclockedRecieps)
+void UIngredientFunctionLibary::SelectUnlockedRecipe(const TArray<FName>& IngredientNames, const TArray<FConverterRecipe>& AllRecieps, TArray<FConverterRecipe>& OutUnclockedRecieps)
 {
     OutUnclockedRecieps.Empty();
 
