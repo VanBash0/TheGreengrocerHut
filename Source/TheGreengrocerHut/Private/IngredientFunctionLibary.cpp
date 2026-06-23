@@ -372,3 +372,20 @@ const UConverter* UIngredientFunctionLibary::GetConverterByIndex(const UObject* 
 
     return Result;
 }
+
+void UIngredientFunctionLibary::GetBasePotions(const int& MaxClientSymptomCount,
+                                               const bool& HasDemonAppeared,
+                                               const TMap<int, FIngredientRowNameRef>& BasePotionsMap,
+                                               const FIngredientRowNameRef& PoisonBase,
+                                               TArray<FName>& BasePotions)
+{
+    for (const auto& base : BasePotionsMap) {
+        if (MaxClientSymptomCount >= base.Key) {
+            BasePotions.Add(base.Value.RowName);
+        }
+    }
+
+    if (HasDemonAppeared) {
+        BasePotions.Add(PoisonBase.RowName);
+    }
+}

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/DeveloperSettings.h"
+#include "IngredientStructures.h"
 #include "GameSettings.generated.h"
 
 UCLASS(Config = Game, DefaultConfig, meta = (DisplayName = "Game Settings"))
@@ -49,7 +50,7 @@ class UGameSettings : public UDataAsset
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredient/Priority")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Priority")
     TMap<int32, FPriorityData> IngredientPriorityData;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Maths",
@@ -129,4 +130,10 @@ public:
         meta = (DisplayName = "New Demon Symptom Weight", ToolTip = "Вес симптома для демона в день его добавления в пул",
             ClampMin = "0.0", UIMin = "0.0"))
     float NewDemonSymptomWeight;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions")
+    TMap<int32, FIngredientRowNameRef> BasePotionsMap;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions")
+    FIngredientRowNameRef PoisonBase;
 };

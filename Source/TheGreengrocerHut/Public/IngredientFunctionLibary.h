@@ -70,6 +70,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient")
     static void SelectUnlockedRecipe(const TArray<FName>& IngredientNames, const TArray<FConverterRecipe>& AllRecieps, TArray<FConverterRecipe>& OutUnclockedRecieps);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient")
+    static void GetBasePotions(const int& MaxClientSymptomCount, const bool& HasDemonPrevious, const TMap<int, FIngredientRowNameRef>& BasePotionsMap, const FIngredientRowNameRef& PoisonBase, TArray<FName>& BasePotions);
 public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static TArray<FIngredient> GetAllIngredients(const UObject* WorldContextObject);
