@@ -4,6 +4,9 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Engine/DeveloperSettings.h"
 #include "GameSettings.h"
+#include "ClientsGenerator.h"
+#include "ClientStruct.h"
+#include "SaveGameData.h"
 #include "GameLoop.generated.h"
 
 UENUM(BlueprintType)
@@ -18,6 +21,22 @@ enum class EGameState : uint8
     GameEnd UMETA(DisplayName = "Game End")
 };
 
+USTRUCT(BlueprintType)
+struct FGameMetrics
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    TMap<FName, FSymptomWithWeightsData> SymptomMetrics;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    int MaxClientSymptomCount;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    bool HasDemonPrevious;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
 
 UCLASS(BlueprintType, Blueprintable)
@@ -36,13 +55,30 @@ public:
     UPROPERTY(BlueprintReadOnly)
     EGameState CurrentState = EGameState::None;
 
-    UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameStateChanged;
+    UPROPERTY(BlueprintAssignable) FGameStateChangedWithArgs OnGameStateChanged;
+
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayStart;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnWaitClient;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnSpawnClient;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnCompleteQuest;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnDayEnd;
     UPROPERTY(BlueprintAssignable) FGameStateChanged OnGameEnd;
+
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
+    void GetCurrentClient(FClient& client) const { client = _currentDaySnapshot.DayClients[currentClientIndex_]; }
+
+    UFUNCTION(BlueprintCallable, Category = "Client")
+    void IncrementCurrentClient();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
+    bool IsFirstClient() const { return currentClientIndex_ == 0; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    void GetDaySnapshot(FDaySnapshot& OutSnapshot) const { OutSnapshot = _currentDaySnapshot; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
@@ -53,4 +89,16 @@ private:
     static const TMap<EGameState, StateDelegatePtr> StateEventMap;
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
     void TriggerStateEvent(EGameState State);
+
+private:
+    FDaySnapshot _currentDaySnapshot;
+    FGameMetrics _metrics;
+
+    int currentClientIndex_ = 0;
+
+private:
+    TObjectPtr<USaveGameData> _savedData;
+
+private:
+    FTimerHandle ClientSpawnTimerHandle;
 };

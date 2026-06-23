@@ -10,6 +10,10 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     {
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
+
+    FClientsGeneratorData GeneratorData;
+    ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, GeneratorData);
+    clientsGenerator.Procces(_currentDaySnapshot);
 }
 
 void UGameLoop::Deinitialize()
@@ -34,6 +38,7 @@ bool UGameLoop::ShouldCreateSubsystem(UObject* Outer) const
     return true;
 
     return false;
+#endif
 }
 
 const TMap<EGameState, UGameLoop::StateDelegatePtr> UGameLoop::StateEventMap = InitStateEventMap();
@@ -65,7 +70,41 @@ void UGameLoop::SetNewState(EGameState NewState)
 {
     if (NewState == CurrentState) { return; }
 
+    EGameState oldState = CurrentState;
     CurrentState = NewState;
-    OnGameStateChanged.Broadcast();
+
+    OnGameStateChanged.Broadcast(oldState, NewState);
     TriggerStateEvent(CurrentState);
 }
+
+void UGameLoop::IncrementCurrentClient()
+{
+    if (CurrentState == EGameState::CompleteQuest)
+    {
+        if (GetWorld()->GetTimerManager().IsTimerActive(ClientSpawnTimerHandle)) { return; }
+
+        if (currentClientIndex_ < _currentDaySnapshot.DayClients.Num() - 1)
+        {
+            SetNewState(EGameState::WaitForClient);
+
+            float SpawnDelay = FMath::RandRange(GameSettings->WaitClientTimeRange.X, GameSettings->WaitClientTimeRange.Y);
+
+            GetWorld()->GetTimerManager().SetTimer(
+                ClientSpawnTimerHandle,
+                [this]()
+                {
+                    currentClientIndex_++;
+                    SetNewState(EGameState::SpawnClient);
+                },
+                SpawnDelay,
+                false
+            );
+        }
+        else
+        {
+            SetNewState(EGameState::DayEnd);
+        }
+    }
+}
+
+

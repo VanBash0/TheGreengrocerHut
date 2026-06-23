@@ -7,9 +7,18 @@ struct FClient
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TArray<FName> Symptoms;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool IsDemon = false;
+};
+
+USTRUCT(BlueprintType)
+struct FTutorialDay : public FTableRowBase
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TArray<FClient> Clients;
 };
