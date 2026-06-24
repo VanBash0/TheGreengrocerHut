@@ -34,6 +34,15 @@ struct FGameMetrics
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere)
     bool HasDemonPrevious;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    int DayNumber;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    float HealingFactor;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    float KillingFactor;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
@@ -81,7 +90,7 @@ public:
     void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
     UFUNCTION(BlueprintCallable, Category = "Infection Rate")
-    void UpdateInfectionRate(float InfectionRate) { _currentDaySnapshot.VillageInfectionRate = InfectionRate; }
+    void UpdateInfectionRate(float DeltaInfectionRate, bool IsGood);
 
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")

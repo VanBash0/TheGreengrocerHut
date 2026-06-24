@@ -14,6 +14,7 @@
 #include "ConverterRecipe.h"
 #include "GameSettings.h"
 #include "ClientStruct.h"
+#include "GameLoop.h"
 
 #include "IngredientFunctionLibary.generated.h"
 
@@ -86,7 +87,8 @@ public:
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
 
     UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
-    static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const FClient& CurrentClient, const TMap<int32, FIngredientRowNameRef>& BasePotionMap, bool& IsGood, float& NewInfectionRate);
+    static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients,
+                                       const UGameLoop* GameLoop, bool& IsGood, float& NewInfectionRate);
 public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static TArray<FIngredient> GetAllIngredients(const UObject* WorldContextObject);

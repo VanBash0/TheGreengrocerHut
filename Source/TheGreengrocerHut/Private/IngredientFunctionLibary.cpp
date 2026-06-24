@@ -418,36 +418,65 @@ void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContex
 
 void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldContextObject,
                                                        const TArray<FIngredient>& Ingredients,
-                                                       const FClient& CurrentClient,
-                                                       const TMap<int32, FIngredientRowNameRef>& BasePotionMap,
+                                                       const UGameLoop* GameLoop,
                                                        bool& IsGood,
-                                                       float& NewInfectionRate)
+                                                       float& DeltaInfectionRate)
 {
     TArray<FName> neededIngredients;
-    GetIngredientsBySymptoms(WorldContextObject, CurrentClient.Symptoms, neededIngredients);
+    FClient currentClient;
+    GameLoop->GetCurrentClient(currentClient);
+    GetIngredientsBySymptoms(WorldContextObject, currentClient.Symptoms, neededIngredients);
+    auto gameSettings = GameLoop->GameSettings;
     
-    int symptomsNum = CurrentClient.Symptoms.Num();
+    int symptomsNum = currentClient.Symptoms.Num();
     int key = 0;
-    for (const auto& base : BasePotionMap) {
+    for (const auto& base : gameSettings->BasePotionsMap) {
         if (symptomsNum >= base.Key) {
             key = FMath::Max(key, base.Key);
         }
     }
-    neededIngredients.Add(BasePotionMap[key].RowName);
+    neededIngredients.Add(gameSettings->BasePotionsMap[key].RowName);
 
+    bool isPoison = false;
     int matchingIngredients = 0;
     int currentPriority = TNumericLimits<int32>::Min();
-    for (int i = 0; i < Ingredients.Num(); ++i) {
+    for (const auto& ingredient : Ingredients) {
         bool bFound = false;
-        FName ingredientName = GetRowNameByIngredient(WorldContextObject, Ingredients[i], bFound);
-        if (bFound && neededIngredients.IsValidIndex(i) && ingredientName == neededIngredients[i]
-                && Ingredients[i].TermsOfUse.AddPriority >= currentPriority) {
+        FName ingredientName = GetRowNameByIngredient(WorldContextObject, ingredient, bFound);
+        if (bFound && neededIngredients.Contains(ingredientName) && ingredient.TermsOfUse.AddPriority >= currentPriority) {
             matchingIngredients++;
-            currentPriority = FMath::Max(currentPriority, Ingredients[i].TermsOfUse.AddPriority);
+            currentPriority = FMath::Max(currentPriority, ingredient.TermsOfUse.AddPriority);
+            if (ingredientName == gameSettings->PoisonBase.RowName) {
+                isPoison = true;
+            }
         }
     }
 
+    float fraction = matchingIngredients / Ingredients.Num();
+    IsGood = (currentClient.IsDemon) ? isPoison : (fraction >= 0.5f && !isPoison);
 
+    FGameMetrics gameMetrics;
+    GameLoop->GetGameMetrics(gameMetrics);
+    int dayMultiplier = 1 + 0.02f * (gameMetrics.DayNumber - 1);
+    if (currentClient.IsDemon) {
+        if (isPoison) {
+            DeltaInfectionRate = -1 * gameSettings->BasicDeltaPoisonDemon * dayMultiplier * gameMetrics.HealingFactor;
+        }
+        else {
+            DeltaInfectionRate = gameSettings->BasicDeltaNotPoisonDemon * dayMultiplier * gameMetrics.KillingFactor;
+        }
+    }
+    else {
+        if (isPoison) {
+            DeltaInfectionRate = -1 * gameSettings->BasicDeltaPoisonClient * dayMultiplier * gameMetrics.HealingFactor;
+        }
+        else if (fraction >= 0.5f) {
+            DeltaInfectionRate = gameSettings->BasicDeltaHeal * dayMultiplier * gameMetrics.HealingFactor * fraction;
+        }
+        else {
+            DeltaInfectionRate = -1 * gameSettings->BasicDeltaNotHeal * dayMultiplier * (1 - fraction);
+        }
+    }
 }
 
 namespace {

@@ -106,4 +106,13 @@ void UGameLoop::IncrementCurrentClient()
     }
 }
 
-
+void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
+{
+    _currentDaySnapshot.VillageInfectionRate += DeltaInfectionRate;
+    if (IsGood) {
+        _metrics.HealingFactor += GameSettings->DeltaHealingFactor;
+    }
+    else {
+        _metrics.KillingFactor += GameSettings->DeltaKillingFactor;
+    }
+}

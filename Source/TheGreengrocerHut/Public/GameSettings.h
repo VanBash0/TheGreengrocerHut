@@ -50,7 +50,8 @@ class UGameSettings : public UDataAsset
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Priority")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Priority",
+        meta = (DisplayName = "Ingredient Priority Data", ToolTip = "Численное значение приоритетов добавления ингредиентов"))
     TMap<int32, FPriorityData> IngredientPriorityData;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Maths",
@@ -131,9 +132,47 @@ public:
             ClampMin = "0.0", UIMin = "0.0"))
     float NewDemonSymptomWeight;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions",
+        meta = (DisplayName = "Base Potions Map", ToolTip = "Пороги числа симптомов для открытия базовых ингредиентов"))
     TMap<int32, FIngredientRowNameRef> BasePotionsMap;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions",
+        meta = (DisplayName = "Poison Base", ToolTip = "Row Name отравы"))
     FIngredientRowNameRef PoisonBase;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Start Healing Factor", ToolTip = "Базовое значение фактора лечения (чем больше, тем быстрее деревня исцеляется)"))
+    float StartHealingFactor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Start Killing Factor", ToolTip = "Базовое значение фактора калечения (чем больше, тем быстрее деревня заражается)"))
+    float StartKillingFactor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Delta Healing Factor", ToolTip = "Величина, на которую увеличивается фактор лечения при исцелении пациента/отраве демона"))
+    float DeltaHealingFactor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Delta Killing Factor", ToolTip = "Величина, на которую увеличивается фактор калечения при неисцелении пациента/неотраве демона"))
+    float DeltaKillingFactor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Basic Delta Heal", ToolTip = "Базовый урон по заражению при исцелении клиента"))
+    float BasicDeltaHeal;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Basic Delta Not Heal", ToolTip = "Базовый урон от заражения при неисцелении клиента"))
+    float BasicDeltaNotHeal;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Basic Delta Poison Demon", ToolTip = "Базовый урон по заражению при отравлении демона"))
+    float BasicDeltaPoisonDemon;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Basic Delta Not Poison Demon", ToolTip = "Базовый урон от заражения при неотравлении демона"))
+    float BasicDeltaNotPoisonDemon;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
+        meta = (DisplayName = "Basic Delta Poison Client", ToolTip = "Базовый урон от заражения при отравлении клиента"))
+    float BasicDeltaPoisonClient;
 };
