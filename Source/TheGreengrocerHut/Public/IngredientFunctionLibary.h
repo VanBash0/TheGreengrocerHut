@@ -13,6 +13,7 @@
 #include "Converter.h"
 #include "ConverterRecipe.h"
 #include "GameSettings.h"
+#include "ClientStruct.h"
 
 #include "IngredientFunctionLibary.generated.h"
 
@@ -57,6 +58,13 @@ private:
 public:
     const TArray<TObjectPtr<UConverter>>& GetConverterCache();
     const UConverter* GetConverterByIndex(int32 Index);
+
+private:
+    void BuildIngredientHashCache();
+    TMap<uint64, TArray<FName>> _ingredientHashToRowName;
+
+public:
+    const FName GetRowNameByIngredient(const FIngredient& Ingredient) const;
 };
 
 UCLASS(BlueprintType)
@@ -76,6 +84,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
+
+    UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
+    static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const FClient& CurrentClient, const TMap<int32, FIngredientRowNameRef>& BasePotionMap, bool& IsGood, float& NewInfectionRate);
 public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static TArray<FIngredient> GetAllIngredients(const UObject* WorldContextObject);
@@ -85,6 +96,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static const FIngredient& GetIngredientByIndex(const UObject* WorldContextObject, int32 Index, bool& bFound);
+
+    UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
+    static const FName GetRowNameByIngredient(const UObject* WorldContextObject, const FIngredient& Ingredient, bool& bFound);
 
     UFUNCTION(BlueprintCallable, Category = "Cache|Symptoms", meta = (WorldContext = "WorldContextObject"))
     static TArray<FSymptomRow> GetAllSymptoms(const UObject* WorldContextObject);

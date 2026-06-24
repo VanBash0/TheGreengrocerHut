@@ -80,6 +80,9 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
+    UFUNCTION(BlueprintCallable, Category = "Infection Rate")
+    void UpdateInfectionRate(float InfectionRate) { _currentDaySnapshot.VillageInfectionRate = InfectionRate; }
+
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;

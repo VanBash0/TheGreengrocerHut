@@ -13,7 +13,7 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 
     FClientsGeneratorData GeneratorData;
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, GeneratorData);
-    clientsGenerator.Procces(_currentDaySnapshot);
+    clientsGenerator.Process(_currentDaySnapshot);
 }
 
 void UGameLoop::Deinitialize()

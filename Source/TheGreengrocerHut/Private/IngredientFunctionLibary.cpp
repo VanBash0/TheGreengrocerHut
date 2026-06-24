@@ -59,6 +59,7 @@ void UCacheSubsystem::PopulateIngredientCache()
     }
 
     _ingredientCacheLoaded = true;
+    BuildIngredientHashCache();
 }
 
 void UCacheSubsystem::PopulateSymptomCache()
@@ -413,4 +414,115 @@ void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContex
             DefaultIngredients.Add(ingredient);
         }
     }
+}
+
+void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldContextObject,
+                                                       const TArray<FIngredient>& Ingredients,
+                                                       const FClient& CurrentClient,
+                                                       const TMap<int32, FIngredientRowNameRef>& BasePotionMap,
+                                                       bool& IsGood,
+                                                       float& NewInfectionRate)
+{
+    TArray<FName> neededIngredients;
+    GetIngredientsBySymptoms(WorldContextObject, CurrentClient.Symptoms, neededIngredients);
+    
+    int symptomsNum = CurrentClient.Symptoms.Num();
+    int key = 0;
+    for (const auto& base : BasePotionMap) {
+        if (symptomsNum >= base.Key) {
+            key = FMath::Max(key, base.Key);
+        }
+    }
+    neededIngredients.Add(BasePotionMap[key].RowName);
+
+    int matchingIngredients = 0;
+    int currentPriority = TNumericLimits<int32>::Min();
+    for (int i = 0; i < Ingredients.Num(); ++i) {
+        bool bFound = false;
+        FName ingredientName = GetRowNameByIngredient(WorldContextObject, Ingredients[i], bFound);
+        if (bFound && neededIngredients.IsValidIndex(i) && ingredientName == neededIngredients[i]
+                && Ingredients[i].TermsOfUse.AddPriority >= currentPriority) {
+            matchingIngredients++;
+            currentPriority = FMath::Max(currentPriority, Ingredients[i].TermsOfUse.AddPriority);
+        }
+    }
+
+
+}
+
+namespace {
+    static uint64 ComputeIngredientHash(const FIngredient& Ingredient)
+    {
+        uint64 Hash = 0;
+
+        // Name и DisplayName исключены из хэша, т.к. будут проблемы при локализации
+
+        Hash = HashCombine(Hash, GetTypeHash(Ingredient.MainColor));
+
+        auto GetAssetPath = [](const TObjectPtr<UObject>& Asset) -> FString
+            {
+                return Asset ? Asset->GetPathName() : FString();
+            };
+
+        Hash = HashCombine(Hash, GetTypeHash(GetAssetPath(Ingredient.Icon)));
+        Hash = HashCombine(Hash, GetTypeHash(GetAssetPath(Ingredient.Mesh)));
+        Hash = HashCombine(Hash, GetTypeHash(GetAssetPath(Ingredient.SFX)));
+        Hash = HashCombine(Hash, GetTypeHash(GetAssetPath(Ingredient.Container)));
+        Hash = HashCombine(Hash, GetTypeHash(Ingredient.TermsOfUse.AddPriority));
+        Hash = HashCombine(Hash, GetTypeHash(Ingredient.TermsOfUse.Mixing));
+
+        return Hash;
+    }
+}
+
+void UCacheSubsystem::BuildIngredientHashCache()
+{
+    _ingredientHashToRowName.Empty();
+    for (const auto& Pair : _ingredientCache) {
+        const FName& RowName = Pair.Key;
+        const FIngredient& Ingredient = Pair.Value;
+        uint64 Hash = ComputeIngredientHash(Ingredient);
+        _ingredientHashToRowName.FindOrAdd(Hash).Add(RowName);
+    }
+}
+
+const FName UCacheSubsystem::GetRowNameByIngredient(const FIngredient& Ingredient) const
+{
+    if (!_ingredientCacheLoaded) {
+        return NAME_None;
+    }
+
+    uint64 Hash = ComputeIngredientHash(Ingredient);
+    const TArray<FName>* FoundNames = _ingredientHashToRowName.Find(Hash);
+    if (!FoundNames) {
+        return NAME_None;
+    }
+
+    if (FoundNames->Num() == 1) {
+        return (*FoundNames)[0];
+    }
+
+    for (const FName& CandidateName : *FoundNames) {
+        const FIngredient* Candidate = _ingredientCache.Find(CandidateName);
+        if (Candidate) {
+            if (FIngredient::StaticStruct()->CompareScriptStruct(&Ingredient, Candidate, 0) == 0) {
+                return CandidateName;
+            }
+        }
+    }
+
+    return NAME_None;
+}
+
+const FName UIngredientFunctionLibary::GetRowNameByIngredient(const UObject* WorldContextObject, const FIngredient& Ingredient, bool& bFound)
+{
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) {
+        bFound = false;
+        return NAME_None;
+    }
+
+    FName Result = Cache->GetRowNameByIngredient(Ingredient);
+    bFound = !Result.IsNone();
+    return Result;
 }

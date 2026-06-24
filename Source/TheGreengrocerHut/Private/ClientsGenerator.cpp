@@ -1,6 +1,7 @@
 #include "ClientsGenerator.h"
 #include "SymptomStructures.h"
 #include "IngredientFunctionLibary.h"
+#include "Algo/RandomShuffle.h"
 
 namespace
 {
@@ -27,7 +28,7 @@ ClientsGenerator::ClientsGenerator(const UObject* WorldContextObject,
     unlockedSymptoms = ClientsGeneratorData.UnlockedSymptoms;
 }
 
-void ClientsGenerator::Procces(FDaySnapshot& OutSnapshot)
+void ClientsGenerator::Process(FDaySnapshot& OutSnapshot)
 {
     if (!TryHandleTutorialDay())
     {
@@ -170,6 +171,8 @@ void ClientsGenerator::InitializeClients()
         demon.Symptoms.SetNum(demonSymptomCount);
         clients.Add(demon);
     }
+
+    Algo::RandomShuffle(clients);
 }
 
 bool ClientsGenerator::TryHandleTutorialDay()

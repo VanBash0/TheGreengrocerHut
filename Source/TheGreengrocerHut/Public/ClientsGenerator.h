@@ -45,7 +45,7 @@ public:
                     const TObjectPtr<UGameSettings> GameSettings,
                     FClientsGeneratorData& ClientsGeneratorData);
 
-    void Procces(FDaySnapshot& OutSnapshot);
+    void Process(FDaySnapshot& OutSnapshot);
 
 private:
     void GenerateDemonSymptoms();
