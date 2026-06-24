@@ -73,6 +73,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient")
     static void GetBasePotions(const int& MaxClientSymptomCount, const bool& HasDemonPrevious, const TMap<int, FIngredientRowNameRef>& BasePotionsMap, const FIngredientRowNameRef& PoisonBase, TArray<FName>& BasePotions);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
+    static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
 public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static TArray<FIngredient> GetAllIngredients(const UObject* WorldContextObject);

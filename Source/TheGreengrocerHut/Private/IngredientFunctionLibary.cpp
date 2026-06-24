@@ -379,6 +379,8 @@ void UIngredientFunctionLibary::GetBasePotions(const int& MaxClientSymptomCount,
                                                const FIngredientRowNameRef& PoisonBase,
                                                TArray<FName>& BasePotions)
 {
+    BasePotions.Empty();
+
     for (const auto& base : BasePotionsMap) {
         if (MaxClientSymptomCount >= base.Key) {
             BasePotions.Add(base.Value.RowName);
@@ -387,5 +389,28 @@ void UIngredientFunctionLibary::GetBasePotions(const int& MaxClientSymptomCount,
 
     if (HasDemonAppeared) {
         BasePotions.Add(PoisonBase.RowName);
+    }
+}
+
+void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients)
+{
+    const TArray<UConverter*> converters = GetAllConverters(WorldContextObject);
+
+    TSet<FName> ToNames;
+
+    for (const UConverter* converter : converters)
+    {
+        if (!converter) continue;
+        for (const FConverterRecipe& recipe : converter->RecipeArray) {
+            ToNames.Add(recipe.To.RowName);
+        }
+    }
+
+    DefaultIngredients.Empty();
+
+    for (const FName& ingredient : Ingredients) {
+        if (!ToNames.Contains(ingredient)) {
+            DefaultIngredients.Add(ingredient);
+        }
     }
 }
