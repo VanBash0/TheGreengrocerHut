@@ -4,23 +4,7 @@
 #include "ClientStruct.h"
 #include "GameSettings.h"
 #include "SaveGameData.h"
-#include "SymptomStructures.h"
 #include "ClientsGenerator.generated.h"
-
-USTRUCT(BlueprintType)
-struct FSymptomWithWeightsData
-{
-    GENERATED_BODY()
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    EBodyPart BodyPart = EBodyPart::None;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    float Weight = 1.0f;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    float DemonWeight = 1.0f;
-};
 
 USTRUCT(BlueprintType)
 struct FClientsGeneratorData

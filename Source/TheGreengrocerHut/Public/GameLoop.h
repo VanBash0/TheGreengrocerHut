@@ -21,30 +21,6 @@ enum class EGameState : uint8
     GameEnd UMETA(DisplayName = "Game End")
 };
 
-USTRUCT(BlueprintType)
-struct FGameMetrics
-{
-    GENERATED_BODY()
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    TMap<FName, FSymptomWithWeightsData> SymptomMetrics;
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    int MaxClientSymptomCount;
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    bool HasDemonPrevious;
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    int DayNumber;
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    float HealingFactor;
-
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    float KillingFactor;
-};
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
 
