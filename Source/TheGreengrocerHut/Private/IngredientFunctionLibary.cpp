@@ -555,3 +555,8 @@ const FName UIngredientFunctionLibary::GetRowNameByIngredient(const UObject* Wor
     bFound = !Result.IsNone();
     return Result;
 }
+
+int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextObject) {
+    const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
+    return projectSettings->TutorialDaysTable->GetRowMap().Num();
+}

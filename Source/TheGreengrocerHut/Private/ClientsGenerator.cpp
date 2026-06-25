@@ -188,6 +188,7 @@ bool ClientsGenerator::TryHandleTutorialDay()
 
         clients = tutorialDayData->Clients;
         unlockedSymptoms.Empty();
+        TSet<FName> demonSymptomsSet;
         for (auto const& client : clients) {
             for (auto const& symptom : client.Symptoms) {
                 if (!projectSettings->SymptomTable) continue;
@@ -201,8 +202,13 @@ bool ClientsGenerator::TryHandleTutorialDay()
                 symptomData.DemonWeight = 1.0f;
                 symptomData.BodyPart = symptomRow.Type;
                 unlockedSymptoms.Add(symptom, symptomData);
+
+                if (client.IsDemon) {
+                    demonSymptomsSet.Add(symptom);
+                }
             }
         }
+        demonSymptomsOfDay = demonSymptomsSet.Array();
 
         return true;
     }

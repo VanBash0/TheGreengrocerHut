@@ -121,6 +121,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static void GetIngredientsBySymptoms(const UObject* WorldContextObject, const TArray<FName>& SymptomRowNames, TArray<FName>& OutIngredientRowNames);
 
+    UFUNCTION(BlueprintCallable, Category = "Tutorial", meta = (WorldContext = "WorldContextObject"))
+    static int32 GetTutorialDaysNum(const UObject* WorldContextObject);
+
 private:
     static UCacheSubsystem* GetCacheSystem(const UObject* WorldContextObject);
 };
