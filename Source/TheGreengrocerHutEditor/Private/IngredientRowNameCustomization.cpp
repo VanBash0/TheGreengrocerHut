@@ -1,5 +1,6 @@
 #include "IngredientRowNameCustomization.h"
 #include "DetailWidgetRow.h"
+#include "GameSettings.h"
 #include "Engine/DataTable.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Text/STextBlock.h"
@@ -15,8 +16,7 @@ void FIngredientRowNameCustomization::CustomizeHeader(
     FDetailWidgetRow& HeaderRow,
     IPropertyTypeCustomizationUtils& CustomizationUtils)
 {
-    RowNameHandle = PropertyHandle->GetChildHandle(
-        GET_MEMBER_NAME_CHECKED(FIngredientRowNameRef, RowName));
+    RowNameHandle = PropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FIngredientRowNameRef, RowName));
 
     RefreshOptions();
 
@@ -45,21 +45,22 @@ void FIngredientRowNameCustomization::RefreshOptions()
     Options.Empty();
     Options.Add(MakeShareable(new FName(NAME_None)));
 
-    UDataTable* Table = LoadObject<UDataTable>(nullptr,
-        TEXT("/Game/Data_New/Ingredient/DT_Ingredients.DT_Ingredients"));
-    if (Table)
+    const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
+    if (ProjectSettings)
     {
-        for (FName RowName : Table->GetRowNames())
+        if (ProjectSettings->IngredientTable)
         {
-            Options.Add(MakeShareable(new FName(RowName)));
+            for (FName RowName : ProjectSettings->IngredientTable->GetRowNames())
+            {
+                Options.Add(MakeShareable(new FName(RowName)));
+            }
         }
     }
 }
 
 TSharedRef<SWidget> FIngredientRowNameCustomization::GenerateOptionWidget(TSharedPtr<FName> Item)
 {
-    return SNew(STextBlock)
-        .Text(FText::FromName(Item.IsValid() ? *Item : NAME_None));
+    return SNew(STextBlock).Text(FText::FromName(Item.IsValid() ? *Item : NAME_None));
 }
 
 void FIngredientRowNameCustomization::OnSelectionChanged(TSharedPtr<FName> Item, ESelectInfo::Type SelectInfo)
