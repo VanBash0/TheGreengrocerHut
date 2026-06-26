@@ -126,13 +126,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Tutorial", meta = (WorldContext = "WorldContextObject"))
     static int32 GetTutorialDaysNum(const UObject* WorldContextObject);
 
-private:
+public:
+    UFUNCTION(BlueprintCallable, Category = "Newspaper", meta = (WorldContext = "WorldContextObject"))
     static const FNewspaper BuildNewspaperFromSnapshot(const UObject* WorldContextObject, const FDaySnapshot& Snapshot, int32 DayNum);
 
-public:
-
     UFUNCTION(BlueprintCallable, Category = "Newspaper", meta = (WorldContext = "WorldContextObject"))
-    static void GetAllNewspapers(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, const bool& CurrentDayIncluded, TArray<FNewspaper>& OutNewspapers);
+    static void GetAllNewspapers(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, const bool CurrentDayIncluded, TArray<FNewspaper>& OutNewspapers);
 
 private:
     static UCacheSubsystem* GetCacheSystem(const UObject* WorldContextObject);

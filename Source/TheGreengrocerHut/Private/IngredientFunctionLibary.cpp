@@ -602,7 +602,7 @@ const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UOb
 void UIngredientFunctionLibary::GetAllNewspapers(const UObject* WorldContextObject,
     const TArray<FDaySnapshot>& PreviousDaysSnapshots,
     const FDaySnapshot& CurrentDaySnapshot,
-    const bool& CurrentDayIncluded,
+    const bool CurrentDayIncluded,
     TArray<FNewspaper>& OutNewspapers)
 {
     int CurrentDay = PreviousDaysSnapshots.Num() + 1;

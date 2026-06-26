@@ -37,6 +37,9 @@ void ClientsGenerator::Process(FDaySnapshot& OutSnapshot, FGameMetrics& OutMetri
         FillSymptoms();
     }
 
+    gameMetrics.SymptomMetrics.GenerateKeyArray(daySnapshot.DaySymptoms);
+    gameMetrics.HasDemonPrevious = gameMetrics.HasDemonPrevious || (demonsNum > 0);
+
     OutSnapshot = daySnapshot;
     OutMetrics = gameMetrics;
 }
@@ -140,8 +143,6 @@ void ClientsGenerator::UpdateSymptomPool()
         FName symptomName = FName(availableSymptoms[i].Name.ToString());
         gameMetrics.SymptomMetrics[symptomName] = newSymptom;
     }
-
-    gameMetrics.SymptomMetrics.GenerateKeyArray(daySnapshot.DaySymptoms);
 }
 
 void ClientsGenerator::InitializeClients()
@@ -191,6 +192,7 @@ bool ClientsGenerator::TryHandleTutorialDay()
         daySnapshot.DayClients = tutorialDayData->Clients;
         TSet<FName> demonSymptomsSet;
         for (auto const& client : daySnapshot.DayClients) {
+            gameMetrics.MaxClientSymptomCount = FMath::Max(gameMetrics.MaxClientSymptomCount, client.Symptoms.Num());
             for (auto const& symptom : client.Symptoms) {
                 if (!tutorialDaysTable) continue;
 
@@ -263,6 +265,7 @@ void ClientsGenerator::FillSymptoms()
 
     for (int i = 0; i < daySnapshot.DayClients.Num(); ++i)
     {
+        gameMetrics.MaxClientSymptomCount = FMath::Max(gameMetrics.MaxClientSymptomCount, daySnapshot.DayClients[i].Symptoms.Num());
         if (daySnapshot.DayClients[i].IsDemon)
         {
             for (int j = 0; j < demonSymptomCount; ++j)

@@ -63,6 +63,9 @@ public:
     void GetDaySnapshot(FDaySnapshot& OutSnapshot) const { OutSnapshot = _currentDaySnapshot; }
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
+    USaveGameData* GetSavedData() const { return _savedData.Get(); }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
     void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
     UFUNCTION(BlueprintCallable, Category = "Infection Rate")
