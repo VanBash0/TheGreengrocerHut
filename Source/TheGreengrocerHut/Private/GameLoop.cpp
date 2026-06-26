@@ -17,7 +17,7 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
 
-    //_currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
+    _currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
 
     UWorld* World = GetWorld();
     if (World)
