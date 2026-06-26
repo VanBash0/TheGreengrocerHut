@@ -12,9 +12,10 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
 
-    FClientsGeneratorData GeneratorData;
-    ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, GeneratorData);
-    clientsGenerator.Process(_currentDaySnapshot);
+    LoadSave();
+
+    ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
+    clientsGenerator.Process(_currentDaySnapshot, _metrics);
 }
 
 void UGameLoop::Deinitialize()
@@ -118,6 +119,22 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     }
 }
 
-FClientsGeneratorData UGameLoop::LoadSave() {
-    
+void UGameLoop::LoadSave() {
+    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("Save1"), 0);
+    if (!loadedGame) {
+        UE_LOG(LogTemp, Warning, TEXT("No save data found."));
+        return;
+    }
+
+    USaveGameData* save = Cast<USaveGameData>(loadedGame);
+    if (!save) {
+        UE_LOG(LogTemp, Error, TEXT("Loaded data is not of type USaveGameData"));
+        return;
+    }
+
+    if (save->DaySnapshots.Num() != 0) {
+        _currentDaySnapshot.VillageInfectionRate = save->DaySnapshots.Last().VillageInfectionRate;
+        _metrics = save->LastDayMetrics;
+        _metrics.DayNumber++;
+    }
 }

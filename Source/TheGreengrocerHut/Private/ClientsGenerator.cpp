@@ -15,20 +15,20 @@ namespace
 ClientsGenerator::ClientsGenerator(const UObject* WorldContextObject, 
                                    const UGameProjectSettings* ProjectSettings,
                                    const TObjectPtr<UGameSettings> GameSettings,
-                                   FClientsGeneratorData& ClientsGeneratorData)
+                                   const FDaySnapshot& CurrentSnapshot,
+                                   const FGameMetrics& GameMetrics)
 {
     worldContextObject = WorldContextObject;
-    generatorData = ClientsGeneratorData;
+    daySnapshot = CurrentSnapshot;
+    gameMetrics = GameMetrics;
     projectSettings = ProjectSettings;
     gameSettings = GameSettings.Get();
 
-    infectionRateNormalized = (generatorData.InfectionRate + 100.f) / 200.f;
-    progressionMultiplier = 1 / (1 + FMath::Exp(-1 * gameSettings->Steepness * (generatorData.DayNumber - gameSettings->Midpoint)));
-
-    unlockedSymptoms = ClientsGeneratorData.UnlockedSymptoms;
+    infectionRateNormalized = (daySnapshot.VillageInfectionRate + 100.f) / 200.f;
+    progressionMultiplier = 1 / (1 + FMath::Exp(-1 * gameSettings->Steepness * (gameMetrics.DayNumber - gameSettings->Midpoint)));
 }
 
-void ClientsGenerator::Process(FDaySnapshot& OutSnapshot)
+void ClientsGenerator::Process(FDaySnapshot& OutSnapshot, FGameMetrics& OutMetrics)
 {
     if (!TryHandleTutorialDay())
     {
@@ -37,14 +37,13 @@ void ClientsGenerator::Process(FDaySnapshot& OutSnapshot)
         FillSymptoms();
     }
 
-    OutSnapshot.DayClients = clients;
-    OutSnapshot.DemonSymptoms = demonSymptomsOfDay;
-    OutSnapshot.VillageInfectionRate = generatorData.InfectionRate;
+    OutSnapshot = daySnapshot;
+    OutMetrics = gameMetrics;
 }
 
 void ClientsGenerator::GenerateDemonSymptoms()
 {
-    demonSymptomsOfDay.Empty();
+    daySnapshot.DemonSymptoms.Empty();
     TSet<EBodyPart> occupiedParts;
     occupiedParts.Reserve(static_cast<int32>(EBodyPart::MAX));
 
@@ -53,14 +52,14 @@ void ClientsGenerator::GenerateDemonSymptoms()
 
         if (chosenSymptom.IsNone()) { break; }
 
-        demonSymptomsOfDay.Add(chosenSymptom);
-        occupiedParts.Add(unlockedSymptoms[chosenSymptom].BodyPart);
+        daySnapshot.DemonSymptoms.Add(chosenSymptom);
+        occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
 
-        unlockedSymptoms[chosenSymptom].DemonWeight = 0.0f;
+        gameMetrics.SymptomMetrics[chosenSymptom].DemonWeight = 0.0f;
     }
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
-    for (auto& unlockedSymptom : unlockedSymptoms)
+    for (auto& unlockedSymptom : gameMetrics.SymptomMetrics)
     {
         float& currentWeight = unlockedSymptom.Value.DemonWeight;
         if (currentWeight > 0.0f)
@@ -76,7 +75,7 @@ void ClientsGenerator::UpdateSymptomPool()
 
     TArray<FSymptomRow> allSymptoms = UIngredientFunctionLibary::GetAllSymptoms(worldContextObject);
     TArray<FName> unlockedSymptomNames;
-    for (const auto& symptom : unlockedSymptoms) {
+    for (const auto& symptom : gameMetrics.SymptomMetrics) {
         unlockedSymptomNames.Add(symptom.Key);
     }
 
@@ -139,7 +138,7 @@ void ClientsGenerator::UpdateSymptomPool()
         newSymptom.Weight = gameSettings->NewSymptomWeight;
         newSymptom.DemonWeight = gameSettings->NewDemonSymptomWeight;
         FName symptomName = FName(availableSymptoms[i].Name.ToString());
-        unlockedSymptoms[symptomName] = newSymptom;
+        gameMetrics.SymptomMetrics[symptomName] = newSymptom;
     }
 }
 
@@ -153,14 +152,14 @@ void ClientsGenerator::InitializeClients()
         * (1 - infectionRateNormalized);
 
     int peopleNum = clientsNum - demonsNum;
-    clients = TArray<FClient>();
+    daySnapshot.DayClients = TArray<FClient>();
     for (int i = 0; i < peopleNum; ++i) {
         FClient client;
         client.IsDemon = false;
         int symptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-gameSettings->Error, gameSettings->Error)),
             gameSettings->MinSymptoms, gameSettings->MaxSymptoms);
         client.Symptoms.SetNum(symptomCount);
-        clients.Add(client);
+        daySnapshot.DayClients.Add(client);
     }
 
     demonSymptomCount = FMath::Clamp(FMath::RoundToInt(expectedValue + FMath::RandRange(-gameSettings->Error, gameSettings->Error)),
@@ -169,10 +168,10 @@ void ClientsGenerator::InitializeClients()
         FClient demon;
         demon.IsDemon = true;
         demon.Symptoms.SetNum(demonSymptomCount);
-        clients.Add(demon);
+        daySnapshot.DayClients.Add(demon);
     }
 
-    Algo::RandomShuffle(clients);
+    Algo::RandomShuffle(daySnapshot.DayClients);
 }
 
 bool ClientsGenerator::TryHandleTutorialDay()
@@ -181,16 +180,15 @@ bool ClientsGenerator::TryHandleTutorialDay()
     if (!projectSettings || !tutorialDaysTable) { return false; }
 
     int tutorialDayCount = tutorialDaysTable->GetRowMap().Num();
-    if (generatorData.DayNumber <= tutorialDayCount) {
-        FName rowName = FName(FString::FromInt(generatorData.DayNumber));
+    if (gameMetrics.DayNumber <= tutorialDayCount) {
+        FName rowName = FName(FString::FromInt(gameMetrics.DayNumber));
         FTutorialDay* tutorialDayData = tutorialDaysTable->FindRow<FTutorialDay>(rowName, TEXT(""));
 
         if (!tutorialDayData) { return false; }
 
-        clients = tutorialDayData->Clients;
-        unlockedSymptoms.Empty();
+        daySnapshot.DayClients = tutorialDayData->Clients;
         TSet<FName> demonSymptomsSet;
-        for (auto const& client : clients) {
+        for (auto const& client : daySnapshot.DayClients) {
             for (auto const& symptom : client.Symptoms) {
                 if (!tutorialDaysTable) continue;
 
@@ -202,14 +200,14 @@ bool ClientsGenerator::TryHandleTutorialDay()
                 symptomData.Weight = 1.0f;
                 symptomData.DemonWeight = 1.0f;
                 symptomData.BodyPart = symptomRow.Type;
-                unlockedSymptoms.Add(symptom, symptomData);
+                gameMetrics.SymptomMetrics.Add(symptom, symptomData);
 
                 if (client.IsDemon) {
                     demonSymptomsSet.Add(symptom);
                 }
             }
         }
-        demonSymptomsOfDay = demonSymptomsSet.Array();
+        daySnapshot.DemonSymptoms = demonSymptomsSet.Array();
 
         return true;
     }
@@ -222,7 +220,7 @@ FName ClientsGenerator::SelectSymptomFromPool(const TSet<EBodyPart>& occupiedPar
     TArray<FSymptomCandidate> symptomCandidates;
     float totalWeight = 0.0f;
 
-    for (const auto& unlockedSymptom : unlockedSymptoms) {
+    for (const auto& unlockedSymptom : gameMetrics.SymptomMetrics) {
         const auto& symptomData = unlockedSymptom.Value;
         if (occupiedParts.Contains(symptomData.BodyPart)) {
             continue;
@@ -261,21 +259,21 @@ void ClientsGenerator::FillSymptoms()
         GenerateDemonSymptoms();
     }
 
-    for (int i = 0; i < clients.Num(); ++i)
+    for (int i = 0; i < daySnapshot.DayClients.Num(); ++i)
     {
-        if (clients[i].IsDemon)
+        if (daySnapshot.DayClients[i].IsDemon)
         {
             for (int j = 0; j < demonSymptomCount; ++j)
             {
-                if (demonSymptomsOfDay.IsValidIndex(j))
+                if (daySnapshot.DemonSymptoms.IsValidIndex(j))
                 {
-                    clients[i].Symptoms[j] = demonSymptomsOfDay[j];
+                    daySnapshot.DayClients[i].Symptoms[j] = daySnapshot.DemonSymptoms[j];
                 }
             }
         }
         else
         {
-            GenerateSymptomsForClient(clients[i]);
+            GenerateSymptomsForClient(daySnapshot.DayClients[i]);
         }
     }
 }
@@ -291,14 +289,14 @@ void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
             break;
         }
 
-        occupiedParts.Add(unlockedSymptoms[chosenSymptom].BodyPart);
+        occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
         client.Symptoms[i] = chosenSymptom;
 
-        unlockedSymptoms[chosenSymptom].Weight = 0.0f;
+        gameMetrics.SymptomMetrics[chosenSymptom].Weight = 0.0f;
     }
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
-    for (auto& unlockedSymptom : unlockedSymptoms)
+    for (auto& unlockedSymptom : gameMetrics.SymptomMetrics)
     {
         float& currentWeight = unlockedSymptom.Value.Weight;
         if (currentWeight > 0.0f) {
