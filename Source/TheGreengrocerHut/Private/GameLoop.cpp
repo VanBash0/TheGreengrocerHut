@@ -176,3 +176,13 @@ void UGameLoop::LoadSave()
         _metrics.MaxClientSymptomCount = 0;
     }
 }
+
+void UGameLoop::SaveGame() {
+    _savedData->DaySnapshots.Add(_currentDaySnapshot);
+    _savedData->LastDayMetrics = _metrics;
+
+    bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, TEXT("Save1"), 0);
+    if (!bSaved) {
+        UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
+    }
+}
