@@ -140,6 +140,8 @@ void ClientsGenerator::UpdateSymptomPool()
         FName symptomName = FName(availableSymptoms[i].Name.ToString());
         gameMetrics.SymptomMetrics[symptomName] = newSymptom;
     }
+
+    gameMetrics.SymptomMetrics.GenerateKeyArray(daySnapshot.DaySymptoms);
 }
 
 void ClientsGenerator::InitializeClients()

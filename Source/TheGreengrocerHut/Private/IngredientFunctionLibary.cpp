@@ -377,13 +377,15 @@ const UConverter* UIngredientFunctionLibary::GetConverterByIndex(const UObject* 
     return Result;
 }
 
-void UIngredientFunctionLibary::GetBasePotions(const int& MaxClientSymptomCount,
-                                               const bool& HasDemonAppeared,
-                                               const TMap<int, FIngredientRowNameRef>& BasePotionsMap,
-                                               const FIngredientRowNameRef& PoisonBase,
+void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject,
+                                               const int& MaxClientSymptomCount,
+                                               const bool& HasDemonPrevious,
                                                TArray<FName>& BasePotions)
 {
     BasePotions.Empty();
+    const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
+    const auto& BasePotionsMap = projectSettings->GameSettingsAsset->BasePotionsMap;
+    const auto& PoisonBase = projectSettings->GameSettingsAsset->PoisonBase;
 
     for (const auto& base : BasePotionsMap) {
         if (MaxClientSymptomCount >= base.Key) {
@@ -391,7 +393,7 @@ void UIngredientFunctionLibary::GetBasePotions(const int& MaxClientSymptomCount,
         }
     }
 
-    if (HasDemonAppeared) {
+    if (HasDemonPrevious) {
         BasePotions.Add(PoisonBase.RowName);
     }
 }

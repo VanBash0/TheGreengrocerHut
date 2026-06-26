@@ -81,8 +81,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Ingredient")
     static void SelectUnlockedRecipe(const TArray<FName>& IngredientNames, const TArray<FConverterRecipe>& AllRecieps, TArray<FConverterRecipe>& OutUnclockedRecieps);
 
-    UFUNCTION(BlueprintCallable, Category = "Ingredient")
-    static void GetBasePotions(const int& MaxClientSymptomCount, const bool& HasDemonPrevious, const TMap<int, FIngredientRowNameRef>& BasePotionsMap, const FIngredientRowNameRef& PoisonBase, TArray<FName>& BasePotions);
+    UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
+    static void GetBasePotions(const UObject* WorldContextObject, const int& MaxClientSymptomCount, const bool& HasDemonAppeared, TArray<FName>& BasePotions);
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);

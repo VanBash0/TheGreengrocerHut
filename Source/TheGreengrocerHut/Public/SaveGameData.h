@@ -12,6 +12,9 @@ struct FDaySnapshot
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<FName> DaySymptoms;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FName> DemonSymptoms;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
