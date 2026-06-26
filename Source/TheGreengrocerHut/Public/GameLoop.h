@@ -77,6 +77,7 @@ private:
     static const TMap<EGameState, StateDelegatePtr> StateEventMap;
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
     void TriggerStateEvent(EGameState State);
+    FClientsGeneratorData LoadSave();
 
 private:
     FDaySnapshot _currentDaySnapshot;

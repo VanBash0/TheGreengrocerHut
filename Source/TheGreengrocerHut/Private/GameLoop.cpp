@@ -1,4 +1,5 @@
 #include "GameLoop.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
@@ -115,4 +116,8 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     else {
         _metrics.KillingFactor += GameSettings->DeltaKillingFactor;
     }
+}
+
+FClientsGeneratorData UGameLoop::LoadSave() {
+    
 }
