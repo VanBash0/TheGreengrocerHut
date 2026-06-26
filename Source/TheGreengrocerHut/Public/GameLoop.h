@@ -78,6 +78,7 @@ private:
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
     void TriggerStateEvent(EGameState State);
     void LoadSave();
+    void TriggerDayStart();
 
 private:
     FDaySnapshot _currentDaySnapshot;

@@ -16,6 +16,16 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
+
+    UWorld* World = GetWorld();
+    if (World) {
+        World->GetTimerManager().SetTimerForNextTick(this, &UGameLoop::TriggerDayStart);
+    }
+}
+
+void UGameLoop::TriggerDayStart()
+{
+    SetNewState(EGameState::DayStart);
 }
 
 void UGameLoop::Deinitialize()
