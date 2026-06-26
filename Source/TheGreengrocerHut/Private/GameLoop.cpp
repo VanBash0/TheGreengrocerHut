@@ -148,9 +148,17 @@ void UGameLoop::LoadSave() {
 
     _savedData = save;
 
-    if (save->DaySnapshots.Num() == 0) { return; }
-
-    _currentDaySnapshot.VillageInfectionRate = save->DaySnapshots.Last().VillageInfectionRate;
-    _metrics = save->LastDayMetrics;
-    _metrics.DayNumber++;
+    if (save->DaySnapshots.Num() != 0) {
+        _currentDaySnapshot.VillageInfectionRate = save->DaySnapshots.Last().VillageInfectionRate;
+        _metrics = save->LastDayMetrics;
+        _metrics.DayNumber++;
+    }
+    else {
+        _currentDaySnapshot.VillageInfectionRate = 0;
+        _metrics.DayNumber = 1;
+        _metrics.HealingFactor = GameSettings->StartHealingFactor;
+        _metrics.KillingFactor = GameSettings->StartKillingFactor;
+        _metrics.HasDemonPrevious = false;
+        _metrics.MaxClientSymptomCount = 0;
+    }
 }
