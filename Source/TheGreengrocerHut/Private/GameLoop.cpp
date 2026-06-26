@@ -132,11 +132,22 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     }
 }
 
-void UGameLoop::LoadSave() {
+void UGameLoop::LoadSave()
+{
     USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("Save1"), 0);
     if (!loadedGame)
     {
         UE_LOG(LogTemp, Warning, TEXT("No save data found."));
+
+        _currentDaySnapshot.VillageInfectionRate = 0;
+        _metrics.DayNumber = 1;
+        _metrics.HealingFactor = GameSettings->StartHealingFactor;
+        _metrics.KillingFactor = GameSettings->StartKillingFactor;
+        _metrics.HasDemonPrevious = false;
+        _metrics.MaxClientSymptomCount = 0;
+
+        _savedData = NewObject<USaveGameData>(this);
+
         return;
     }
 
