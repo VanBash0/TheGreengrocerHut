@@ -147,4 +147,12 @@ void UGameLoop::LoadSave() {
         _metrics = save->LastDayMetrics;
         _metrics.DayNumber++;
     }
+    else {
+        _currentDaySnapshot.VillageInfectionRate = 0;
+        _metrics.DayNumber = 1;
+        _metrics.HealingFactor = GameSettings->StartHealingFactor;
+        _metrics.KillingFactor = GameSettings->StartKillingFactor;
+        _metrics.HasDemonPrevious = false;
+        _metrics.MaxClientSymptomCount = 0;
+    }
 }

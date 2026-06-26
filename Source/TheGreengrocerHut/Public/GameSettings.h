@@ -146,6 +146,10 @@ public:
         meta = (DisplayName = "Poison Base", ToolTip = "Row Name отравы"))
     FIngredientRowNameRef PoisonBase;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ingredients|Base Potions",
+        meta = (DisplayName = "Bottle", ToolTip = "Row Name склянки"))
+    FIngredientRowNameRef Bottle;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
         meta = (DisplayName = "Start Healing Factor", ToolTip = "Базовое значение фактора лечения (чем больше, тем быстрее деревня исцеляется)"))
     float StartHealingFactor;
