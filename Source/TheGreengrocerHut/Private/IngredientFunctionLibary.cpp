@@ -12,6 +12,9 @@ void UCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         _ingredientTable = ProjectSettings->IngredientTable.LoadSynchronous();
         _symptomTable = ProjectSettings->SymptomTable.LoadSynchronous();
         _converterFolderPath = ProjectSettings->ConverterFolderPath;
+
+        ProjectSettings->TutorialNewspaperDataTable.LoadSynchronous();
+        ProjectSettings->NewspaperDataTable.LoadSynchronous();
     }
 
     PopulateIngredientCache();
@@ -559,4 +562,33 @@ const FName UIngredientFunctionLibary::GetRowNameByIngredient(const UObject* Wor
 int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextObject) {
     const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
     return projectSettings->TutorialDaysTable->GetRowMap().Num();
+}
+
+const FNewspaper UIngredientFunctionLibary::GetNewspaperByDayNum(const UObject* WorldContextObject,
+    const TArray<FDaySnapshot>& PreviousDaysSnapshots,
+    const FDaySnapshot& CurrentDaySnapshot,
+    int DayNum, int CurrentDayNum)
+{
+    FNewspaper outNewspaper;
+    const FDaySnapshot& snapshot = (DayNum < CurrentDayNum) ? PreviousDaysSnapshots[DayNum - 1] : CurrentDaySnapshot;
+    outNewspaper.DemonSymptoms = snapshot.DemonSymptoms;
+
+    const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
+
+    float infRate = snapshot.VillageInfectionRate;
+    float roundedRate = FMath::Floor(FMath::Min(100.f, FMath::Max(-100.f, infRate - FMath::Modulo(infRate, 10))));
+    FName rateRowName = FName(*FString::FromInt(roundedRate));
+    FNewspaperData* data = ProjectSettings->NewspaperDataTable->FindRow<FNewspaperData>(rateRowName, TEXT(""));
+    outNewspaper.VillageImage = data->VillageImage;
+
+    if (DayNum <= GetTutorialDaysNum(WorldContextObject)) {
+        FName rowName = FName(*FString::FromInt(DayNum));
+        FTutorialNewspaperData* tutorData = ProjectSettings->TutorialNewspaperDataTable->FindRow<FTutorialNewspaperData>(rowName, TEXT(""));
+        outNewspaper.Description = tutorData->Description;
+    }
+    else {
+        outNewspaper.Description = data->Description;
+    }
+
+    return outNewspaper;
 }

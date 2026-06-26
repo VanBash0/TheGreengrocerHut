@@ -15,6 +15,7 @@
 #include "GameSettings.h"
 #include "ClientStruct.h"
 #include "GameLoop.h"
+#include "NewsPaperStructures.h"
 
 #include "IngredientFunctionLibary.generated.h"
 
@@ -121,8 +122,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static void GetIngredientsBySymptoms(const UObject* WorldContextObject, const TArray<FName>& SymptomRowNames, TArray<FName>& OutIngredientRowNames);
 
+public:
     UFUNCTION(BlueprintCallable, Category = "Tutorial", meta = (WorldContext = "WorldContextObject"))
     static int32 GetTutorialDaysNum(const UObject* WorldContextObject);
+
+private:
+    static const FNewspaper GetNewspaperByDayNum(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, int DayNum, int CurrentDayNum);
 
 private:
     static UCacheSubsystem* GetCacheSystem(const UObject* WorldContextObject);

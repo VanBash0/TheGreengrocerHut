@@ -177,12 +177,13 @@ void ClientsGenerator::InitializeClients()
 
 bool ClientsGenerator::TryHandleTutorialDay()
 {
-    if (!projectSettings || !projectSettings->TutorialDaysTable) { return false; }
+    TObjectPtr<UDataTable> tutorialDaysTable = projectSettings->TutorialDaysTable.LoadSynchronous();
+    if (!projectSettings || !tutorialDaysTable) { return false; }
 
-    int tutorialDayCount = projectSettings->TutorialDaysTable->GetRowMap().Num();
+    int tutorialDayCount = tutorialDaysTable->GetRowMap().Num();
     if (generatorData.DayNumber <= tutorialDayCount) {
         FName rowName = FName(FString::FromInt(generatorData.DayNumber));
-        FTutorialDay* tutorialDayData = projectSettings->TutorialDaysTable->FindRow<FTutorialDay>(rowName, TEXT(""));
+        FTutorialDay* tutorialDayData = tutorialDaysTable->FindRow<FTutorialDay>(rowName, TEXT(""));
 
         if (!tutorialDayData) { return false; }
 
@@ -191,7 +192,7 @@ bool ClientsGenerator::TryHandleTutorialDay()
         TSet<FName> demonSymptomsSet;
         for (auto const& client : clients) {
             for (auto const& symptom : client.Symptoms) {
-                if (!projectSettings->SymptomTable) continue;
+                if (!tutorialDaysTable) continue;
 
                 bool bFound = false;
                 const FSymptomRow& symptomRow = UIngredientFunctionLibary::GetSymptomByRowName(worldContextObject, symptom, bFound);
