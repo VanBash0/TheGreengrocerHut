@@ -564,31 +564,56 @@ int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextO
     return projectSettings->TutorialDaysTable->GetRowMap().Num();
 }
 
-const FNewspaper UIngredientFunctionLibary::GetNewspaperByDayNum(const UObject* WorldContextObject,
-    const TArray<FDaySnapshot>& PreviousDaysSnapshots,
-    const FDaySnapshot& CurrentDaySnapshot,
-    int DayNum, int CurrentDayNum)
+const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UObject* WorldContextObject,
+    const FDaySnapshot& Snapshot, int32 DayNum)
 {
     FNewspaper outNewspaper;
-    const FDaySnapshot& snapshot = (DayNum < CurrentDayNum) ? PreviousDaysSnapshots[DayNum - 1] : CurrentDaySnapshot;
-    outNewspaper.DemonSymptoms = snapshot.DemonSymptoms;
+    outNewspaper.DemonSymptoms = Snapshot.DemonSymptoms;
 
-    const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
+    const UGameProjectSettings* Settings = GetDefault<UGameProjectSettings>();
+    if (!Settings) return outNewspaper;
 
-    float infRate = snapshot.VillageInfectionRate;
-    float roundedRate = FMath::Floor(FMath::Min(100.f, FMath::Max(-100.f, infRate - FMath::Modulo(infRate, 10))));
-    FName rateRowName = FName(*FString::FromInt(roundedRate));
-    FNewspaperData* data = ProjectSettings->NewspaperDataTable->FindRow<FNewspaperData>(rateRowName, TEXT(""));
-    outNewspaper.VillageImage = data->VillageImage;
+    float rate = Snapshot.VillageInfectionRate;
+    float rounded = FMath::Floor(FMath::Clamp(rate - FMath::Modulo(rate, 10.0f), -100.0f, 100.0f));
+    FName rateRowName = FName(*FString::FromInt((int32)rounded));
 
-    if (DayNum <= GetTutorialDaysNum(WorldContextObject)) {
-        FName rowName = FName(*FString::FromInt(DayNum));
-        FTutorialNewspaperData* tutorData = ProjectSettings->TutorialNewspaperDataTable->FindRow<FTutorialNewspaperData>(rowName, TEXT(""));
-        outNewspaper.Description = tutorData->Description;
+    if (FNewspaperData* Data = Settings->NewspaperDataTable->FindRow<FNewspaperData>(rateRowName, TEXT(""))) {
+        outNewspaper.VillageImage = Data->VillageImage;
+        outNewspaper.Description = Data->Description;
     }
     else {
-        outNewspaper.Description = data->Description;
+        outNewspaper.VillageImage = nullptr;
+        outNewspaper.Description = FText::GetEmpty();
+    }
+
+    if (DayNum <= UIngredientFunctionLibary::GetTutorialDaysNum(WorldContextObject))
+    {
+        FName TutorRowName = FName(*FString::FromInt(DayNum));
+        if (FTutorialNewspaperData* TutorData = Settings->TutorialNewspaperDataTable->FindRow<FTutorialNewspaperData>(TutorRowName, TEXT(""))) {
+            outNewspaper.Description = TutorData->Description;
+        }
     }
 
     return outNewspaper;
+}
+
+void UIngredientFunctionLibary::GetCurrentNewspaper(const UObject* WorldContextObject,
+    const FDaySnapshot& CurrentDaySnapshot,
+    const int32& CurrentDayNum,
+    FNewspaper& OutNewspaper)
+{
+    OutNewspaper = BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDayNum);
+}
+
+void UIngredientFunctionLibary::GetAllNewspapers(const UObject* WorldContextObject,
+    const TArray<FDaySnapshot>& PreviousDaysSnapshots,
+    const FDaySnapshot& CurrentDaySnapshot,
+    TArray<FNewspaper>& OutNewspapers)
+{
+    int CurrentDay = PreviousDaysSnapshots.Num() + 1;
+    for (int i = 0; i < CurrentDay - 1; ++i) {
+        OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, PreviousDaysSnapshots[i], i + 1));
+    }
+
+    OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDay));
 }

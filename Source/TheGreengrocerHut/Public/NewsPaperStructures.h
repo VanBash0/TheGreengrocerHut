@@ -35,9 +35,6 @@ struct FNewspaperData : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int InfectionRate;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<UTexture2D> VillageImage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

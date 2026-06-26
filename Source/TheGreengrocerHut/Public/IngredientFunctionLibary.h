@@ -127,7 +127,14 @@ public:
     static int32 GetTutorialDaysNum(const UObject* WorldContextObject);
 
 private:
-    static const FNewspaper GetNewspaperByDayNum(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, int DayNum, int CurrentDayNum);
+    static const FNewspaper BuildNewspaperFromSnapshot(const UObject* WorldContextObject, const FDaySnapshot& Snapshot, int32 DayNum);
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Newspaper", meta = (WorldContext = "WorldContextObject"))
+    static void GetCurrentNewspaper(const UObject* WorldContextObject, const FDaySnapshot& CurrentDaySnapshot, const int& CurrentDayNum, FNewspaper& OutNewspaper);
+
+    UFUNCTION(BlueprintCallable, Category = "Newspaper", meta = (WorldContext = "WorldContextObject"))
+    static void GetAllNewspapers(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, TArray<FNewspaper>& OutNewspapers);
 
 private:
     static UCacheSubsystem* GetCacheSystem(const UObject* WorldContextObject);
