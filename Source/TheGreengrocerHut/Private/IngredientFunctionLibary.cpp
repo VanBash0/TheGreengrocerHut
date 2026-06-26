@@ -597,17 +597,10 @@ const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UOb
     return outNewspaper;
 }
 
-void UIngredientFunctionLibary::GetCurrentNewspaper(const UObject* WorldContextObject,
-    const FDaySnapshot& CurrentDaySnapshot,
-    const int32& CurrentDayNum,
-    FNewspaper& OutNewspaper)
-{
-    OutNewspaper = BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDayNum);
-}
-
 void UIngredientFunctionLibary::GetAllNewspapers(const UObject* WorldContextObject,
     const TArray<FDaySnapshot>& PreviousDaysSnapshots,
     const FDaySnapshot& CurrentDaySnapshot,
+    const bool& CurrentDayIncluded,
     TArray<FNewspaper>& OutNewspapers)
 {
     int CurrentDay = PreviousDaysSnapshots.Num() + 1;
@@ -615,5 +608,7 @@ void UIngredientFunctionLibary::GetAllNewspapers(const UObject* WorldContextObje
         OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, PreviousDaysSnapshots[i], i + 1));
     }
 
-    OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDay));
+    if (CurrentDayIncluded) {
+        OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDay));
+    }
 }
