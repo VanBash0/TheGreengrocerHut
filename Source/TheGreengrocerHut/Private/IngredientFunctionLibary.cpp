@@ -563,6 +563,7 @@ const FName UIngredientFunctionLibary::GetRowNameByIngredient(const UObject* Wor
 
 int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextObject) {
     const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
+    if (!projectSettings || !projectSettings->TutorialDaysTable) return 0;
     return projectSettings->TutorialDaysTable->GetRowMap().Num();
 }
 
@@ -575,6 +576,8 @@ const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UOb
     const UGameProjectSettings* Settings = GetDefault<UGameProjectSettings>();
     if (!Settings) return outNewspaper;
 
+    if (!Settings->NewspaperDataTable) return outNewspaper;
+
     float rate = Snapshot.VillageInfectionRate;
     float rounded = FMath::Floor(FMath::Clamp(rate - FMath::Modulo(rate, 10.0f), -100.0f, 100.0f));
     FName rateRowName = FName(*FString::FromInt((int32)rounded));
@@ -583,10 +586,8 @@ const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UOb
         outNewspaper.VillageImage = Data->VillageImage;
         outNewspaper.Description = Data->Description;
     }
-    else {
-        outNewspaper.VillageImage = nullptr;
-        outNewspaper.Description = FText::GetEmpty();
-    }
+
+    if (!Settings->TutorialNewspaperDataTable) return outNewspaper;
 
     if (DayNum <= UIngredientFunctionLibary::GetTutorialDaysNum(WorldContextObject))
     {

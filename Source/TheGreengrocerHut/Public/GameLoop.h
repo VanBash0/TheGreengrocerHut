@@ -74,6 +74,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Save")
     void SaveGame();
 
+public: //TO DELETE (œŒÀÕ¿ﬂ ’”…Õﬂ)
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASS")
+    bool DidPlayerWin();
+
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
