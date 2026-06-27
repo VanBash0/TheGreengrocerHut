@@ -97,6 +97,7 @@ private:
     int currentClientIndex_ = 0;
 
 private:
+    UPROPERTY()
     TObjectPtr<USaveGameData> _savedData;
 
 private:

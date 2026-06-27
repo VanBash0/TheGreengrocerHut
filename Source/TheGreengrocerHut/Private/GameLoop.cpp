@@ -153,6 +153,7 @@ void UGameLoop::LoadSave()
     if (!save)
     {
         UE_LOG(LogTemp, Error, TEXT("Loaded data is not of type USaveGameData"));
+        _savedData = NewObject<USaveGameData>(this);
         return;
     }
 
@@ -175,17 +176,19 @@ void UGameLoop::LoadSave()
     }
 }
 
-void UGameLoop::SaveGame() {
+void UGameLoop::SaveGame()
+{
     _savedData->DaySnapshots.Add(_currentDaySnapshot);
     _savedData->LastDayMetrics = _metrics;
 
     bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, TEXT("Save1"), 0);
-    if (!bSaved) {
+    if (!bSaved)
+    {
         UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
     }
 }
 
 bool UGameLoop::DidPlayerWin()
 {
-    return _currentDaySnapshot.VillageInfectionRate >= 1.0f;
+    return _currentDaySnapshot.VillageInfectionRate >= 100.0f;
 }
