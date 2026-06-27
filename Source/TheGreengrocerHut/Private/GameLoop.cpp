@@ -10,14 +10,14 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     if (ProjectSettings)
     {
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
+
+        _currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
     }
 
     LoadSave();
 
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
-
-    //_currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
 
     UWorld* World = GetWorld();
     if (World)
@@ -38,21 +38,13 @@ void UGameLoop::Deinitialize()
 
 bool UGameLoop::ShouldCreateSubsystem(UObject* Outer) const
 {
-    if (!Super::ShouldCreateSubsystem(Outer))
-        return false;
+    if (!Super::ShouldCreateSubsystem(Outer)) { return false; }
 
     UWorld* World = Cast<UWorld>(Outer);
-    if (!World)
-        return false;
+    if (!World) { return false; }
 
-    FString WorldName = World->GetName();
-
-    /* if (WorldName.Contains(TEXT("GAME_LEVEL")))
-         return true;*/
-
-    return true;
-
-    return false;
+    EWorldType::Type WorldType = World->WorldType;
+    return WorldType == EWorldType::PIE || WorldType == EWorldType::Game;
 }
 
 const TMap<EGameState, UGameLoop::StateDelegatePtr> UGameLoop::StateEventMap = InitStateEventMap();
@@ -84,9 +76,15 @@ void UGameLoop::SetNewState(EGameState NewState)
 {
     if (NewState == CurrentState) { return; }
 
+    UE_LOG(LogTemp, Warning, TEXT("SetNewState: %s -> %s"),
+        *UEnum::GetValueAsString(CurrentState),
+        *UEnum::GetValueAsString(NewState));
+
+    // Стек вызовов
+    UE_LOG(LogTemp, Warning, TEXT("%s"), *FFrame::GetScriptCallstack());
+
     EGameState oldState = CurrentState;
     CurrentState = NewState;
-
     OnGameStateChanged.Broadcast(oldState, NewState);
     TriggerStateEvent(CurrentState);
 }
@@ -185,4 +183,9 @@ void UGameLoop::SaveGame() {
     if (!bSaved) {
         UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
     }
+}
+
+bool UGameLoop::DidPlayerWin()
+{
+    return _currentDaySnapshot.VillageInfectionRate >= 1.0f;
 }
