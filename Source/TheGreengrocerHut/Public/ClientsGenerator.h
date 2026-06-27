@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "ClientStruct.h"
 #include "GameSettings.h"
+#include "GameProjectSettingsNew.h"
 #include "SaveGameData.h"
 
 class THEGREENGROCERHUT_API ClientsGenerator

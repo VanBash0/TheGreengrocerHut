@@ -6,37 +6,6 @@
 #include "IngredientStructures.h"
 #include "GameSettings.generated.h"
 
-UCLASS(Config = Game, DefaultConfig, meta = (DisplayName = "Game Settings", SectionName = "TheGreengrocerHutSettings"))
-class UGameProjectSettings : public UDeveloperSettings
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UGameSettings> GameSettingsAsset;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> SymptomTable;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> IngredientTable;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> DefaultBodyPartTable;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> TutorialDaysTable;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    FString ConverterFolderPath;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> TutorialNewspaperDataTable;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> NewspaperDataTable;
-};
-
 USTRUCT(BlueprintType)
 struct FPriorityData
 {
