@@ -74,6 +74,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Save")
     void SaveGame();
 
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    void ResetGameData();
+
 public: //TO DELETE (онкмюъ усимъ)
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASS")
     bool DidPlayerWin();

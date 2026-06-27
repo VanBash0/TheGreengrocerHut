@@ -24,6 +24,8 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     {
         World->GetTimerManager().SetTimerForNextTick(this, &UGameLoop::TriggerDayStart);
     }
+
+    UE_LOG(LogTemp, Error, TEXT("INIT_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"));
 }
 
 void UGameLoop::TriggerDayStart()
@@ -186,6 +188,12 @@ void UGameLoop::SaveGame()
     {
         UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
     }
+}
+
+void UGameLoop::ResetGameData()
+{
+    UGameplayStatics::DeleteGameInSlot(TEXT("Save1"), 0);
+    _savedData = NewObject<USaveGameData>(this);
 }
 
 bool UGameLoop::DidPlayerWin()
