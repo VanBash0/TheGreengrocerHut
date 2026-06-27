@@ -58,7 +58,7 @@ void ClientsGenerator::GenerateDemonSymptoms()
         daySnapshot.DemonSymptoms.Add(chosenSymptom);
         occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
 
-        gameMetrics.SymptomMetrics[chosenSymptom].DemonWeight = 0.0f;
+        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom)) { Data->DemonWeight = 0.0f; }
     }
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
@@ -141,7 +141,7 @@ void ClientsGenerator::UpdateSymptomPool()
         newSymptom.Weight = gameSettings->NewSymptomWeight;
         newSymptom.DemonWeight = gameSettings->NewDemonSymptomWeight;
         FName symptomName = FName(availableSymptoms[i].Name.ToString());
-        gameMetrics.SymptomMetrics[symptomName] = newSymptom;
+        gameMetrics.SymptomMetrics.Add(symptomName, newSymptom);
     }
 }
 
@@ -297,7 +297,7 @@ void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
         occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
         client.Symptoms[i] = chosenSymptom;
 
-        gameMetrics.SymptomMetrics[chosenSymptom].Weight = 0.0f;
+        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom)) { Data->Weight = 0.0f; }
     }
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
