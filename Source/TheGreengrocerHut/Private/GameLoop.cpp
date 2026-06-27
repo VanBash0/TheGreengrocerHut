@@ -17,7 +17,7 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
 
-    _currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
+    //_currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
 
     UWorld* World = GetWorld();
     if (World)
@@ -132,11 +132,22 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     }
 }
 
-void UGameLoop::LoadSave() {
+void UGameLoop::LoadSave()
+{
     USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("Save1"), 0);
     if (!loadedGame)
     {
         UE_LOG(LogTemp, Warning, TEXT("No save data found."));
+
+        _currentDaySnapshot.VillageInfectionRate = 0;
+        _metrics.DayNumber = 1;
+        _metrics.HealingFactor = GameSettings->StartHealingFactor;
+        _metrics.KillingFactor = GameSettings->StartKillingFactor;
+        _metrics.HasDemonPrevious = false;
+        _metrics.MaxClientSymptomCount = 0;
+
+        _savedData = NewObject<USaveGameData>(this);
+
         return;
     }
 
@@ -163,5 +174,15 @@ void UGameLoop::LoadSave() {
         _metrics.KillingFactor = GameSettings->StartKillingFactor;
         _metrics.HasDemonPrevious = false;
         _metrics.MaxClientSymptomCount = 0;
+    }
+}
+
+void UGameLoop::SaveGame() {
+    _savedData->DaySnapshots.Add(_currentDaySnapshot);
+    _savedData->LastDayMetrics = _metrics;
+
+    bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, TEXT("Save1"), 0);
+    if (!bSaved) {
+        UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
     }
 }

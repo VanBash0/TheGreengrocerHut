@@ -71,6 +71,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Infection Rate")
     void UpdateInfectionRate(float DeltaInfectionRate, bool IsGood);
 
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    void SaveGame();
+
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UGameSettings> GameSettings;
