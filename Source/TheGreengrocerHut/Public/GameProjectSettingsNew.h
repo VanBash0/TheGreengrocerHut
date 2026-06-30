@@ -6,7 +6,7 @@
 #include "GameSettings.h"
 #include "GameProjectSettingsNew.generated.h"
 
-UCLASS(Config = Game, meta = (DisplayName = "Game Settings", SectionName = "TheGreengrocerHutSettings"))
+UCLASS(Config = Game, defaultconfig, meta = (DisplayName = "Game Settings", SectionName = "TheGreengrocerHutSettings"))
 class UGameProjectSettings : public UDeveloperSettings
 {
     GENERATED_BODY()

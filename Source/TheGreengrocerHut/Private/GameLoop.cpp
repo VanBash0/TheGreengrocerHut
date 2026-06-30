@@ -1,4 +1,5 @@
 #include "GameLoop.h"
+#include <IngredientFunctionLibary.h>
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 
@@ -6,26 +7,24 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
 
+    UWorld* World = GetWorld();
+    if (!World) { return; }
+
     const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
     if (ProjectSettings)
     {
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
-
-        _currentDaySnapshot.DaySymptoms = ProjectSettings->SymptomTable->GetRowNames();
     }
 
     LoadSave();
 
+    FString MapName = World->GetMapName();
+    if (!MapName.Contains(TEXT("GAME_LEVEL"))) { return; }
+
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
 
-    UWorld* World = GetWorld();
-    if (World)
-    {
-        World->GetTimerManager().SetTimerForNextTick(this, &UGameLoop::TriggerDayStart);
-    }
-
-    UE_LOG(LogTemp, Error, TEXT("INIT_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"));
+    World->GetTimerManager().SetTimerForNextTick(this, &UGameLoop::TriggerDayStart);
 }
 
 void UGameLoop::TriggerDayStart()
@@ -41,10 +40,8 @@ void UGameLoop::Deinitialize()
 bool UGameLoop::ShouldCreateSubsystem(UObject* Outer) const
 {
     if (!Super::ShouldCreateSubsystem(Outer)) { return false; }
-
     UWorld* World = Cast<UWorld>(Outer);
     if (!World) { return false; }
-
     EWorldType::Type WorldType = World->WorldType;
     return WorldType == EWorldType::PIE || WorldType == EWorldType::Game;
 }

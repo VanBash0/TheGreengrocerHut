@@ -179,8 +179,9 @@ void ClientsGenerator::InitializeClients()
 
 bool ClientsGenerator::TryHandleTutorialDay()
 {
+    if (!projectSettings) { return false; }
     TObjectPtr<UDataTable> tutorialDaysTable = projectSettings->TutorialDaysTable.LoadSynchronous();
-    if (!projectSettings || !tutorialDaysTable) { return false; }
+    if (!tutorialDaysTable) { return false; }
 
     int tutorialDayCount = tutorialDaysTable->GetRowMap().Num();
     if (gameMetrics.DayNumber <= tutorialDayCount) {
