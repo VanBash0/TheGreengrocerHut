@@ -69,9 +69,6 @@ struct FIngredientSeed : public FTableRowBase
 	FIngredientRowNameRef GrowedIngredientRowName;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Regrow", meta = (EditCondition = "HarvestType == EPlantHarvestType::MultipleHarvest"))
-	int32 DayAmountBetweenHarvest = 0;
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Regrow", meta = (EditCondition = "HarvestType == EPlantHarvestType::MultipleHarvest"))
 	int32 MaxHarvestAmount = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Regrow", meta = (EditCondition = "HarvestType == EPlantHarvestType::MultipleHarvest"))
