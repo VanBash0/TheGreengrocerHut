@@ -8,7 +8,7 @@ public class TheGreengrocerHut : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "StructUtils", "SubstanceCore", "DeveloperSettings" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "StructUtils", "SubstanceCore", "DeveloperSettings", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "AssetRegistry" });
 
