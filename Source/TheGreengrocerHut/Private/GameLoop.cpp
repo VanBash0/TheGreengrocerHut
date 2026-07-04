@@ -131,7 +131,7 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
 
 void UGameLoop::LoadSave()
 {
-    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("Save1"), 0);
+    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("GAME_LOOP_SAVE_SLOT"), 0);
     if (!loadedGame)
     {
         UE_LOG(LogTemp, Warning, TEXT("No save data found."));

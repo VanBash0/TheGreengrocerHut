@@ -1,7 +1,7 @@
 #include "IngredientRowNameCustomization.h"
 #include "DetailWidgetRow.h"
 #include "GameSettings.h"
-#include "GameProjectSettingsNew.h"
+#include "GameProjectSettings.h"
 #include "Engine/DataTable.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Text/STextBlock.h"

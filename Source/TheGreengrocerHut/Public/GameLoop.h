@@ -2,9 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "Engine/DeveloperSettings.h"
 #include "GameSettings.h"
-#include "GameProjectSettingsNew.h"
+#include "GameProjectSettings.h"
 #include "ClientsGenerator.h"
 #include "ClientStruct.h"
 #include "SaveGameData.h"

@@ -4,7 +4,7 @@
 #include "Engine/DeveloperSettings.h"
 #include "Engine/DataTable.h"
 #include "GameSettings.h"
-#include "GameProjectSettingsNew.generated.h"
+#include "GameProjectSettings.generated.h"
 
 UCLASS(Config = Game, defaultconfig, meta = (DisplayName = "Game Settings", SectionName = "TheGreengrocerHutSettings"))
 class UGameProjectSettings : public UDeveloperSettings

@@ -5,7 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "SymptomStructures.h"
 #include "ClientStruct.h"
-#include "GameProjectSettingsNew.h"
+#include "GameProjectSettings.h"
 #include "GameSettings.h"
 #include "SubstanceCoreHelpers.h"
 #include "SymptomViewer.generated.h"
