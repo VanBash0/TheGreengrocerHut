@@ -6,6 +6,21 @@
 #include "Sound/SoundCue.h"
 #include "IngredientStructures.generated.h"
 
+USTRUCT(BlueprintType)
+struct FIngredientContainerVariation
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UStaticMesh* Mesh;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FTransform DecalTransform;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<USoundCue> SFX;
+};
+
 UCLASS(BlueprintType)
 class UIngredientContainer : public UDataAsset
 {
@@ -13,13 +28,7 @@ class UIngredientContainer : public UDataAsset
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMesh* Mesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTransform DecalTransform;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<USoundCue> SFX;
+    TArray<FIngredientContainerVariation> Variations;
 };
 
 USTRUCT(BlueprintType)
