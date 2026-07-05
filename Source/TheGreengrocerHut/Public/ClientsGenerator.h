@@ -35,6 +35,7 @@ private:
 
     float infectionRateNormalized;
     float progressionMultiplier;
+
     const UGameSettings* gameSettings;
     const UGameProjectSettings* projectSettings;
     const UObject* worldContextObject;
