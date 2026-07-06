@@ -18,6 +18,7 @@ void UCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     }
 
     PopulateIngredientCache();
+    PopulateIngredientSeedCache();
     PopulateSymptomCache();
     PopulateConverterCache();
 }
@@ -27,6 +28,10 @@ void UCacheSubsystem::Deinitialize()
     _ingredientTable = nullptr;
     _ingredientCache.Empty();
     _ingredientCacheLoaded = false;
+
+    _ingredientSeedTable = nullptr;
+    _ingredientSeedCache.Empty();
+    _ingredientSeedCacheLoaded = false;
 
     _symptomTable = nullptr;
     _symptomCache.Empty();
@@ -63,6 +68,26 @@ void UCacheSubsystem::PopulateIngredientCache()
 
     _ingredientCacheLoaded = true;
     BuildIngredientHashCache();
+}
+
+void UCacheSubsystem::PopulateIngredientSeedCache()
+{
+    if (!_ingredientSeedTable || _ingredientSeedCacheLoaded) { return; }
+
+    _ingredientSeedCache.Empty();
+    static const FString Context(TEXT("UCacheSubsystem::PopulateIngredientSeedCache"));
+    TArray<FName> RowNames = _ingredientSeedTable->GetRowNames();
+
+    for (const FName& RowName : RowNames)
+    {
+        FIngredientSeed* Row = _ingredientSeedTable->FindRow<FIngredientSeed>(RowName, Context);
+        if (Row)
+        {
+            _ingredientSeedCache.Add(RowName, *Row);
+        }
+    }
+
+    _ingredientSeedCacheLoaded = true;
 }
 
 void UCacheSubsystem::PopulateSymptomCache()
@@ -144,6 +169,27 @@ const FIngredient* UCacheSubsystem::GetIngredientByIndex(int32 Index)
     for (int32 i = 0; i < Index; ++i) { ++It; }
 
     return &It->Value;
+}
+
+//GETTERS_INGREDIENT_SEED
+const TMap<FName, FIngredientSeed>& UCacheSubsystem::GetIngredientSeedCache()
+{
+    if (!_ingredientSeedCacheLoaded)
+    {
+        PopulateIngredientSeedCache();
+    }
+
+    return _ingredientSeedCache;
+}
+
+const FIngredientSeed* UCacheSubsystem::GetIngredientSeedByRowName(FName RowName)
+{
+    if (!_ingredientSeedCacheLoaded)
+    {
+        PopulateIngredientSeedCache();
+    }
+
+    return _ingredientSeedCache.Find(RowName);
 }
 
 //GETTERS_SYMPTOM
@@ -286,6 +332,31 @@ void UIngredientFunctionLibary::GetIngredientsBySymptoms(const UObject* WorldCon
     OutIngredientRowNames = ResultSet.Array();
 }
 
+void UIngredientFunctionLibary::GetIngredientSeedByIngredient(const UObject* WorldContextObject, const TArray<FName>& IngredientRowNames, TArray<FName>& OutSeedIngredientRowNames)
+{
+    OutSeedIngredientRowNames.Empty();
+
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return;
+
+    const TMap<FName, FIngredientSeed>& Seeds = Cache->GetIngredientSeedCache();
+
+    const TSet<FName> IngredientSet(IngredientRowNames);
+
+    OutSeedIngredientRowNames.Reserve(IngredientSet.Num());
+
+    for (const auto& Pair : Seeds)
+    {
+        const FName& SeedRowName = Pair.Key;
+        const FIngredientSeed& Seed = Pair.Value;
+
+        if (IngredientSet.Contains(Seed.GrowedIngredientRowName.RowName))
+        {
+            OutSeedIngredientRowNames.Add(SeedRowName);
+        }
+    }
+}
+
 TArray<FIngredient> UIngredientFunctionLibary::GetAllIngredients(const UObject* WorldContextObject)
 {
     UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
@@ -419,6 +490,24 @@ void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContex
             DefaultIngredients.Add(ingredient);
         }
     }
+}
+
+TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldContextObject, const FDaySnapshot& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot)
+{
+    TArray<FName> NewSymptoms;
+    NewSymptoms.Reserve(CurrentDaySnapshot.DaySymptoms.Num());
+
+    TSet<FName> PreviousSymptomsSet(PreviousDaysSnapshot.DaySymptoms);
+
+    for (const FName& Symp : CurrentDaySnapshot.DaySymptoms)
+    {
+        if (!PreviousSymptomsSet.Contains(Symp))
+        {
+            NewSymptoms.Add(Symp);
+        }
+    }
+
+    return NewSymptoms;
 }
 
 void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldContextObject,

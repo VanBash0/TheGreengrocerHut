@@ -9,6 +9,7 @@
 #include "AssetRegistry/ARFilter.h"
 
 #include "IngredientStructures.h"
+#include "GardenStructures.h"
 #include "SymptomStructures.h"
 #include "Converter.h"
 #include "ConverterRecipe.h"
@@ -39,6 +40,17 @@ public:
     const TMap<FName, FIngredient>& GetIngredientCache();
     const FIngredient* GetIngredientByRowName(FName rowName);
     const FIngredient* GetIngredientByIndex(int32 Index);
+
+private:
+    void PopulateIngredientSeedCache();
+    UPROPERTY()
+    TObjectPtr<UDataTable> _ingredientSeedTable;
+    TMap<FName, FIngredientSeed> _ingredientSeedCache;
+    bool _ingredientSeedCacheLoaded = false;
+
+public:
+    const TMap<FName, FIngredientSeed>& GetIngredientSeedCache();
+    const FIngredientSeed* GetIngredientSeedByRowName(FName rowName);
 
 private:
     void PopulateSymptomCache();
@@ -87,6 +99,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
 
+    UFUNCTION(BlueprintCallable, Category = "Symptom", meta = (WorldContext = "WorldContextObject"))
+    static TArray<FName> SelectNewSymptoms(const UObject* WorldContextObject, const FDaySnapshot& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot);
+
     UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
     static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients,
                                        const UGameLoop* GameLoop, bool& IsGood, float& NewInfectionRate);
@@ -122,6 +137,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static void GetIngredientsBySymptoms(const UObject* WorldContextObject, const TArray<FName>& SymptomRowNames, TArray<FName>& OutIngredientRowNames);
 
+    UFUNCTION(BlueprintCallable, Category = "Cache|IngredientsSeed", meta = (WorldContext = "WorldContextObject"))
+    static void GetIngredientSeedByIngredient(const UObject* WorldContextObject, const TArray<FName>& IngredientRowNames, TArray<FName>& OutSeedIngredientRowNames);
 public:
     UFUNCTION(BlueprintCallable, Category = "Tutorial", meta = (WorldContext = "WorldContextObject"))
     static int32 GetTutorialDaysNum(const UObject* WorldContextObject);

@@ -22,13 +22,16 @@ public:
     TSoftObjectPtr<UDataTable> IngredientTable;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
+    TSoftObjectPtr<UDataTable> IngredientSeedTable;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Data")
     TSoftObjectPtr<UDataTable> DefaultBodyPartTable;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
-    TSoftObjectPtr<UDataTable> TutorialDaysTable;
+    FString ConverterFolderPath;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
-    FString ConverterFolderPath;
+    TSoftObjectPtr<UDataTable> TutorialDaysTable;
 
     UPROPERTY(Config, EditAnywhere, Category = "Data")
     TSoftObjectPtr<UDataTable> TutorialNewspaperDataTable;
