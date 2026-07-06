@@ -14,8 +14,14 @@ void UCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         _symptomTable = ProjectSettings->SymptomTable.LoadSynchronous();
         _converterFolderPath = ProjectSettings->ConverterFolderPath;
 
-        ProjectSettings->TutorialNewspaperDataTable.LoadSynchronous();
-        ProjectSettings->NewspaperDataTable.LoadSynchronous();
+        _newspaperTable = ProjectSettings->NewspaperDataTable.LoadSynchronous();
+        _tutorialNewspaperTable = ProjectSettings->TutorialNewspaperDataTable.LoadSynchronous();
+        _tutorialDaysTable = ProjectSettings->TutorialDaysTable.LoadSynchronous();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("doesn't load developer settings"));
+        return;
     }
 
     PopulateIngredientCache();
@@ -28,6 +34,7 @@ void UCacheSubsystem::Deinitialize()
 {
     _ingredientTable = nullptr;
     _ingredientCache.Empty();
+    _ingredientHashToRowName.Empty();
     _ingredientCacheLoaded = false;
 
     _ingredientSeedTable = nullptr;
@@ -40,6 +47,10 @@ void UCacheSubsystem::Deinitialize()
 
     _converterCache.Empty();
     _converterCacheLoaded = false;
+
+    _newspaperTable = nullptr;
+    _tutorialNewspaperTable = nullptr;
+    _tutorialDaysTable = nullptr;
 
     Super::Deinitialize();
 }
@@ -458,6 +469,7 @@ void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject
     const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
     const auto& BasePotionsMap = projectSettings->GameSettingsAsset->BasePotionsMap;
     const auto& PoisonBase = projectSettings->GameSettingsAsset->PoisonBase;
+    const auto& BottleBase = projectSettings->GameSettingsAsset->BottleBase;
 
     for (const auto& base : BasePotionsMap) {
         if (MaxClientSymptomCount >= base.Key) {
@@ -468,6 +480,8 @@ void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject
     if (HasDemonPrevious) {
         BasePotions.Add(PoisonBase.RowName);
     }
+
+    BasePotions.Add(BottleBase.RowName);
 }
 
 void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients)
@@ -658,10 +672,15 @@ const FName UIngredientFunctionLibary::GetRowNameByIngredient(const UObject* Wor
     return Result;
 }
 
-int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextObject) {
-    const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
-    if (!projectSettings || !projectSettings->TutorialDaysTable) return 0;
-    return projectSettings->TutorialDaysTable->GetRowMap().Num();
+int32 UIngredientFunctionLibary::GetTutorialDaysNum(const UObject* WorldContextObject)
+{
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return 0;
+
+    UDataTable* DaysTable = Cache->GetTutorialDaysTable();
+    if (!DaysTable) return 0;
+
+    return DaysTable->GetRowNames().Num();
 }
 
 const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UObject* WorldContextObject,
@@ -670,26 +689,29 @@ const FNewspaper UIngredientFunctionLibary::BuildNewspaperFromSnapshot(const UOb
     FNewspaper outNewspaper;
     outNewspaper.DemonSymptoms = Snapshot.DemonSymptoms;
 
-    const UGameProjectSettings* Settings = GetDefault<UGameProjectSettings>();
-    if (!Settings) return outNewspaper;
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return outNewspaper;
 
-    if (!Settings->NewspaperDataTable) return outNewspaper;
+    UDataTable* NewspaperTable = Cache->GetNewspaperTable();
+    if (!NewspaperTable) return outNewspaper;
 
     float rate = Snapshot.VillageInfectionRate;
     float rounded = FMath::Floor(FMath::Clamp(rate - FMath::Modulo(rate, 10.0f), -100.0f, 100.0f));
     FName rateRowName = FName(*FString::FromInt((int32)rounded));
 
-    if (FNewspaperData* Data = Settings->NewspaperDataTable->FindRow<FNewspaperData>(rateRowName, TEXT(""))) {
+    if (FNewspaperData* Data = NewspaperTable->FindRow<FNewspaperData>(rateRowName, TEXT("")))
+    {
         outNewspaper.VillageImage = Data->VillageImage;
         outNewspaper.Description = Data->Description;
     }
 
-    if (!Settings->TutorialNewspaperDataTable) return outNewspaper;
+    UDataTable* TutorialNewspaperTable = Cache->GetTutorialNewspaperTable();
+    if (!TutorialNewspaperTable) return outNewspaper;
 
     if (DayNum <= UIngredientFunctionLibary::GetTutorialDaysNum(WorldContextObject))
     {
         FName TutorRowName = FName(*FString::FromInt(DayNum));
-        if (FTutorialNewspaperData* TutorData = Settings->TutorialNewspaperDataTable->FindRow<FTutorialNewspaperData>(TutorRowName, TEXT(""))) {
+        if (FTutorialNewspaperData* TutorData = TutorialNewspaperTable->FindRow<FTutorialNewspaperData>(TutorRowName, TEXT(""))) {
             outNewspaper.Description = TutorData->Description;
         }
     }

@@ -10,30 +10,35 @@
 #include "SubstanceCoreHelpers.h"
 #include "SymptomViewer.generated.h"
 
+USTRUCT()
 struct FVisualOverlayPoolEntry
 {
+    GENERATED_BODY()
+
     bool bIsInUse = false;
 
-    UStaticMeshComponent* MeshComponent = nullptr;
-    UMaterialInstanceDynamic* DynamicMaterial = nullptr;
+    UPROPERTY()
+    TObjectPtr<UStaticMeshComponent> MeshComponent = nullptr;
 
-    USubstanceGraphInstance* SubstanceInstance = nullptr;
+    UPROPERTY()
+    TObjectPtr<UMaterialInstanceDynamic> DynamicMaterial = nullptr;
+
+    UPROPERTY()
+    TObjectPtr<USubstanceGraphInstance> SubstanceInstance = nullptr;
 };
 
+USTRUCT()
 struct FBodyPartData
 {
-    UStaticMeshComponent* BaseMeshComp = nullptr;
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TObjectPtr<UStaticMeshComponent> BaseMeshComp = nullptr;
+
     TArray<FVisualOverlayPoolEntry*> OverlayEntries;
 
-    inline void Hide()
-    {
-        BaseMeshComp->SetVisibility(false, true);
-    }
-
-    inline void Show()
-    {
-        BaseMeshComp->SetVisibility(true, true);
-    }
+    inline void Hide() { BaseMeshComp->SetVisibility(false, true); }
+    inline void Show() { BaseMeshComp->SetVisibility(true, true); }
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRenderComplete);
@@ -42,6 +47,7 @@ UCLASS(BlueprintType, Blueprintable)
 class THEGREENGROCERHUT_API ASymptomViewer : public AActor
 {
 	GENERATED_BODY()
+
 public:
     ASymptomViewer();
 
@@ -72,7 +78,7 @@ public:
 
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Symptom Viewer")
-    USceneComponent* SymptomRoot;
+    TObjectPtr<USceneComponent> SymptomRoot;
 
     UPROPERTY(BlueprintAssignable, Category = "Symptom Viewer|Events", meta = (DisplayName = "On Render Complete", ToolTip = "Fires when all Substance textures are fully rendered and ready"))
     FOnRenderComplete OnRenderComplete;
@@ -84,12 +90,16 @@ private:
     USubstanceGraphInstance* CopyGraphAndSetMaterial(USubstanceGraphInstance* Graph, UMaterialInterface* MainMaterial, UMaterialInstanceDynamic* DimMaterial);
     const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> SelectBodySymptomsByType(const TArray<FSymptomRow>& Symptoms);
 
+    UPROPERTY()
     TMap<EBodyPart, FBodyPartData> _bodyParts;
+    UPROPERTY()
     TArray<FVisualOverlayPoolEntry> _pool;
 
 private:
     void RenderTick();
 
     FTimerHandle _renderTimerHandle;
-    TArray<USubstanceGraphInstance*> _toRender;
+
+    UPROPERTY()
+    TArray<TObjectPtr<USubstanceGraphInstance>> _toRender;
 };

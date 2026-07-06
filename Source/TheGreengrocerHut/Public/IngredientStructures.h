@@ -86,3 +86,18 @@ struct FIngredientRowNameRef
         return RowName == Other.RowName;
     }
 };
+
+USTRUCT(BlueprintType)
+struct FIngredientContainerSave
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FText FirstIngredientName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 IngredientsAmount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName IngredientRowName;
+};

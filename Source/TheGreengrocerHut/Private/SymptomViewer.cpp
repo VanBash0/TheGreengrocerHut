@@ -88,6 +88,8 @@ void ASymptomViewer::InitializeViewer()
         return;
     }
 
+    _pool.Reserve(64);
+
     for (int partIndex = 1; partIndex < (int)EBodyPart::MAX; partIndex++)
     {
         EBodyPart partType = static_cast<EBodyPart>(partIndex);

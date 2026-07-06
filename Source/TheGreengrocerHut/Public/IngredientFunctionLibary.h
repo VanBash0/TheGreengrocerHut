@@ -32,8 +32,9 @@ public:
 
 private:
     void PopulateIngredientCache();
-    TMap<FName, FIngredient> _ingredientCache;
+    UPROPERTY()
     TObjectPtr<UDataTable> _ingredientTable;
+    TMap<FName, FIngredient> _ingredientCache;
     bool _ingredientCacheLoaded = false;
 
 public:
@@ -54,8 +55,9 @@ public:
 
 private:
     void PopulateSymptomCache();
-    TMap<FName, FSymptomRow> _symptomCache;
+    UPROPERTY()
     TObjectPtr<UDataTable> _symptomTable;
+    TMap<FName, FSymptomRow> _symptomCache;
     bool _symptomCacheLoaded = false;
 
 public:
@@ -65,6 +67,7 @@ public:
 
 private:
     void PopulateConverterCache();
+    UPROPERTY()
     TArray<TObjectPtr<UConverter>> _converterCache;
     FString _converterFolderPath;
     bool _converterCacheLoaded = false;
@@ -76,6 +79,19 @@ public:
 private:
     void BuildIngredientHashCache();
     TMap<uint64, TArray<FName>> _ingredientHashToRowName;
+
+public:
+    UDataTable* GetNewspaperTable() const { return _newspaperTable; }
+    UDataTable* GetTutorialNewspaperTable() const { return _tutorialNewspaperTable; }
+    UDataTable* GetTutorialDaysTable() const { return _tutorialDaysTable; }
+
+private:
+    UPROPERTY()
+    TObjectPtr<UDataTable> _newspaperTable;
+    UPROPERTY()
+    TObjectPtr<UDataTable> _tutorialNewspaperTable;
+    UPROPERTY()
+    TObjectPtr<UDataTable> _tutorialDaysTable;
 
 public:
     const FName GetRowNameByIngredient(const FIngredient& Ingredient) const;
