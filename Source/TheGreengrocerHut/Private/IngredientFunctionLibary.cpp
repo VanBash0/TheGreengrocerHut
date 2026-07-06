@@ -10,6 +10,7 @@ void UCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     if (ProjectSettings)
     {
         _ingredientTable = ProjectSettings->IngredientTable.LoadSynchronous();
+        _ingredientSeedTable = ProjectSettings->IngredientSeedTable.LoadSynchronous();
         _symptomTable = ProjectSettings->SymptomTable.LoadSynchronous();
         _converterFolderPath = ProjectSettings->ConverterFolderPath;
 
@@ -492,12 +493,19 @@ void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContex
     }
 }
 
-TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldContextObject, const FDaySnapshot& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot)
+TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot)
 {
     TArray<FName> NewSymptoms;
     NewSymptoms.Reserve(CurrentDaySnapshot.DaySymptoms.Num());
 
-    TSet<FName> PreviousSymptomsSet(PreviousDaysSnapshot.DaySymptoms);
+    if (PreviousDaysSnapshot.Num() == 0)
+    {
+        NewSymptoms = CurrentDaySnapshot.DaySymptoms;
+        return NewSymptoms;
+    }
+
+    const FDaySnapshot& LastPreviousSnapshot = PreviousDaysSnapshot.Last();
+    const TSet<FName> PreviousSymptomsSet(LastPreviousSnapshot.DaySymptoms);
 
     for (const FName& Symp : CurrentDaySnapshot.DaySymptoms)
     {

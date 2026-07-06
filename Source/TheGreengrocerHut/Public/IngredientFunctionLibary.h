@@ -100,7 +100,7 @@ public:
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
 
     UFUNCTION(BlueprintCallable, Category = "Symptom", meta = (WorldContext = "WorldContextObject"))
-    static TArray<FName> SelectNewSymptoms(const UObject* WorldContextObject, const FDaySnapshot& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot);
+    static TArray<FName> SelectNewSymptoms(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot);
 
     UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
     static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients,
