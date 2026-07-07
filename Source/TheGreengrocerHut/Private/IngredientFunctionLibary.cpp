@@ -481,6 +481,23 @@ void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject
     }
 }
 
+void UIngredientFunctionLibary::GetBasePotionBySumptomCount(const UObject* WorldContextObject,
+    const UGameSettings* GameSettings,
+    const int& ClientSymptomCount,
+    FName& Potion)
+{
+    int key = 0;
+    for (const auto& base : GameSettings->BasePotionsMap)
+    {
+        if (ClientSymptomCount >= base.Key)
+        {
+            key = FMath::Max(key, base.Key);
+        }
+    }
+
+    Potion = GameSettings->BasePotionsMap[key].RowName;
+}   
+
 void UIngredientFunctionLibary::GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients)
 {
     const TArray<UConverter*> converters = GetAllConverters(WorldContextObject);
@@ -530,25 +547,26 @@ TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldC
 }
 
 void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldContextObject,
-                                                       const TArray<FIngredient>& Ingredients,
-                                                       const UGameLoop* GameLoop,
-                                                       bool& IsGood,
-                                                       float& DeltaInfectionRate)
+    const TArray<FIngredient>& Ingredients,
+    const UGameLoop* GameLoop,
+    bool& IsGood,
+    float& DeltaInfectionRate,
+    TArray<FName>& OutIngredientNames,
+    TArray<bool>& OutIngredientValidity)
 {
+    OutIngredientNames.Empty();
+    OutIngredientValidity.Empty();
+    OutIngredientNames.Reserve(Ingredients.Num());
+    OutIngredientValidity.Reserve(Ingredients.Num());
+
     TArray<FName> neededIngredients;
     FClient currentClient;
     GameLoop->GetCurrentClient(currentClient);
     GetIngredientsBySymptoms(WorldContextObject, currentClient.Symptoms, neededIngredients);
-    auto gameSettings = GameLoop->GameSettings;
-    
-    int symptomsNum = currentClient.Symptoms.Num();
-    int key = 0;
-    for (const auto& base : gameSettings->BasePotionsMap) {
-        if (symptomsNum >= base.Key) {
-            key = FMath::Max(key, base.Key);
-        }
-    }
-    neededIngredients.Add(gameSettings->BasePotionsMap[key].RowName);
+    const TObjectPtr<UGameSettings>& gameSettings = GameLoop->GameSettings;
+    FName basePotion;
+    GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), basePotion);
+    neededIngredients.Add(basePotion);
 
     bool isPoison = false;
     int matchingIngredients = 0;
@@ -556,7 +574,13 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
     for (const auto& ingredient : Ingredients) {
         bool bFound = false;
         FName ingredientName = GetRowNameByIngredient(WorldContextObject, ingredient, bFound);
-        if (bFound && neededIngredients.Contains(ingredientName) && ingredient.TermsOfUse.AddPriority >= currentPriority) {
+
+        bool bIsValid = bFound && neededIngredients.Contains(ingredientName) && ingredient.TermsOfUse.AddPriority >= currentPriority;
+
+        OutIngredientNames.Add(ingredientName);
+        OutIngredientValidity.Add(bIsValid);
+
+        if (bIsValid) {
             matchingIngredients++;
             currentPriority = FMath::Max(currentPriority, ingredient.TermsOfUse.AddPriority);
             if (ingredientName == gameSettings->PoisonBase.RowName) {
@@ -730,4 +754,21 @@ void UIngredientFunctionLibary::GetAllNewspapers(const UObject* WorldContextObje
     if (CurrentDayIncluded) {
         OutNewspapers.Add(BuildNewspaperFromSnapshot(WorldContextObject, CurrentDaySnapshot, CurrentDay));
     }
+}
+
+void UIngredientFunctionLibary::SortIngredientsByPriority(const UObject* WorldContextObject, TArray<FName>& IngredientNames, bool bDescending)
+{
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+    if (!Cache) return;
+
+    IngredientNames.Sort([Cache, bDescending](const FName& A, const FName& B)
+        {
+            const FIngredient* IngredientA = Cache->GetIngredientByRowName(A);
+            const FIngredient* IngredientB = Cache->GetIngredientByRowName(B);
+
+            int32 PriorityA = IngredientA ? IngredientA->TermsOfUse.AddPriority : TNumericLimits<int32>::Min();
+            int32 PriorityB = IngredientB ? IngredientB->TermsOfUse.AddPriority : TNumericLimits<int32>::Min();
+
+            return bDescending ? (PriorityA > PriorityB) : (PriorityA < PriorityB);
+        });
 }
