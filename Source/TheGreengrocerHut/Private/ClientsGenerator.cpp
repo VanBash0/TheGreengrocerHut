@@ -192,8 +192,12 @@ bool ClientsGenerator::TryHandleTutorialDay()
 
         daySnapshot.DayClients = tutorialDayData->Clients;
         TSet<FName> demonSymptomsSet;
+        demonsNum = 0;
         for (auto const& client : daySnapshot.DayClients) {
             gameMetrics.MaxClientSymptomCount = FMath::Max(gameMetrics.MaxClientSymptomCount, client.Symptoms.Num());
+            if (client.IsDemon) {
+                demonsNum++;
+            }
             for (auto const& symptom : client.Symptoms) {
                 if (!tutorialDaysTable) continue;
 

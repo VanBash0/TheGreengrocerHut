@@ -105,4 +105,7 @@ private:
 
 private:
     FTimerHandle ClientSpawnTimerHandle;
+
+private:
+    inline static const FString SaveSlotName = TEXT("GAME_LOOP_SAVE_SLOT");
 };
