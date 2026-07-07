@@ -131,7 +131,7 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
 
 void UGameLoop::LoadSave()
 {
-    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(TEXT("GAME_LOOP_SAVE_SLOT"), 0);
+    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0);
     if (!loadedGame)
     {
         UE_LOG(LogTemp, Warning, TEXT("No save data found."));
@@ -180,16 +180,20 @@ void UGameLoop::SaveGame()
     _savedData->DaySnapshots.Add(_currentDaySnapshot);
     _savedData->LastDayMetrics = _metrics;
 
-    bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, TEXT("Save1"), 0);
+    bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, SaveSlotName, 0);
     if (!bSaved)
     {
         UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("Saving successful!"));
     }
 }
 
 void UGameLoop::ResetGameData()
 {
-    UGameplayStatics::DeleteGameInSlot(TEXT("Save1"), 0);
+    UGameplayStatics::DeleteGameInSlot(SaveSlotName, 0);
     _savedData = NewObject<USaveGameData>(this);
 }
 
