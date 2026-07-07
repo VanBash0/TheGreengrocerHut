@@ -327,7 +327,7 @@ void UIngredientFunctionLibary::GetIngredientsBySymptoms(const UObject* WorldCon
 
     const TMap<FName, FSymptomRow>& Symptoms = Cache->GetSymptomCache();
 
-    TSet<FName> ResultSet;
+    TSet<FName> SeenSet;
 
     for (const FName& SymptomName : SymptomRowNames)
     {
@@ -335,13 +335,12 @@ void UIngredientFunctionLibary::GetIngredientsBySymptoms(const UObject* WorldCon
         if (!Symptom) continue;
 
         const FName& IngredientRowName = Symptom->IngredientRow.RowName;
-        if (!IngredientRowName.IsNone())
+        if (!IngredientRowName.IsNone() && !SeenSet.Contains(IngredientRowName))
         {
-            ResultSet.Add(IngredientRowName);
+            SeenSet.Add(IngredientRowName);
+            OutIngredientRowNames.Add(IngredientRowName);
         }
     }
-
-    OutIngredientRowNames = ResultSet.Array();
 }
 
 void UIngredientFunctionLibary::GetIngredientSeedByIngredient(const UObject* WorldContextObject, const TArray<FName>& IngredientRowNames, TArray<FName>& OutSeedIngredientRowNames)
@@ -568,14 +567,37 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
     GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), basePotion);
     neededIngredients.Add(basePotion);
 
-    bool isPoison = false;
-    int matchingIngredients = 0;
-    int currentPriority = TNumericLimits<int32>::Min();
+    // резолвим имена игрока
+    TArray<FName> playerIngredientNames;
+    playerIngredientNames.Reserve(Ingredients.Num());
     for (const auto& ingredient : Ingredients) {
         bool bFound = false;
         FName ingredientName = GetRowNameByIngredient(WorldContextObject, ingredient, bFound);
+        playerIngredientNames.Add(bFound ? ingredientName : NAME_None);
+    }
 
-        bool bIsValid = bFound && neededIngredients.Contains(ingredientName) && ingredient.TermsOfUse.AddPriority >= currentPriority;
+    // строгое сравнение: длина + поэлементно по порядку
+    bool bExactMatch = (playerIngredientNames.Num() == neededIngredients.Num());
+    if (bExactMatch) {
+        for (int32 i = 0; i < playerIngredientNames.Num(); ++i) {
+            if (playerIngredientNames[i] != neededIngredients[i]) {
+                bExactMatch = false;
+                break;
+            }
+        }
+    }
+
+    bool isPoison = false;
+    int matchingIngredients = 0;
+    int currentPriority = TNumericLimits<int32>::Min();
+
+    for (int32 i = 0; i < Ingredients.Num(); ++i) {
+        const FIngredient& ingredient = Ingredients[i];
+        FName ingredientName = playerIngredientNames[i];
+
+        bool bIsValid = bExactMatch
+            && !ingredientName.IsNone()
+            && ingredient.TermsOfUse.AddPriority >= currentPriority;
 
         OutIngredientNames.Add(ingredientName);
         OutIngredientValidity.Add(bIsValid);
@@ -591,6 +613,7 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
 
     float fraction = matchingIngredients / Ingredients.Num();
     IsGood = (currentClient.IsDemon) ? isPoison : (fraction >= 0.5f && !isPoison);
+
 
     FGameMetrics gameMetrics;
     GameLoop->GetGameMetrics(gameMetrics);
