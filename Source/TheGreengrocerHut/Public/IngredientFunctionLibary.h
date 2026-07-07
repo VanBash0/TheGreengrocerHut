@@ -113,6 +113,9 @@ public:
     static void GetBasePotions(const UObject* WorldContextObject, const int& MaxClientSymptomCount, const bool& HasDemonAppeared, TArray<FName>& BasePotions);
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
+    static void GetBasePotionBySumptomCount(const UObject* WorldContextObject, const UGameSettings* GameSettings, const int& ClientSymptomCount, FName& Potion);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
 
     UFUNCTION(BlueprintCallable, Category = "Symptom", meta = (WorldContext = "WorldContextObject"))
@@ -120,7 +123,8 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Potion", meta = (WorldContext = "WorldContextObject"))
     static void CalculatePotionQuality(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients,
-                                       const UGameLoop* GameLoop, bool& IsGood, float& NewInfectionRate);
+        const UGameLoop* GameLoop, bool& IsGood, float& DeltaInfectionRate,
+        TArray<FName>& OutIngredientNames, TArray<bool>& OutIngredientValidity);
 public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Ingredients", meta = (WorldContext = "WorldContextObject"))
     static TArray<FIngredient> GetAllIngredients(const UObject* WorldContextObject);
@@ -165,6 +169,10 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Newspaper", meta = (WorldContext = "WorldContextObject"))
     static void GetAllNewspapers(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshots, const FDaySnapshot& CurrentDaySnapshot, const bool CurrentDayIncluded, TArray<FNewspaper>& OutNewspapers);
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
+    static void SortIngredientsByPriority(const UObject* WorldContextObject, UPARAM(ref) TArray<FName>& IngredientNames, bool bDescending = true);
 
 private:
     static UCacheSubsystem* GetCacheSystem(const UObject* WorldContextObject);
