@@ -558,83 +558,138 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
     OutIngredientNames.Reserve(Ingredients.Num());
     OutIngredientValidity.Reserve(Ingredients.Num());
 
-    TArray<FName> neededIngredients;
     FClient currentClient;
     GameLoop->GetCurrentClient(currentClient);
+
+    // ингредиенты по симптомам (без базы) — "правильный" набор для лечения
+    TArray<FName> neededIngredients;
     GetIngredientsBySymptoms(WorldContextObject, currentClient.Symptoms, neededIngredients);
+
     const TObjectPtr<UGameSettings>& gameSettings = GameLoop->GameSettings;
-    FName basePotion;
-    GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), basePotion);
-    neededIngredients.Add(basePotion);
+
+    // требуемая база: демону — строго яд, иначе — по кол-ву симптомов
+    FName requiredBase;
+    if (currentClient.IsDemon)
+    {
+        requiredBase = gameSettings->PoisonBase.RowName;
+    }
+    else
+    {
+        GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), requiredBase);
+    }
 
     // резолвим имена игрока
     TArray<FName> playerIngredientNames;
     playerIngredientNames.Reserve(Ingredients.Num());
-    for (const auto& ingredient : Ingredients) {
+    for (const auto& ingredient : Ingredients)
+    {
         bool bFound = false;
         FName ingredientName = GetRowNameByIngredient(WorldContextObject, ingredient, bFound);
         playerIngredientNames.Add(bFound ? ingredientName : NAME_None);
     }
 
-    // строгое сравнение: длина + поэлементно по порядку
-    bool bExactMatch = (playerIngredientNames.Num() == neededIngredients.Num());
-    if (bExactMatch) {
-        for (int32 i = 0; i < playerIngredientNames.Num(); ++i) {
-            if (playerIngredientNames[i] != neededIngredients[i]) {
-                bExactMatch = false;
-                break;
-            }
+    // 1. база первая и совпадает с требуемой
+    const bool bBaseOk = !requiredBase.IsNone() && (playerIngredientNames[0] == requiredBase);
+
+    // 2. остальные ингредиенты как мультимножество сравниваются с "правильным" набором по симптомам
+    bool bRestMatchesSymptoms = false;
+    if (bBaseOk)
+    {
+        TArray<FName> playerRest(playerIngredientNames);
+        playerRest.RemoveAt(0);
+
+        if (playerRest.Num() == neededIngredients.Num())
+        {
+            TArray<FName> playerRestSorted = playerRest;
+            TArray<FName> neededSorted = neededIngredients;
+            playerRestSorted.Sort([](const FName& A, const FName& B) { return A.LexicalLess(B); });
+            neededSorted.Sort([](const FName& A, const FName& B) { return A.LexicalLess(B); });
+
+            bRestMatchesSymptoms = (playerRestSorted == neededSorted);
         }
     }
 
+    // демону "правильно" = база-яд + НЕправильный набор ингредиентов
+    // обычному клиенту "правильно" = правильная база + правильный набор ингредиентов
+    const bool bExactMatch = bBaseOk && (currentClient.IsDemon ? !bRestMatchesSymptoms : bRestMatchesSymptoms);
+
+    // 3. проверка порядка по приоритету (после базы — неубывающий) + подсчёт валидных
     bool isPoison = false;
-    int matchingIngredients = 0;
-    int currentPriority = TNumericLimits<int32>::Min();
+    int32 matchingIngredients = 0;
+    int32 currentPriority = TNumericLimits<int32>::Min();
 
-    for (int32 i = 0; i < Ingredients.Num(); ++i) {
+    for (int32 i = 0; i < Ingredients.Num(); ++i)
+    {
         const FIngredient& ingredient = Ingredients[i];
-        FName ingredientName = playerIngredientNames[i];
+        const FName ingredientName = playerIngredientNames[i];
+        bool bIsValid = false;
 
-        bool bIsValid = bExactMatch
-            && !ingredientName.IsNone()
-            && ingredient.TermsOfUse.AddPriority >= currentPriority;
+        if (i == 0)
+        {
+            bIsValid = bBaseOk;
+            if (bIsValid)
+            {
+                matchingIngredients++;
+                currentPriority = TNumericLimits<int32>::Min();
+                if (ingredientName == gameSettings->PoisonBase.RowName)
+                {
+                    isPoison = true;
+                }
+            }
+        }
+        else
+        {
+            bIsValid = bExactMatch
+                && !ingredientName.IsNone()
+                && ingredient.TermsOfUse.AddPriority >= currentPriority;
+
+            if (bIsValid)
+            {
+                matchingIngredients++;
+                currentPriority = FMath::Max(currentPriority, ingredient.TermsOfUse.AddPriority);
+                if (ingredientName == gameSettings->PoisonBase.RowName)
+                {
+                    isPoison = true;
+                }
+            }
+        }
 
         OutIngredientNames.Add(ingredientName);
         OutIngredientValidity.Add(bIsValid);
-
-        if (bIsValid) {
-            matchingIngredients++;
-            currentPriority = FMath::Max(currentPriority, ingredient.TermsOfUse.AddPriority);
-            if (ingredientName == gameSettings->PoisonBase.RowName) {
-                isPoison = true;
-            }
-        }
     }
 
-    float fraction = matchingIngredients / Ingredients.Num();
-    IsGood = (currentClient.IsDemon) ? isPoison : (fraction >= 0.5f && !isPoison);
+    const float fraction = static_cast<float>(matchingIngredients) / static_cast<float>(Ingredients.Num());
 
+    IsGood = (currentClient.IsDemon) ? isPoison : (fraction >= 0.5f && !isPoison);
 
     FGameMetrics gameMetrics;
     GameLoop->GetGameMetrics(gameMetrics);
-    int dayMultiplier = 1 + 0.02f * (gameMetrics.DayNumber - 1);
-    if (currentClient.IsDemon) {
-        if (isPoison) {
-            DeltaInfectionRate = -1 * gameSettings->BasicDeltaPoisonDemon * dayMultiplier * gameMetrics.HealingFactor;
+    const float dayMultiplier = 1.f + 0.02f * (gameMetrics.DayNumber - 1);
+
+    if (currentClient.IsDemon)
+    {
+        if (isPoison)
+        {
+            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaPoisonDemon * dayMultiplier * gameMetrics.HealingFactor;
         }
-        else {
+        else
+        {
             DeltaInfectionRate = gameSettings->BasicDeltaNotPoisonDemon * dayMultiplier * gameMetrics.KillingFactor;
         }
     }
-    else {
-        if (isPoison) {
-            DeltaInfectionRate = -1 * gameSettings->BasicDeltaPoisonClient * dayMultiplier * gameMetrics.HealingFactor;
+    else
+    {
+        if (isPoison)
+        {
+            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaPoisonClient * dayMultiplier * gameMetrics.HealingFactor;
         }
-        else if (fraction >= 0.5f) {
+        else if (fraction >= 0.5f)
+        {
             DeltaInfectionRate = gameSettings->BasicDeltaHeal * dayMultiplier * gameMetrics.HealingFactor * fraction;
         }
-        else {
-            DeltaInfectionRate = -1 * gameSettings->BasicDeltaNotHeal * dayMultiplier * (1 - fraction);
+        else
+        {
+            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaNotHeal * dayMultiplier * (1.f - fraction);
         }
     }
 }
