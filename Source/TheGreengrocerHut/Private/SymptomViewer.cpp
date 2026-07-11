@@ -18,7 +18,6 @@ ASymptomViewer::ASymptomViewer()
     SymptomRoot->SetupAttachment(RootComponent);
     SymptomRoot->SetRelativeLocation(FVector::ZeroVector);
     SymptomRoot->SetRelativeRotation(FRotator::ZeroRotator);
-
 }
 
 void ASymptomViewer::BeginPlay()
