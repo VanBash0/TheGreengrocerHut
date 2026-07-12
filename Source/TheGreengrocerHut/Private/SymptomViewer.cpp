@@ -18,30 +18,49 @@ ASymptomViewer::ASymptomViewer()
     SymptomRoot->SetupAttachment(RootComponent);
     SymptomRoot->SetRelativeLocation(FVector::ZeroVector);
     SymptomRoot->SetRelativeRotation(FRotator::ZeroRotator);
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Constructor called for %s"), *GetName());
 }
 
 void ASymptomViewer::BeginPlay()
 {
     Super::BeginPlay();
 
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] BeginPlay start"));
+
     const UGameProjectSettings* ProjectSettings = GetDefault<UGameProjectSettings>();
     if (ProjectSettings)
     {
         SymptomsTable = ProjectSettings->SymptomTable.LoadSynchronous();
         DefaultBodyPartTable = ProjectSettings->DefaultBodyPartTable.LoadSynchronous();
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] SymptomsTable loaded: %s (%s)"),
+            SymptomsTable ? TEXT("OK") : TEXT("NULL"),
+            SymptomsTable ? *SymptomsTable->GetPathName() : TEXT("n/a"));
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] DefaultBodyPartTable loaded: %s (%s)"),
+            DefaultBodyPartTable ? TEXT("OK") : TEXT("NULL"),
+            DefaultBodyPartTable ? *DefaultBodyPartTable->GetPathName() : TEXT("n/a"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] UGameProjectSettings::GetDefault returned NULL!"));
     }
 
     if (!SymptomsTable || !DefaultBodyPartTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("Tables not assigned!"));
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Tables not assigned! Aborting BeginPlay."));
         return;
     }
 
     InitializeViewer();
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] BeginPlay end"));
 }
 
 void ASymptomViewer::BeginDestroy()
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] BeginDestroy start, pool size=%d"), _pool.Num());
+
     if (GetWorld())
     {
         GetWorld()->GetTimerManager().ClearTimer(_renderTimerHandle);
@@ -75,15 +94,19 @@ void ASymptomViewer::BeginDestroy()
     _pool.Empty();
     _toRender.Empty();
 
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] BeginDestroy end"));
+
     Super::BeginDestroy();
 }
 
 //LOGIC METHOD
 void ASymptomViewer::InitializeViewer()
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] InitializeViewer start"));
+
     if (!RootComponent)
     {
-        UE_LOG(LogTemp, Error, TEXT("RootComponent is null!"));
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] RootComponent is null!"));
         return;
     }
 
@@ -101,24 +124,30 @@ void ASymptomViewer::InitializeViewer()
         bodyData.BaseMeshComp->SetVisibility(false);
 
         _bodyParts.Add(partType, bodyData);
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Created body part comp for %s (%s)"),
+            *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType),
+            *GetNameSafe(bodyData.BaseMeshComp));
     }
 
-    UE_LOG(LogTemp, Error, TEXT("Viewer initialized with %d body parts"), _bodyParts.Num());
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Viewer initialized with %d body parts"), _bodyParts.Num());
 }
 
 void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] SetNewSymptoms_Implementation start, %d symptoms in client"), newClient.Symptoms.Num());
+
     Reset();
 
     if (!SymptomsTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("Symptoms table not assigned!"));
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Symptoms table not assigned!"));
         return;
     }
 
     if (!DefaultBodyPartTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("Body parts table not assigned!"));
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Body parts table not assigned!"));
         return;
     }
 
@@ -130,6 +159,13 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
         if (FSymptomRow* symptom = SymptomsTable->FindRow<FSymptomRow>(name, ContextString))
         {
             symptomsByPart.FindOrAdd(symptom->Type).Add(*symptom);
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Symptom '%s' mapped to body part %s"),
+                *name.ToString(),
+                *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)symptom->Type));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Symptom row '%s' NOT FOUND in SymptomsTable!"), *name.ToString());
         }
     }
 
@@ -151,6 +187,9 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
         {
             meshToUse = visual.first.second.OverrideBody.Mesh;
             maskToUse = visual.first.second.OverrideBody.RGB_Mask;
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Part %s uses OVERRIDE body mesh=%s mask=%s"),
+                *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType),
+                *GetNameSafe(meshToUse), *GetNameSafe(maskToUse));
         }
         else
         {
@@ -160,26 +199,59 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
             {
                 meshToUse = tableRow->Mesh;
                 maskToUse = tableRow->RGB_Mask;
+                UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Part %s uses DEFAULT body mesh=%s mask=%s"),
+                    *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType),
+                    *GetNameSafe(meshToUse), *GetNameSafe(maskToUse));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] DefaultBodyPartTable row '%s' NOT FOUND!"), *RowName.ToString());
             }
         }
 
         bodyData->BaseMeshComp->SetStaticMesh(meshToUse);
 
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Part %s has %d overlays to place, StaticMesh set: %s"),
+            *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType),
+            visual.second.Num(),
+            meshToUse ? TEXT("YES") : TEXT("NULL"));
+
         for (const FVisualOverlay& overlay : visual.second)
         {
             FVisualOverlayPoolEntry* element = GetPoolEntry(bodyData->BaseMeshComp, overlay.Material);
 
-            if (!element || !element->MeshComponent) { continue; }
+            if (!element || !element->MeshComponent)
+            {
+                UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] GetPoolEntry returned NULL entry or NULL MeshComponent for part %s!"),
+                    *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType));
+                continue;
+            }
+
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Overlay entry acquired: comp=%s material=%s visible=%s attachedTo=%s"),
+                *GetNameSafe(element->MeshComponent),
+                *GetNameSafe(overlay.Material),
+                element->MeshComponent->IsVisible() ? TEXT("true") : TEXT("false"),
+                *GetNameSafe(element->MeshComponent->GetAttachParent()));
 
             if (element->DynamicMaterial)
             {
                 element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Channel")), TextureChannelToVector4(overlay.LayerChannel));
                 element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
+                UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] DynamicMaterial params set on %s (Mask=%s)"),
+                    *GetNameSafe(element->DynamicMaterial), *GetNameSafe(maskToUse));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] element->DynamicMaterial is NULL, overlay will show base material or nothing!"));
             }
 
             bodyData->OverlayEntries.Add(element);
 
-            if (!overlay.SubstanceGraph) { continue; }
+            if (!overlay.SubstanceGraph)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Overlay has no SubstanceGraph, skipping substance render for this entry"));
+                continue;
+            }
 
             USubstanceGraphInstance* newGraph = CopyGraphAndSetMaterial(overlay.SubstanceGraph, overlay.Material, element->DynamicMaterial);
 
@@ -187,16 +259,27 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
             {
                 _toRender.Add(newGraph);
                 element->SubstanceInstance = newGraph;
+                UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Queued substance graph %s for render (toRender count now %d)"),
+                    *GetNameSafe(newGraph), _toRender.Num());
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] CopyGraphAndSetMaterial returned NULL for overlay on part %s!"),
+                    *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)partType));
             }
         }
 
         bodyData->Hide();
     }
 
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Finished building overlays. Total graphs to render: %d"), _toRender.Num());
+
     if (_toRender.Num() > 0)
     {
         TArray<SubstanceAir::GraphInstanceSPtr> toAsync;
         for (const auto& g : _toRender) { toAsync.Add(g->Instance); }
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Calling Substance::Helpers::RenderAsync with %d graphs"), toAsync.Num());
         Substance::Helpers::RenderAsync(toAsync);
 
         if (GetWorld())
@@ -204,23 +287,59 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
             FTimerDelegate Del;
             Del.BindLambda([this]() { this->RenderTick(); });
             GetWorld()->GetTimerManager().SetTimer(_renderTimerHandle, Del, 0.001f, true);
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick timer started"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] GetWorld() is NULL, cannot start RenderTick timer!"));
         }
     }
     else
     {
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] No graphs to render, broadcasting OnRenderComplete immediately"));
         OnRenderComplete.Broadcast();
     }
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] SetNewSymptoms_Implementation end"));
 }
 
 void ASymptomViewer::ShowBodyPart_Implementation(const EBodyPart& PartType)
 {
-    if (IsRendering()) { return; }
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] ShowBodyPart_Implementation called for %s, IsRendering=%s"),
+        *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)PartType),
+        IsRendering() ? TEXT("true") : TEXT("false"));
+
+    if (IsRendering())
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] ShowBodyPart ABORTED because IsRendering() is true (_toRender.Num()=%d) - part will NOT be shown!"), _toRender.Num());
+        return;
+    }
 
     for (auto& kv : _bodyParts)
     {
         if (kv.Key == PartType)
         {
             kv.Value.Show();
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Showing part %s, BaseMesh visible=%s, overlay count=%d"),
+                *StaticEnum<EBodyPart>()->GetNameStringByValue((int32)kv.Key),
+                kv.Value.BaseMeshComp->IsVisible() ? TEXT("true") : TEXT("false"),
+                kv.Value.OverlayEntries.Num());
+
+            for (FVisualOverlayPoolEntry* entry : kv.Value.OverlayEntries)
+            {
+                if (entry && entry->MeshComponent)
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer]   Overlay comp=%s visible=%s material=%s mesh=%s"),
+                        *GetNameSafe(entry->MeshComponent),
+                        entry->MeshComponent->IsVisible() ? TEXT("true") : TEXT("false"),
+                        *GetNameSafe(entry->DynamicMaterial),
+                        *GetNameSafe(entry->MeshComponent->GetStaticMesh()));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("[SymptomViewer]   Overlay entry or its MeshComponent is NULL!"));
+                }
+            }
         }
         else
         {
@@ -232,9 +351,15 @@ void ASymptomViewer::ShowBodyPart_Implementation(const EBodyPart& PartType)
 //POOL HELPER
 USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial)
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] CopyGraphAndSetMaterial start, graph=%s mainMaterial=%s"), *GetNameSafe(graph), *GetNameSafe(mainMaterial));
+
     USubstanceGraphInstance* newGraph = graph->Duplicate();
 
-    if (!newGraph) { return nullptr; }
+    if (!newGraph)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] graph->Duplicate() returned NULL!"));
+        return nullptr;
+    }
 
     newGraph->ConditionalPostLoad();
     newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
@@ -242,17 +367,20 @@ USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraph
     newGraph->CreateOutputs();
 
     TArray<FString> outputNames = newGraph->GetOutputNames();
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] newGraph has %d outputs"), outputNames.Num());
     for (const FString& outputName : outputNames)
     {
         newGraph->EnableOutput(outputName, true);
     }
 
-    TMap<FName, FString> mapping;
+    TMap<FName, int32> mapping;
     if (mainMaterial && graph)
     {
         TArray<FMaterialParameterInfo> textureParams;
         TArray<FGuid> textureGuids;
         mainMaterial->GetAllTextureParameterInfo(textureParams, textureGuids);
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] mainMaterial has %d texture params"), textureParams.Num());
 
         for (const FMaterialParameterInfo& param : textureParams)
         {
@@ -261,52 +389,72 @@ USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraph
 
             if (!TextureValue) { continue; }
 
+            int32 index = 0;
             for (auto& OutputPair : graph->OutputInstances)
             {
                 USubstanceOutputData* OutputData = OutputPair.Value;
-                if (!OutputData) { continue; }
+                if (!OutputData) { index++; continue; }
 
                 UTexture2D* OutputTexture = Cast<UTexture2D>(OutputData->GetData());
-                if (!OutputTexture || OutputTexture != TextureValue) { continue; }
+                if (!OutputTexture || OutputTexture != TextureValue) { index++; continue; }
 
                 SubstanceAir::OutputInstance* OutputInstance = Substance::Helpers::GetSubstanceOutputByID(graph, OutputPair.Key);
+                FString DebugIdentifier = OutputInstance ? FString(OutputInstance->mDesc.mIdentifier.c_str()) : TEXT("<null OutputInstance>");
 
-                if (!OutputInstance) { break; }
+                mapping.Add(param.Name, index);
 
-                FString OutputIdentifier = FString(OutputInstance->mDesc.mIdentifier.c_str());
-                mapping.Add(param.Name, OutputIdentifier);
+                UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Mapped material param '%s' -> substance output index %d (identifier='%s', for reference only)"),
+                    *param.Name.ToString(), index, *DebugIdentifier);
 
                 break;
             }
         }
     }
 
-    if (mapping.Num() == 0) { return newGraph; }
+    if (mapping.Num() == 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] No texture param mapping found! dimMaterial will keep default/empty textures."));
+        return newGraph;
+    }
 
     for (auto& map : mapping)
     {
         FName ParamName = map.Key;
-        FString OutputIdentifier = map.Value;
+        int32 TargetIndex = map.Value;
+
+        bool bAssigned = false;
+        int32 index = 0;
 
         for (auto& OutputPair : newGraph->OutputInstances)
         {
+            if (index != TargetIndex) { index++; continue; }
+
             USubstanceOutputData* OutputData = OutputPair.Value;
-            if (!OutputData) { continue; }
+            UTexture2D* OutputTexture = OutputData ? Cast<UTexture2D>(OutputData->GetData()) : nullptr;
 
-            UTexture2D* OutputTexture = Cast<UTexture2D>(OutputData->GetData());
-            if (!OutputTexture) { continue; }
-
-            SubstanceAir::OutputInstance* OutputInstance = Substance::Helpers::GetSubstanceOutputByID(newGraph, OutputPair.Key);
-            if (!OutputInstance) { continue; }
-
-            FString NewOutputIdentifier = FString(OutputInstance->mDesc.mIdentifier.c_str());
-            if (NewOutputIdentifier != OutputIdentifier) { continue; }
+            if (!OutputTexture)
+            {
+                UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Output at index %d has no valid UTexture2D yet (param '%s')"), TargetIndex, *ParamName.ToString());
+                break;
+            }
 
             dimMaterial->SetTextureParameterValue(ParamName, OutputTexture);
+            bAssigned = true;
+
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Assigned new output texture '%s' (index %d) to param '%s' on %s"),
+                *GetNameSafe(OutputTexture), TargetIndex, *ParamName.ToString(), *GetNameSafe(dimMaterial));
 
             break;
         }
+
+        if (!bAssigned)
+        {
+            UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] Could not find matching new output at index %d (param '%s')"),
+                TargetIndex, *ParamName.ToString());
+        }
     }
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] CopyGraphAndSetMaterial end, returning %s"), *GetNameSafe(newGraph));
 
     return newGraph;
 }
@@ -334,11 +482,16 @@ const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> ASy
         }
     }
 
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] SelectBodySymptomsByType: %d symptoms in, %d overlays out, deformExist=%s"),
+        Symptoms.Num(), overlays.Num(), deformExist ? TEXT("true") : TEXT("false"));
+
     return { { deformExist, deform }, overlays };
 }
 
 void ASymptomViewer::Reset()
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Reset start, pool size=%d"), _pool.Num());
+
     if (GetWorld())
     {
         GetWorld()->GetTimerManager().ClearTimer(_renderTimerHandle);
@@ -378,6 +531,8 @@ void ASymptomViewer::Reset()
     }
 
     _toRender.Empty();
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Reset end, freed %d pool entries"), FreedCount);
 }
 
 FVisualOverlayPoolEntry* ASymptomViewer::GetPoolEntry(UStaticMeshComponent* root, UMaterialInterface* material)
@@ -398,7 +553,12 @@ FVisualOverlayPoolEntry* ASymptomViewer::GetPoolEntry(UStaticMeshComponent* root
             {
                 entry.MeshComponent->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
                 entry.MeshComponent->SetStaticMesh(root->GetStaticMesh());
+                entry.MeshComponent->SetVisibility(true, true);
             }
+
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] GetPoolEntry: REUSED entry, comp=%s attachedTo=%s visible=%s"),
+                *GetNameSafe(entry.MeshComponent), *GetNameSafe(root),
+                entry.MeshComponent ? (entry.MeshComponent->IsVisible() ? TEXT("true") : TEXT("false")) : TEXT("n/a"));
 
             return &entry;
         }
@@ -417,11 +577,20 @@ FVisualOverlayPoolEntry* ASymptomViewer::GetPoolEntry(UStaticMeshComponent* root
         newEntry.MeshComponent->SetStaticMesh(root->GetStaticMesh());
     }
     newEntry.MeshComponent->RegisterComponent();
+    newEntry.MeshComponent->SetVisibility(true, true);
 
     if (material)
     {
         newEntry.DynamicMaterial = UMaterialInstanceDynamic::Create(material, this, FName("OverlayMaterial"));
         newEntry.MeshComponent->SetMaterial(0, newEntry.DynamicMaterial);
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] GetPoolEntry: CREATED NEW entry #%d, comp=%s attachedTo=%s"),
+        _pool.Num(), *GetNameSafe(newEntry.MeshComponent), *GetNameSafe(root));
+
+    if (_pool.Num() >= _pool.Max())
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] WARNING: _pool is about to grow beyond reserved capacity (%d)! Raw pointers previously returned from GetPoolEntry may become DANGLING after this Add()."), _pool.Max());
     }
 
     _pool.Add(newEntry);
@@ -433,6 +602,8 @@ void ASymptomViewer::RenderTick()
 {
     if (_toRender.IsEmpty())
     {
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: _toRender empty, stopping timer and broadcasting OnRenderComplete"));
+
         if (GetWorld())
         {
             GetWorld()->GetTimerManager().ClearTimer(_renderTimerHandle);
@@ -447,7 +618,11 @@ void ASymptomViewer::RenderTick()
 
     for (USubstanceGraphInstance* graph : _toRender)
     {
-        if (!graph || !graph->Instance) { continue; }
+        if (!graph || !graph->Instance)
+        {
+            UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] RenderTick: graph or graph->Instance is NULL in _toRender!"));
+            continue;
+        }
 
         bool ready = false;
         for (auto& pair : graph->OutputInstances)
@@ -455,6 +630,11 @@ void ASymptomViewer::RenderTick()
             if (!pair.Value) { continue; }
 
             UTexture2D* tex = Cast<UTexture2D>(pair.Value->GetData());
+            int32 mipCount = (tex && tex->GetPlatformData()) ? tex->GetPlatformData()->Mips.Num() : -1;
+
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: graph=%s output tex=%s mipCount=%d"),
+                *GetNameSafe(graph), *GetNameSafe(tex), mipCount);
+
             if (tex && tex->GetPlatformData() && tex->GetPlatformData()->Mips.Num() > 4)
             {
                 ready = true;
@@ -462,11 +642,16 @@ void ASymptomViewer::RenderTick()
             }
         }
 
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: graph=%s ready=%s"),
+            *GetNameSafe(graph), ready ? TEXT("true") : TEXT("false"));
+
         if (ready) completed.Add(graph);
     }
 
     for (USubstanceGraphInstance* graph : completed)
     {
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: finalizing render for graph=%s"), *GetNameSafe(graph));
+
         for (auto& pair : graph->OutputInstances)
         {
             SubstanceAir::OutputInstance* output = Substance::Helpers::GetSubstanceOutputByID(graph, pair.Key);
@@ -481,5 +666,8 @@ void ASymptomViewer::RenderTick()
         Substance::Helpers::RenderSync(singleGraph, true);
 
         _toRender.Remove(graph);
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: graph=%s RenderSync done, removed from _toRender, %d remaining"),
+            *GetNameSafe(graph), _toRender.Num());
     }
 }
