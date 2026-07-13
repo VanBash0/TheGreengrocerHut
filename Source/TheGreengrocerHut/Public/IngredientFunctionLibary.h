@@ -115,8 +115,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetBasePotionBySumptomCount(const UObject* WorldContextObject, const UGameSettings* GameSettings, const int& ClientSymptomCount, FName& Potion);
 
-    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject", ToolTip="По списку ингредиентов возвращает только сырые"))
     static void GetDefaultIngredients(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& DefaultIngredients);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject", ToolTip = "По списку ингредиентов возвращает их сырые версии"))
+    static void GetIngredientRawVariants(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& RawIngredients);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject", ToolTip = "Возвращает список ингредиентов, которые впервые появились сегодня"))
+    static void GetNewIngredientsOfToday(const UObject* WorldContextObject, const UGameLoop* GameLoop, const TArray<FName>& TodayIngredients, TArray<FName>& NewIngredients);
 
     UFUNCTION(BlueprintCallable, Category = "Symptom", meta = (WorldContext = "WorldContextObject"))
     static TArray<FName> SelectNewSymptoms(const UObject* WorldContextObject, const TArray<FDaySnapshot>& PreviousDaysSnapshot, const FDaySnapshot& CurrentDaySnapshot);
@@ -159,6 +165,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Cache|IngredientsSeed", meta = (WorldContext = "WorldContextObject"))
     static void GetIngredientSeedByIngredient(const UObject* WorldContextObject, const TArray<FName>& IngredientRowNames, TArray<FName>& OutSeedIngredientRowNames);
+
 public:
     UFUNCTION(BlueprintCallable, Category = "Tutorial", meta = (WorldContext = "WorldContextObject"))
     static int32 GetTutorialDaysNum(const UObject* WorldContextObject);

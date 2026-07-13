@@ -850,3 +850,68 @@ void UIngredientFunctionLibary::SortIngredientsByPriority(const UObject* WorldCo
             return bDescending ? (PriorityA > PriorityB) : (PriorityA < PriorityB);
         });
 }
+
+void UIngredientFunctionLibary::GetIngredientRawVariants(const UObject* WorldContextObject, const TArray<FName>& Ingredients, TArray<FName>& RawIngredients)
+{
+    RawIngredients.Empty();
+
+    TMap<FName, FName> recipeMap;
+    const TArray<UConverter*> converters = GetAllConverters(WorldContextObject);
+    for (const UConverter* converter : converters)
+    {
+        if (!converter) continue;
+        for (const FConverterRecipe& recipe : converter->RecipeArray)
+        {
+            recipeMap.Add(recipe.To.RowName, recipe.From.RowName);
+        }
+    }
+
+    TSet<FName> resultSet;
+    TSet<FName> visited;
+
+    TFunction<void(FName)> Traverse = [&](FName Ingredient)
+    {
+        if (visited.Contains(Ingredient)) return;
+        visited.Add(Ingredient);
+
+        if (!recipeMap.Contains(Ingredient))
+        {
+            resultSet.Add(Ingredient);
+            return;
+        }
+
+        Traverse(recipeMap[Ingredient]);
+    };
+
+    for (const FName& ingredient : Ingredients)
+    {
+        Traverse(ingredient);
+    }
+
+    RawIngredients.Reserve(resultSet.Num());
+    for (const FName& Raw : resultSet)
+    {
+        RawIngredients.Add(Raw);
+    }
+}
+
+void UIngredientFunctionLibary::GetNewIngredientsOfToday(const UObject* WorldContextObject, const UGameLoop* GameLoop, const TArray<FName>& TodayIngredients, TArray<FName>& NewIngredients)
+{
+    NewIngredients.Empty();
+    
+    TArray<FName> yesterdayIngredients;
+    FGameMetrics yesterdayMetrics = GameLoop->GetPreviousDayMetrics();
+    GetBasePotions(WorldContextObject, yesterdayMetrics.MaxClientSymptomCount, yesterdayMetrics.HasDemonPrevious, yesterdayIngredients);
+
+    TArray<FName> yesterdaySymptoms = GameLoop->GetPreviousDaySymptoms();
+    TArray<FName> yesterdaySymptomsIngredients;
+    GetIngredientsBySymptoms(WorldContextObject, yesterdaySymptoms, yesterdaySymptomsIngredients);
+
+    yesterdayIngredients.Append(yesterdaySymptomsIngredients);
+
+    for (const auto& ingredient : TodayIngredients) {
+        if (!yesterdayIngredients.Contains(ingredient)) {
+            NewIngredients.Add(ingredient);
+        }
+    }
+}

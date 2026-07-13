@@ -77,6 +77,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Save")
     void ResetGameData();
 
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    const FGameMetrics GetPreviousDayMetrics() const { return _savedData->LastDayMetrics; }
+
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    const TArray<FName> GetPreviousDaySymptoms() const { return _savedData->DaySnapshots.Num() > 0 ? _savedData->DaySnapshots.Last().DaySymptoms : TArray<FName>(); }
+
 public: //TO DELETE (онкмюъ усимъ)
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASS")
     bool DidPlayerWin();
