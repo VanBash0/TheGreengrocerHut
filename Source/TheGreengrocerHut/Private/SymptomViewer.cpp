@@ -276,17 +276,35 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
 
     if (_toRender.Num() > 0)
     {
-        TArray<SubstanceAir::GraphInstanceSPtr> toAsync;
-        for (const auto& g : _toRender) { toAsync.Add(g->Instance); }
+        /*for (const auto& g : _toRender)
+        {
+            Substance::Helpers::RenderSync(g->Instance, false);
+        }
 
-        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Calling Substance::Helpers::RenderAsync with %d graphs"), toAsync.Num());
+        _toRender.Empty();
+        OnRenderComplete.Broadcast();*/
+
+        TArray<SubstanceAir::GraphInstanceSPtr> toAsync;
+        for (const auto& g : _toRender)
+        {
+            bool bInstanceValid = g && g->Instance.get() != nullptr;
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Preparing RenderAsync: graph=%s Instance valid=%s (raw ptr=%p)"),
+                *GetNameSafe(g), bInstanceValid ? TEXT("true") : TEXT("false"), g ? g->Instance.get() : nullptr);
+
+            if (bInstanceValid)
+            {
+                toAsync.Add(g->Instance);
+            }
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Calling Substance::Helpers::RenderAsync with %d graphs (out of %d in _toRender)"), toAsync.Num(), _toRender.Num());
         Substance::Helpers::RenderAsync(toAsync);
 
         if (GetWorld())
         {
             FTimerDelegate Del;
             Del.BindLambda([this]() { this->RenderTick(); });
-            GetWorld()->GetTimerManager().SetTimer(_renderTimerHandle, Del, 0.001f, true);
+            GetWorld()->GetTimerManager().SetTimer(_renderTimerHandle, Del, 0.1f, true);
             UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick timer started"));
         }
         else
@@ -351,7 +369,8 @@ void ASymptomViewer::ShowBodyPart_Implementation(const EBodyPart& PartType)
 //POOL HELPER
 USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial)
 {
-    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] CopyGraphAndSetMaterial start, graph=%s mainMaterial=%s"), *GetNameSafe(graph), *GetNameSafe(mainMaterial));
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] CopyGraphAndSetMaterial start, graph=%s mainMaterial=%s"),
+        *GetNameSafe(graph), *GetNameSafe(mainMaterial));
 
     USubstanceGraphInstance* newGraph = graph->Duplicate();
 
@@ -360,6 +379,11 @@ USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraph
         UE_LOG(LogTemp, Error, TEXT("[SymptomViewer] graph->Duplicate() returned NULL!"));
         return nullptr;
     }
+
+    UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] After Duplicate(): newGraph=%s, source graph Instance valid=%s, newGraph Instance valid=%s"),
+        *GetNameSafe(newGraph),
+        (graph->Instance.get() != nullptr) ? TEXT("true") : TEXT("false"),
+        (newGraph->Instance.get() != nullptr) ? TEXT("true") : TEXT("false"));
 
     newGraph->ConditionalPostLoad();
     newGraph->SetInputInt("$outputsize", TArray<int32>{ 10, 10 });
@@ -373,6 +397,48 @@ USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraph
         newGraph->EnableOutput(outputName, true);
     }
 
+    // WORKAROUND: Substance::Helpers::CreateSubstanceTexture2D only calls Texture->UpdateResource()
+    // inside a #if WITH_EDITORONLY_DATA block, so textures created at runtime in a packaged build
+    // never get their RHI resource initialized and stay on the placeholder mips forever.
+    // UpdateResource() itself is NOT editor-only, so we call it manually here for every output.
+    for (auto& OutputPair : newGraph->OutputInstances)
+    {
+        USubstanceOutputData* OutputData = OutputPair.Value;
+        UTexture2D* OutputTexture = OutputData ? Cast<UTexture2D>(OutputData->GetData()) : nullptr;
+        if (OutputTexture)
+        {
+            OutputTexture->UpdateResource();
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Manually called UpdateResource() on %s"), *GetNameSafe(OutputTexture));
+        }
+    }
+
+    // Dump identity of each output texture right after creation, before any param assignment,
+    // to check whether CreateOutputs() actually produced distinct UTexture2D objects or if
+    // they all collapse onto the same shared/placeholder texture in this build config.
+    {
+        int32 dbgIndex = 0;
+        for (auto& OutputPair : newGraph->OutputInstances)
+        {
+            USubstanceOutputData* OutputData = OutputPair.Value;
+            UTexture2D* OutputTexture = OutputData ? Cast<UTexture2D>(OutputData->GetData()) : nullptr;
+
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Output[%d] right after CreateOutputs: OutputData=%p Texture=%p Path='%s'"),
+                dbgIndex,
+                OutputData,
+                OutputTexture,
+                OutputTexture ? *OutputTexture->GetPathName() : TEXT("<null>"));
+
+            dbgIndex++;
+        }
+    }
+
+    // NOTE: matching used to be done by comparing OutputInstance->mDesc.mIdentifier strings
+    // between the original graph and the duplicated graph. In packaged/cooked builds this
+    // identifier can come back empty or identical for every output, which made every
+    // material param match the FIRST output in the list (confirmed via logs: all three
+    // params ended up bound to the same texture in Build.log, while Editor.txt showed
+    // three distinct per-output textures). Matching by array index instead, since
+    // newGraph = graph->Duplicate() preserves output order/count.
     TMap<FName, int32> mapping;
     if (mainMaterial && graph)
     {
@@ -441,8 +507,8 @@ USubstanceGraphInstance* ASymptomViewer::CopyGraphAndSetMaterial(USubstanceGraph
             dimMaterial->SetTextureParameterValue(ParamName, OutputTexture);
             bAssigned = true;
 
-            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Assigned new output texture '%s' (index %d) to param '%s' on %s"),
-                *GetNameSafe(OutputTexture), TargetIndex, *ParamName.ToString(), *GetNameSafe(dimMaterial));
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] Assigned new output texture ptr=%p path='%s' (index %d) to param '%s' on %s"),
+                OutputTexture, *OutputTexture->GetPathName(), TargetIndex, *ParamName.ToString(), *GetNameSafe(dimMaterial));
 
             break;
         }
@@ -624,21 +690,19 @@ void ASymptomViewer::RenderTick()
             continue;
         }
 
-        bool ready = false;
+        bool ready = true; // готовность = ВСЕ output'ы готовы, не любой первый
         for (auto& pair : graph->OutputInstances)
         {
             if (!pair.Value) { continue; }
-
             UTexture2D* tex = Cast<UTexture2D>(pair.Value->GetData());
-            int32 mipCount = (tex && tex->GetPlatformData()) ? tex->GetPlatformData()->Mips.Num() : -1;
+            int32 sizeX = tex ? tex->GetSizeX() : -1;
 
-            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: graph=%s output tex=%s mipCount=%d"),
-                *GetNameSafe(graph), *GetNameSafe(tex), mipCount);
+            UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: graph=%s output ptr=%p path='%s' sizeX=%d"),
+                *GetNameSafe(graph), tex, tex ? *tex->GetPathName() : TEXT("<null>"), sizeX);
 
-            if (tex && tex->GetPlatformData() && tex->GetPlatformData()->Mips.Num() > 4)
+            if (!tex || tex->GetSizeX() != 1024) // подставь реальный ожидаемый размер (тот, что задан в графе)
             {
-                ready = true;
-                break;
+                ready = false;
             }
         }
 
