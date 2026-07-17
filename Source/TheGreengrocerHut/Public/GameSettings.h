@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "IngredientStructures.h"
+#include "ClientStruct.h"
 #include "GameSettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -135,22 +136,6 @@ public:
     float DeltaKillingFactor;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Heal", ToolTip = "Базовый урон по заражению при исцелении клиента"))
-    float BasicDeltaHeal;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Not Heal", ToolTip = "Базовый урон от заражения при неисцелении клиента"))
-    float BasicDeltaNotHeal;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Poison Demon", ToolTip = "Базовый урон по заражению при отравлении демона"))
-    float BasicDeltaPoisonDemon;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Not Poison Demon", ToolTip = "Базовый урон от заражения при неотравлении демона"))
-    float BasicDeltaNotPoisonDemon;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Poison Client", ToolTip = "Базовый урон от заражения при отравлении клиента"))
-    float BasicDeltaPoisonClient;
+        meta = (DisplayName = "Potion Result Delta Map", ToolTip = "Базовая дельта заражения для каждого исхода (EPotionResult)"))
+    TMap<EPotionResult, float> PotionResultDeltaMap;
 };

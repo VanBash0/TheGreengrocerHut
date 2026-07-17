@@ -459,10 +459,7 @@ const UConverter* UIngredientFunctionLibary::GetConverterByIndex(const UObject* 
     return Result;
 }
 
-void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject,
-                                               const int& MaxClientSymptomCount,
-                                               const bool& HasDemonPrevious,
-                                               TArray<FName>& BasePotions)
+void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject, const int& MaxClientSymptomCount, const bool& HasDemonPrevious, TArray<FName>& BasePotions)
 {
     BasePotions.Empty();
     const UGameProjectSettings* projectSettings = GetDefault<UGameProjectSettings>();
@@ -480,10 +477,7 @@ void UIngredientFunctionLibary::GetBasePotions(const UObject* WorldContextObject
     }
 }
 
-void UIngredientFunctionLibary::GetBasePotionBySumptomCount(const UObject* WorldContextObject,
-    const UGameSettings* GameSettings,
-    const int& ClientSymptomCount,
-    FName& Potion)
+void UIngredientFunctionLibary::GetBasePotionBySumptomCount(const UObject* WorldContextObject, const UGameSettings* GameSettings, const int& ClientSymptomCount, FName& Potion)
 {
     int key = 0;
     for (const auto& base : GameSettings->BasePotionsMap)
@@ -545,23 +539,116 @@ TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldC
     return NewSymptoms;
 }
 
-void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldContextObject,
-    const TArray<FIngredient>& Ingredients,
-    const UGameLoop* GameLoop,
-    bool& IsGood,
-    float& DeltaInfectionRate,
-    TArray<FName>& OutIngredientNames,
-    TArray<bool>& OutIngredientValidity)
+void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const UGameLoop* GameLoop, FClientResult& OutResult)
 {
-    OutIngredientNames.Empty();
-    OutIngredientValidity.Empty();
-    OutIngredientNames.Reserve(Ingredients.Num());
-    OutIngredientValidity.Reserve(Ingredients.Num());
+    OutResult = FClientResult();
+    GameLoop->GetCurrentClient(OutResult.Client);
+    const FClient& currentClient = OutResult.Client;
+
+    FPotionCompareResult Compare;
+    ComparePotionToRecipe(WorldContextObject, Ingredients, GameLoop, Compare);
+
+    OutResult.GivenIngredients = Compare.GivenIngredients;
+    OutResult.IngredientValidity = Compare.IngredientValidity;
+    OutResult.PotionMatchScore = Compare.PotionMatchScore;
+
+    if (currentClient.IsDemon)
+    {
+        if (Compare.IsPoison)
+        {
+            OutResult.Result = EPotionResult::Demon_Poisoned;
+        }
+        else if (Compare.PotionMatchScore >= 0.5f)
+        {
+            OutResult.Result = EPotionResult::Demon_GivenGoodPotion;
+        }
+        else
+        {
+            OutResult.Result = EPotionResult::Demon_NotPoisoned;
+        }
+    }
+    else
+    {
+        if (Compare.IsPoison)
+        {
+            OutResult.Result = EPotionResult::Human_Poisoned;
+        }
+        else if (Compare.ValidFraction >= 0.5f)
+        {
+            OutResult.Result = EPotionResult::Human_Healed;
+        }
+        else
+        {
+            OutResult.Result = EPotionResult::Human_NotHealed;
+        }
+    }
+
+    const TObjectPtr<UGameSettings>& gameSettings = GameLoop->GameSettings;
+
+    FGameMetrics gameMetrics;
+    GameLoop->GetGameMetrics(gameMetrics);
+    const float dayMultiplier = 1.f + 0.02f * (gameMetrics.DayNumber - 1);
+
+    const float* BaseDeltaPtr = gameSettings->PotionResultDeltaMap.Find(OutResult.Result);
+    float delta = BaseDeltaPtr ? *BaseDeltaPtr : 0.f;
+
+    switch (OutResult.Result)
+    {
+    case EPotionResult::Human_Healed:
+        delta *= dayMultiplier * gameMetrics.HealingFactor * Compare.ValidFraction;
+        break;
+
+    case EPotionResult::Human_NotHealed:
+        delta *= (1.f - Compare.ValidFraction);
+        break;
+
+    case EPotionResult::Human_Poisoned:
+    case EPotionResult::Demon_Poisoned:
+        delta *= dayMultiplier * gameMetrics.HealingFactor;
+        break;
+
+    case EPotionResult::Demon_NotPoisoned:
+    case EPotionResult::Demon_GivenGoodPotion:
+        delta *= dayMultiplier * gameMetrics.KillingFactor;
+        break;
+    }
+
+    OutResult.DeltaInfectionRate = delta;
+}
+
+namespace
+{
+    // Размер пересечения двух мультимножеств FName (сколько раз каждое имя встречается в обоих) —
+    // используется ТОЛЬКО внутри одной приоритетной группы, где порядок не важен.
+    int32 CountMultisetIntersection(const TArray<FName>& A, const TArray<FName>& B)
+    {
+        TMap<FName, int32> CountsA;
+        for (const FName& Name : A) { CountsA.FindOrAdd(Name)++; }
+
+        int32 Intersection = 0;
+        for (const FName& Name : B)
+        {
+            int32* Remaining = CountsA.Find(Name);
+            if (Remaining && *Remaining > 0)
+            {
+                --(*Remaining);
+                ++Intersection;
+            }
+        }
+        return Intersection;
+    }
+}
+
+void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const UGameLoop* GameLoop, FPotionCompareResult& OutCompare)
+{
+    OutCompare = FPotionCompareResult();
+    OutCompare.GivenIngredients.Reserve(Ingredients.Num());
+    OutCompare.IngredientValidity.Reserve(Ingredients.Num());
 
     FClient currentClient;
     GameLoop->GetCurrentClient(currentClient);
 
-    // ингредиенты по симптомам (без базы) — "правильный" набор для лечения
+    // ингредиенты по симптомам (без базы) — то, что нужно добавить сверх базы
     TArray<FName> neededIngredients;
     GetIngredientsBySymptoms(WorldContextObject, currentClient.Symptoms, neededIngredients);
 
@@ -578,6 +665,10 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
         GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), requiredBase);
     }
 
+    // единственный валидный порядок закладки: неубывающий AddPriority
+    TArray<FName> sortedNeeded = neededIngredients;
+    SortIngredientsByPriority(WorldContextObject, sortedNeeded, /*bDescending=*/false);
+
     // резолвим имена игрока
     TArray<FName> playerIngredientNames;
     playerIngredientNames.Reserve(Ingredients.Num());
@@ -587,34 +678,75 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
         FName ingredientName = GetRowNameByIngredient(WorldContextObject, ingredient, bFound);
         playerIngredientNames.Add(bFound ? ingredientName : NAME_None);
     }
+    OutCompare.GivenIngredients = playerIngredientNames;
 
-    // 1. база первая и совпадает с требуемой
-    const bool bBaseOk = !requiredBase.IsNone() && (playerIngredientNames[0] == requiredBase);
+    // === Строим канонический рецепт БЛОКАМИ по приоритету ===
+    // Блок 0 — всегда база (если требуется), размер 1.
+    // Дальше — sortedNeeded разбит на последовательные группы с одинаковым AddPriority.
+    // Внутри блока порядок не важен (сравниваем как мультимножество),
+    // порядок МЕЖДУ блоками важен (блок должен закрыться, прежде чем начнётся следующий).
+    TArray<TArray<FName>> CanonicalGroups;
 
-    // 2. остальные ингредиенты как мультимножество сравниваются с "правильным" набором по симптомам
-    bool bRestMatchesSymptoms = false;
-    if (bBaseOk)
+    if (!requiredBase.IsNone())
     {
-        TArray<FName> playerRest(playerIngredientNames);
-        playerRest.RemoveAt(0);
+        CanonicalGroups.AddDefaulted();
+        CanonicalGroups.Last().Add(requiredBase);
+    }
 
-        if (playerRest.Num() == neededIngredients.Num())
+    {
+        UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
+        int32 PrevPriority = TNumericLimits<int32>::Min();
+        bool bFirstGroup = true;
+
+        for (const FName& Name : sortedNeeded)
         {
-            TArray<FName> playerRestSorted = playerRest;
-            TArray<FName> neededSorted = neededIngredients;
-            playerRestSorted.Sort([](const FName& A, const FName& B) { return A.LexicalLess(B); });
-            neededSorted.Sort([](const FName& A, const FName& B) { return A.LexicalLess(B); });
+            const FIngredient* IngredientData = Cache ? Cache->GetIngredientByRowName(Name) : nullptr;
+            const int32 Priority = IngredientData ? IngredientData->TermsOfUse.AddPriority : 0;
 
-            bRestMatchesSymptoms = (playerRestSorted == neededSorted);
+            if (bFirstGroup || Priority != PrevPriority)
+            {
+                CanonicalGroups.AddDefaulted();
+                PrevPriority = Priority;
+                bFirstGroup = false;
+            }
+
+            CanonicalGroups.Last().Add(Name);
         }
     }
 
-    // демону "правильно" = база-яд + НЕправильный набор ингредиентов
-    // обычному клиенту "правильно" = правильная база + правильный набор ингредиентов
-    const bool bExactMatch = bBaseOk && (currentClient.IsDemon ? !bRestMatchesSymptoms : bRestMatchesSymptoms);
+    int32 TotalNeeded = 0;
+    for (const TArray<FName>& Group : CanonicalGroups) { TotalNeeded += Group.Num(); }
 
-    // 3. проверка порядка по приоритету (после базы — неубывающий) + подсчёт валидных
-    bool isPoison = false;
+    // === PotionMatchScore: блочное совпадение ===
+    // Идём по канонической последовательности блоков, "откусывая" от player-последовательности
+    // ровно столько ингредиентов, сколько в текущем блоке, и сравниваем этот кусок как мультимножество.
+    int32 PositionalMatches = 0;
+    {
+        int32 PlayerIndex = 0;
+        for (const TArray<FName>& Group : CanonicalGroups)
+        {
+            TArray<FName> PlayerSlice;
+            for (int32 k = 0; k < Group.Num() && PlayerIndex < playerIngredientNames.Num(); ++k, ++PlayerIndex)
+            {
+                PlayerSlice.Add(playerIngredientNames[PlayerIndex]);
+            }
+            PositionalMatches += CountMultisetIntersection(PlayerSlice, Group);
+        }
+
+        const int32 Denominator = FMath::Max(playerIngredientNames.Num(), TotalNeeded);
+        OutCompare.PotionMatchScore = Denominator > 0
+            ? static_cast<float>(PositionalMatches) / static_cast<float>(Denominator)
+            : 1.f; // оба списка пустые -> считаем точным совпадением
+    }
+
+    const bool bExactRecipeMatch = OutCompare.PotionMatchScore >= 1.0f;
+
+    // "база на своём месте" — отдельно от score, нужно для валидности конкретно 0-го слота и детекта яда
+    const bool bBaseOk = !requiredBase.IsNone()
+        && playerIngredientNames.Num() > 0
+        && (playerIngredientNames[0] == requiredBase);
+
+    // проверка порядка по приоритету (после базы — неубывающий) + подсчёт валидных
     int32 matchingIngredients = 0;
     int32 currentPriority = TNumericLimits<int32>::Min();
 
@@ -633,13 +765,13 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
                 currentPriority = TNumericLimits<int32>::Min();
                 if (ingredientName == gameSettings->PoisonBase.RowName)
                 {
-                    isPoison = true;
+                    OutCompare.IsPoison = true;
                 }
             }
         }
         else
         {
-            bIsValid = bExactMatch
+            bIsValid = bExactRecipeMatch
                 && !ingredientName.IsNone()
                 && ingredient.TermsOfUse.AddPriority >= currentPriority;
 
@@ -649,49 +781,17 @@ void UIngredientFunctionLibary::CalculatePotionQuality(const UObject* WorldConte
                 currentPriority = FMath::Max(currentPriority, ingredient.TermsOfUse.AddPriority);
                 if (ingredientName == gameSettings->PoisonBase.RowName)
                 {
-                    isPoison = true;
+                    OutCompare.IsPoison = true;
                 }
             }
         }
 
-        OutIngredientNames.Add(ingredientName);
-        OutIngredientValidity.Add(bIsValid);
+        OutCompare.IngredientValidity.Add(bIsValid);
     }
 
-    const float fraction = static_cast<float>(matchingIngredients) / static_cast<float>(Ingredients.Num());
-
-    IsGood = (currentClient.IsDemon) ? isPoison : (fraction >= 0.5f && !isPoison);
-
-    FGameMetrics gameMetrics;
-    GameLoop->GetGameMetrics(gameMetrics);
-    const float dayMultiplier = 1.f + 0.02f * (gameMetrics.DayNumber - 1);
-
-    if (currentClient.IsDemon)
-    {
-        if (isPoison)
-        {
-            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaPoisonDemon * dayMultiplier * gameMetrics.HealingFactor;
-        }
-        else
-        {
-            DeltaInfectionRate = gameSettings->BasicDeltaNotPoisonDemon * dayMultiplier * gameMetrics.KillingFactor;
-        }
-    }
-    else
-    {
-        if (isPoison)
-        {
-            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaPoisonClient * dayMultiplier * gameMetrics.HealingFactor;
-        }
-        else if (fraction >= 0.5f)
-        {
-            DeltaInfectionRate = gameSettings->BasicDeltaHeal * dayMultiplier * gameMetrics.HealingFactor * fraction;
-        }
-        else
-        {
-            DeltaInfectionRate = -1.f * gameSettings->BasicDeltaNotHeal * dayMultiplier * (1.f - fraction);
-        }
-    }
+    OutCompare.ValidFraction = Ingredients.Num() > 0
+        ? static_cast<float>(matchingIngredients) / static_cast<float>(Ingredients.Num())
+        : 0.f;
 }
 
 namespace {
