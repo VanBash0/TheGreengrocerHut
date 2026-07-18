@@ -42,22 +42,25 @@ struct FPotionCompareResult
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     TArray<bool> IngredientValidity;
 
-    // Насколько поданные ингредиенты (включая базу первым слотом) совпадают с канонической
-    // последовательностью: база + нужные по симптомам, сгруппированные по AddPriority.
-    // Между группами порядок строго важен (блок закрывается прежде чем начнётся следующий),
-    // ВНУТРИ группы с одинаковым приоритетом порядок не важен (сравнение как мультимножество).
-    // 0.0 — ни одна позиция не совпала, 1.0 — точное совпадение рецепта целиком.
+    // Насколько поданные ингредиенты (включая базу) совпадают с каноническим рецептом,
+    // сгруппированным по AddPriority. Между уровнями приоритета порядок важен,
+    // ВНУТРИ уровня — не важен (сравнение как мультимножество). 0.0..1.0
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     float PotionMatchScore = 0.f;
 
-    // Доля валидных ингредиентов (matchingIngredients / Ingredients.Num()) по итогам прохода
-    // проверки порядка приоритетов. Гейтится через PotionMatchScore == 1.0 для i>0 — см. IngredientValidity.
+    // Доля валидных ингредиентов по итогам проверки неубывающего порядка приоритетов.
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     float ValidFraction = 0.f;
 
     // Первый ингредиент (база) — это отрава
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     bool IsPoison = false;
+
+    // Совпадение по каждому уровню приоритета отдельно — для UI-фидбека игроку.
+    // Ключ = Priority (-1 База, 0 Основной, 1 Дополнительный, 2 Связывающий и т.д., см. GameSettings->IngredientPriorityData).
+    // Значение = все ингредиенты игрока на этом уровне совпали (как мультимножество) с нужными.
+    UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
+    TMap<int32, bool> TierMatchResults;
 };
 
 USTRUCT(BlueprintType)
@@ -82,6 +85,12 @@ struct FClientResult
 
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     float PotionMatchScore = 0.f;
+
+    // Совпадение по каждому уровню приоритета — прокинуто из FPotionCompareResult,
+    // чтобы в BP не пришлось отдельно дёргать ComparePotionToRecipe для UI-фидбека.
+    // Ключ = Priority, значение = совпал ли этот уровень целиком.
+    UPROPERTY(BlueprintReadOnly, Category = "Client Result")
+    TMap<int32, bool> TierMatchResults;
 };
 
 USTRUCT(BlueprintType)

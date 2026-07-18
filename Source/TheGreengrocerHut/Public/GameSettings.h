@@ -17,6 +17,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Priority")
     TObjectPtr<UTexture2D> LabelTexture;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Priority | Feedback")
+    TMap<bool, FText> FeedbackResultText;
 };
 
 UCLASS(BlueprintType, Blueprintable)

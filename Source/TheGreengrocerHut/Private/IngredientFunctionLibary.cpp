@@ -539,6 +539,7 @@ TArray<FName> UIngredientFunctionLibary::SelectNewSymptoms(const UObject* WorldC
     return NewSymptoms;
 }
 
+// ===== ИНТЕРПРЕТАЦИЯ РЕЗУЛЬТАТА КЛИЕНТА =====
 void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const UGameLoop* GameLoop, FClientResult& OutResult)
 {
     OutResult = FClientResult();
@@ -551,6 +552,7 @@ void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContex
     OutResult.GivenIngredients = Compare.GivenIngredients;
     OutResult.IngredientValidity = Compare.IngredientValidity;
     OutResult.PotionMatchScore = Compare.PotionMatchScore;
+    OutResult.TierMatchResults = Compare.TierMatchResults;
 
     if (currentClient.IsDemon)
     {
@@ -618,8 +620,8 @@ void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContex
 
 namespace
 {
-    // Размер пересечения двух мультимножеств FName (сколько раз каждое имя встречается в обоих) —
-    // используется ТОЛЬКО внутри одной приоритетной группы, где порядок не важен.
+    // Размер пересечения двух мультимножеств FName — используется ТОЛЬКО внутри
+    // одного приоритетного уровня, где порядок между элементами не важен.
     int32 CountMultisetIntersection(const TArray<FName>& A, const TArray<FName>& B)
     {
         TMap<FName, int32> CountsA;
@@ -637,8 +639,33 @@ namespace
         }
         return Intersection;
     }
+
+    // Локальная группа ингредиентов рецепта с одним и тем же приоритетом
+    // (-1 База, 0 Основной, 1 Дополнительный, 2 Связывающий — имена/значения из GameSettings->IngredientPriorityData)
+    struct FCanonicalGroup
+    {
+        int32 Priority = 0;
+        TArray<FName> Names;
+    };
+
+    // Группирует список ингредиентов по их фактическому AddPriority (не зависит от позиции/порядка)
+    TMap<int32, TArray<FName>> GroupByPriority(UCacheSubsystem* Cache, const TArray<FName>& Names)
+    {
+        TMap<int32, TArray<FName>> Result;
+        for (const FName& Name : Names)
+        {
+            if (Name.IsNone()) { continue; }
+
+            const FIngredient* IngredientData = Cache ? Cache->GetIngredientByRowName(Name) : nullptr;
+            const int32 Priority = IngredientData ? IngredientData->TermsOfUse.AddPriority : 0;
+            Result.FindOrAdd(Priority).Add(Name);
+        }
+        return Result;
+    }
 }
 
+// ===== ЧИСТОЕ СРАВНЕНИЕ ЗЕЛЬЯ С РЕЦЕПТОМ =====
+// Ничего не знает про демонов/людей/дельты — только "что дали" против "что нужно было дать".
 void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContextObject, const TArray<FIngredient>& Ingredients, const UGameLoop* GameLoop, FPotionCompareResult& OutCompare)
 {
     OutCompare = FPotionCompareResult();
@@ -665,10 +692,6 @@ void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContex
         GetBasePotionBySumptomCount(WorldContextObject, gameSettings, currentClient.Symptoms.Num(), requiredBase);
     }
 
-    // единственный валидный порядок закладки: неубывающий AddPriority
-    TArray<FName> sortedNeeded = neededIngredients;
-    SortIngredientsByPriority(WorldContextObject, sortedNeeded, /*bDescending=*/false);
-
     // резолвим имена игрока
     TArray<FName> playerIngredientNames;
     playerIngredientNames.Reserve(Ingredients.Num());
@@ -680,57 +703,59 @@ void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContex
     }
     OutCompare.GivenIngredients = playerIngredientNames;
 
-    // === Строим канонический рецепт БЛОКАМИ по приоритету ===
-    // Блок 0 — всегда база (если требуется), размер 1.
-    // Дальше — sortedNeeded разбит на последовательные группы с одинаковым AddPriority.
-    // Внутри блока порядок не важен (сравниваем как мультимножество),
-    // порядок МЕЖДУ блоками важен (блок должен закрыться, прежде чем начнётся следующий).
-    TArray<TArray<FName>> CanonicalGroups;
+    // === Строим канонический рецепт: база + нужные по симптомам, ВСЕ вместе, ===
+    // === сгруппированные по фактическому AddPriority (база сама встанет первой, у неё Priority == -1) ===
+    UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
 
+    TArray<FName> allRecipeIngredients = neededIngredients;
     if (!requiredBase.IsNone())
     {
-        CanonicalGroups.AddDefaulted();
-        CanonicalGroups.Last().Add(requiredBase);
+        allRecipeIngredients.Add(requiredBase);
     }
 
-    {
-        UCacheSubsystem* Cache = GetCacheSystem(WorldContextObject);
-        int32 PrevPriority = TNumericLimits<int32>::Min();
-        bool bFirstGroup = true;
-
-        for (const FName& Name : sortedNeeded)
+    allRecipeIngredients.Sort([Cache](const FName& A, const FName& B)
         {
-            const FIngredient* IngredientData = Cache ? Cache->GetIngredientByRowName(Name) : nullptr;
-            const int32 Priority = IngredientData ? IngredientData->TermsOfUse.AddPriority : 0;
+            const FIngredient* IA = Cache ? Cache->GetIngredientByRowName(A) : nullptr;
+            const FIngredient* IB = Cache ? Cache->GetIngredientByRowName(B) : nullptr;
+            const int32 PA = IA ? IA->TermsOfUse.AddPriority : 0;
+            const int32 PB = IB ? IB->TermsOfUse.AddPriority : 0;
+            return PA < PB;
+        });
 
-            if (bFirstGroup || Priority != PrevPriority)
-            {
-                CanonicalGroups.AddDefaulted();
-                PrevPriority = Priority;
-                bFirstGroup = false;
-            }
+    TArray<FCanonicalGroup> CanonicalGroups;
+    for (const FName& Name : allRecipeIngredients)
+    {
+        const FIngredient* IngredientData = Cache ? Cache->GetIngredientByRowName(Name) : nullptr;
+        const int32 Priority = IngredientData ? IngredientData->TermsOfUse.AddPriority : 0;
 
-            CanonicalGroups.Last().Add(Name);
+        if (CanonicalGroups.Num() == 0 || CanonicalGroups.Last().Priority != Priority)
+        {
+            CanonicalGroups.AddDefaulted();
+            CanonicalGroups.Last().Priority = Priority;
         }
+        CanonicalGroups.Last().Names.Add(Name);
     }
 
+    // === PotionMatchScore: блочное позиционное совпадение ===
+    // Идём по канонической последовательности приоритетных блоков, "откусывая" от
+    // player-последовательности ровно столько ингредиентов, сколько в текущем блоке,
+    // сравниваем этот кусок как мультимножество. Лишние ингредиенты сверху раздувают
+    // знаменатель (max(данного, нужного)) и проседают в скор, даже если "нужная часть" верна.
     int32 TotalNeeded = 0;
-    for (const TArray<FName>& Group : CanonicalGroups) { TotalNeeded += Group.Num(); }
-
-    // === PotionMatchScore: блочное совпадение ===
-    // Идём по канонической последовательности блоков, "откусывая" от player-последовательности
-    // ровно столько ингредиентов, сколько в текущем блоке, и сравниваем этот кусок как мультимножество.
     int32 PositionalMatches = 0;
     {
         int32 PlayerIndex = 0;
-        for (const TArray<FName>& Group : CanonicalGroups)
+        for (const FCanonicalGroup& Group : CanonicalGroups)
         {
+            TotalNeeded += Group.Names.Num();
+
             TArray<FName> PlayerSlice;
-            for (int32 k = 0; k < Group.Num() && PlayerIndex < playerIngredientNames.Num(); ++k, ++PlayerIndex)
+            for (int32 k = 0; k < Group.Names.Num() && PlayerIndex < playerIngredientNames.Num(); ++k, ++PlayerIndex)
             {
                 PlayerSlice.Add(playerIngredientNames[PlayerIndex]);
             }
-            PositionalMatches += CountMultisetIntersection(PlayerSlice, Group);
+
+            PositionalMatches += CountMultisetIntersection(PlayerSlice, Group.Names);
         }
 
         const int32 Denominator = FMath::Max(playerIngredientNames.Num(), TotalNeeded);
@@ -739,9 +764,45 @@ void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContex
             : 1.f; // оба списка пустые -> считаем точным совпадением
     }
 
+    // === TierMatchResults: совпадение НЕЗАВИСИМО ОТ ПОЗИЦИИ, по фактическому приоритету игрока ===
+    // Ключ = union приоритетов из нужного рецепта И того, что реально дал игрок.
+    // Если игрок кинул лишнее (в уже занятый уровень или в вообще не нужный) — мультимножества
+    // не совпадут по размеру, и уровень станет false, даже если "нужная" часть внутри присутствует.
+    {
+        UCacheSubsystem* CacheForGiven = Cache; // тот же кэш, что и для рецепта
+
+        TMap<int32, TArray<FName>> NeededByPriority;
+        for (const FCanonicalGroup& Group : CanonicalGroups)
+        {
+            NeededByPriority.Add(Group.Priority, Group.Names);
+        }
+
+        const TMap<int32, TArray<FName>> GivenByPriority = GroupByPriority(CacheForGiven, playerIngredientNames);
+
+        TSet<int32> AllPriorities;
+        NeededByPriority.GetKeys(AllPriorities);
+        for (const auto& Pair : GivenByPriority) { AllPriorities.Add(Pair.Key); }
+
+        for (int32 Priority : AllPriorities)
+        {
+            const TArray<FName>* NeededAtTier = NeededByPriority.Find(Priority);
+            const TArray<FName>* GivenAtTier = GivenByPriority.Find(Priority);
+
+            const int32 NeededCount = NeededAtTier ? NeededAtTier->Num() : 0;
+            const int32 GivenCount = GivenAtTier ? GivenAtTier->Num() : 0;
+
+            const int32 Intersection = (NeededAtTier && GivenAtTier)
+                ? CountMultisetIntersection(*GivenAtTier, *NeededAtTier)
+                : 0;
+
+            const bool bTierMatched = (NeededCount == GivenCount) && (Intersection == NeededCount);
+            OutCompare.TierMatchResults.Add(Priority, bTierMatched);
+        }
+    }
+
     const bool bExactRecipeMatch = OutCompare.PotionMatchScore >= 1.0f;
 
-    // "база на своём месте" — отдельно от score, нужно для валидности конкретно 0-го слота и детекта яда
+    // "база на своём месте" — отдельно от score/tiers, нужно для валидности конкретно 0-го слота и детекта яда
     const bool bBaseOk = !requiredBase.IsNone()
         && playerIngredientNames.Num() > 0
         && (playerIngredientNames[0] == requiredBase);
@@ -763,10 +824,13 @@ void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContex
             {
                 matchingIngredients++;
                 currentPriority = TNumericLimits<int32>::Min();
-                if (ingredientName == gameSettings->PoisonBase.RowName)
-                {
-                    OutCompare.IsPoison = true;
-                }
+            }
+
+            // Яд детектится независимо от того, была ли эта база "правильной" —
+            // если игрок дал человеку яд, это яд, даже если requiredBase был другим.
+            if (ingredientName == gameSettings->PoisonBase.RowName)
+            {
+                OutCompare.IsPoison = true;
             }
         }
         else
@@ -794,7 +858,8 @@ void UIngredientFunctionLibary::ComparePotionToRecipe(const UObject* WorldContex
         : 0.f;
 }
 
-namespace {
+namespace
+{
     static uint64 ComputeIngredientHash(const FIngredient& Ingredient)
     {
         uint64 Hash = 0;
