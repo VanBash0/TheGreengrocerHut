@@ -1,0 +1,183 @@
+﻿# Newspapers English translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Newspapers\n"
+"POT-Creation-Date: 2026-07-20 12:25\n"
+"PO-Revision-Date: 2026-07-20 12:25\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	4B80993A4BBE1C5794E584A331D21373
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-10.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-10.Description
+msgctxt ",4B80993A4BBE1C5794E584A331D21373"
+msgid "Воздух становится чище, а первые солнечные лучи пробиваются сквозь дымку. Жители кашляют реже, а на деревьях появляются нежные листья. Над деревней вновь рождается надежда."
+msgstr ""
+
+#. Key:	622535A54C2055DF672E6FBCDE5C5443
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-100.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-100.Description
+msgctxt ",622535A54C2055DF672E6FBCDE5C5443"
+msgid "Деревня вновь цветёт во всей красе: зеленые сады, прозрачные колодцы, люди здоровы и счастливы. Болезнь полностью изгнана, и жизнь в каждом уголке наполняется светом."
+msgstr ""
+
+#. Key:	114B4AEA45DAEE0B25E9199A27419A46
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-20.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-20.Description
+msgctxt ",114B4AEA45DAEE0B25E9199A27419A46"
+msgid "Сильнее чувствуются свежие запахи трав и почвы. Дети начинают играть на улицах, а взрослые возвращаются к делам. Плесень с крыш постепенно исчезает."
+msgstr ""
+
+#. Key:	E6B72BD34AC53B3B50BBF7839EAFAC62
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-30.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-30.Description
+msgctxt ",E6B72BD34AC53B3B50BBF7839EAFAC62"
+msgid "Деревня оживает: деревья зеленеют, в колодцах сияет вода. Люди улыбаются друг другу, кашель становится редкостью, а воздух снова лёгкий."
+msgstr ""
+
+#. Key:	C21F31F2478A98842B9EB8858B31D41B
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-40.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-40.Description
+msgctxt ",C21F31F2478A98842B9EB8858B31D41B"
+msgid "Силы возвращаются и людям, и животным. Дома очищаются от налёта гнили, а на улицах появляются цветы. Воздух наполнен запахом трав и свежей земли."
+msgstr ""
+
+#. Key:	30EF679E415F1E07B2BC789A23C1141D
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-50.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-50.Description
+msgctxt ",30EF679E415F1E07B2BC789A23C1141D"
+msgid "Деревня расцветает: крыши чистые, дороги ровные, деревья покрыты густой листвой. Жители бодры, животные шумят, а река вновь прозрачна."
+msgstr ""
+
+#. Key:	BA79720A48F418481C1D0683C37F54DE
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-60.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-60.Description
+msgctxt ",BA79720A48F418481C1D0683C37F54DE"
+msgid "Зелень становится насыщенной, вода в колодцах кристально чиста. Ветер приносит запахи свежего хлеба и трав. Болезнь почти изгнана, и жизнь возвращается."
+msgstr ""
+
+#. Key:	F13EEC5640DA50C444FBAF8EABA5B4FB
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-70.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-70.Description
+msgctxt ",F13EEC5640DA50C444FBAF8EABA5B4FB"
+msgid "Воздух напоён ароматами цветов, люди трудятся в огородах, дети смеются на улицах. Даже дома светятся теплом и уютом."
+msgstr ""
+
+#. Key:	1A7555B248B1D5EFEB70BE8BD8DC7805
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-80.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-80.Description
+msgctxt ",1A7555B248B1D5EFEB70BE8BD8DC7805"
+msgid "Деревня сияет здоровьем: дороги чисты, вода прозрачна, деревья полны жизни. Жители заботливо ухаживают за каждым домом, каждой оградой."
+msgstr ""
+
+#. Key:	725A39CA445E500BDFE7548828A8915F
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-90.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.-90.Description
+msgctxt ",725A39CA445E500BDFE7548828A8915F"
+msgid "Возвращается мир и покой: болезненные тени исчезли, колодцы блестят, крыши сияют. Воздух полон свежести и радости жизни."
+msgstr ""
+
+#. Key:	0ABEB60841E865A559D6C292E2E94993
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.0.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.0.Description
+msgctxt ",0ABEB60841E865A559D6C292E2E94993"
+msgid "Деревня тихо дышит утренним воздухом. Дома свежо пахнут дымом, в садах зеленеют молодые листья, а у колодцев играют солнечные блики. Ни одна тень болезни пока не коснулась этих улиц."
+msgstr ""
+
+#. Key:	8D05A44446A3A82DFD31C3B228565593
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.10.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.10.Description
+msgctxt ",8D05A44446A3A82DFD31C3B228565593"
+msgid "Легкая хрипота витает в воздухе, и жители начинают кашлять по утрам. Некоторые листья на деревьях теряют блеск, а на крыльцах появляется налёт сырости. Тревожная дрожь проходит по колодцам, как предвестие."
+msgstr ""
+
+#. Key:	577727FF4D7DC08A9AE258AD17419319
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.100.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.100.Description
+msgctxt ",577727FF4D7DC08A9AE258AD17419319"
+msgid "Деревня словно умерла: дома пусты и разваливаются, деревья чернеют, река течёт вязкой и тёмной массой. Ни один житель не стоит на улицах — болезнь поглотила всё живое."
+msgstr ""
+
+#. Key:	B2E66E7B4FC666D716AC06B4262E4ED2
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.20.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.20.Description
+msgctxt ",B2E66E7B4FC666D716AC06B4262E4ED2"
+msgid "На крышах домов собирается пыльный налёт, и запах сырости усиливается. Люди жалуются на слабость, а собаки прячутся в темные углы. Даже река кажется мутной, словно болезнь коснулась воды."
+msgstr ""
+
+#. Key:	4604871C4CB7E3B6D4B3C49641FC1E24
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.30.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.30.Description
+msgctxt ",4604871C4CB7E3B6D4B3C49641FC1E24"
+msgid "Деревня уже кажется серой: окна домов тускнеют, двери скрипят чаще. Кашель становится частым, и по утрам воздух дрожит от слабых стонах жителей. Травы в огородах желтеют и увядают."
+msgstr ""
+
+#. Key:	EF6577C6416022AB70D78AAA72F79ADF
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.40.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.40.Description
+msgctxt ",EF6577C6416022AB70D78AAA72F79ADF"
+msgid "Тени болезни ползут по улицам, и от домов веет холодом. Коровы и куры выглядят болезненно, их шерсть и перья теряют блеск. Люди шепчутся, опасаясь приближения чего-то худого."
+msgstr ""
+
+#. Key:	742F88344FF02FED82EBD9879749FDF4
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.50.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.50.Description
+msgctxt ",742F88344FF02FED82EBD9879749FDF4"
+msgid "Сильный запах сырости и гнили окутывает деревню. Дети болеют и кашляют, взрослые теряют силы, а деревья постепенно сбрасывают листья. Дома кажутся пустыми, словно сама жизнь уходит из них."
+msgstr ""
+
+#. Key:	01C5A209418DFC357D9F62837CCB1F25
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.60.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.60.Description
+msgctxt ",01C5A209418DFC357D9F62837CCB1F25"
+msgid "На крышах проступают пятна плесени, колодцы темнеют. Жители хромают по улицам, их глаза тускнеют, а ветер приносит запах болезни. Даже птицы покидают деревню, оставляя лишь тревожное молчание."
+msgstr ""
+
+#. Key:	4F6461C145D8621D2A8B788437E4878D
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.70.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.70.Description
+msgctxt ",4F6461C145D8621D2A8B788437E4878D"
+msgid "В воздухе повисла тяжесть гнили. Кашель слышен за каждым углом, и на стенах домов появляются следы грибка. Деревня будто забыта богами, и каждый шаг отдает хрипом."
+msgstr ""
+
+#. Key:	15BDF6AE41A69E37D5BD54AB52FCBA15
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.80.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.80.Description
+msgctxt ",15BDF6AE41A69E37D5BD54AB52FCBA15"
+msgid "Деревня теряет формы: дороги покрыты туманом, дома покрыты плесенью, а деревья почти голые. Люди сидят в домах, бледные и сгорбленные, лишь изредка кто-то появляется на улице."
+msgstr ""
+
+#. Key:	B9DF3D964BFEDCA7C002FEB537B5A541
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.90.Description
+#: /Game/Data_New/Newspapers/DT_NewspaperData.DT_NewspaperData.90.Description
+msgctxt ",B9DF3D964BFEDCA7C002FEB537B5A541"
+msgid "От деревни остались лишь силуэты. Ветер несёт запах гнили и болезней, колодцы стали мутными, а крыши рушатся. Даже крики жителей звучат как стоны мертвых."
+msgstr ""
+
+#. Key:	0CF3CF2B4E4B99F1CA6B8086458BC02B
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.1.Description
+#: /Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.1.Description
+msgctxt ",0CF3CF2B4E4B99F1CA6B8086458BC02B"
+msgid "<News>Землю и люд деревенский одолели разные </><Bold>болячки</><News>: жар, ломота, сыпь незнаемая. </><News>Зелейнику велено не только варево творить, но и </><Bold>исследовать</><News> недуги. Осматривай </><Bold>части тела</><News> больных и по признакам ищи в </><Bold>книге</><News> нужные травы. Найдя </><Bold>ингредиенты</><News>, следуй порядку: сначала — </><Bold>Основные</><News>, затем — </><Bold>Поддерживающие</><News>, после — </><Bold>Связывающие</><News>. Помни также: не всякая трава любит нож да пест. Коли в </><Bold>книге</><News> не сказано, что ингредиент надобно резать или толочь, клади его в </><Bold>котёл</><News> цельным, дабы сохранить природную силу. Ежели ингредиентов один-два, в первую очередь добавь </><Bold>Родниковую воду</>."
+msgstr ""
+
+#. Key:	8300E2044652092C40D99DB733B4B6E6
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.2.Description
+#: /Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.2.Description
+msgctxt ",8300E2044652092C40D99DB733B4B6E6"
+msgid "<News>Зелейник, помни про основу, добавляй её самой первой! Если в зелье три или четыре ингредиента — возьми </><Bold>Травяной отвар</><News>. Он укрепит силу трав и поможет им слиться воедино. Если же ингредиентов пять и более — используй </><Bold>Берёзовый сок</><News>. Он удержит мощь сложного зелья и не даст ему распасться. Верная основа — верное зелье! И ведай ещё: не всякий </><Bold>ингредиент</><News> кладётся в котёл как есть. Иные надлежит </><Bold>порезать</><News>, дабы сок и сила их лучше вышли в варево. Иные же следует после </><Bold>растолочь</><News> в ступе, превратив в мягкую кашицу, чтобы зелье приняло их без остатка. Лишь тогда бросай их в </><Bold>котёл</><News> и вари как велено, дабы зелье вышло крепким и действенным.</>"
+msgstr ""
+
+#. Key:	778C57574694B279E893939F5A145C1E
+#. SourceLocation:	/Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.3.Description
+#: /Game/Data_New/Newspapers/DT_TutorialNewspaperData.DT_TutorialNewspaperData.3.Description
+msgctxt ",778C57574694B279E893939F5A145C1E"
+msgid "<News>Полнится слухами земля: завелись в наших краях </><Bold>бесы</><News>. Но не спеши тратить редкие запасы — трави их </><Bold>Мочевиной</><News>. Как распознать </><Bold>нечисть</><News>? Я буду сообщать точные </><Bold>признаки</><News>, и они должны совпадать </><Bold>как две капли воды</><News>. Смотри внимательно — не отрави обычного </><Bold>прихожанина</><News>! Сегодняшний признак беса — желтуха: </><Bold>жёлтые глаза</><News> </><News>и </><Bold>жёлтый нос.</>"
+msgstr ""
+

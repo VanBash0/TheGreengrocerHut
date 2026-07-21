@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "IngredientStructures.h"
+#include "ClientStruct.h"
 #include "GameSettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -16,6 +17,22 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Priority")
     TObjectPtr<UTexture2D> LabelTexture;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Priority | Feedback")
+    TMap<bool, FText> FeedbackResultText;
+};
+
+USTRUCT(BlueprintType)
+struct FLanguageData
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FString LangCode;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TObjectPtr<UTexture2D> LangIcon;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -135,22 +152,10 @@ public:
     float DeltaKillingFactor;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Heal", ToolTip = "Базовый урон по заражению при исцелении клиента"))
-    float BasicDeltaHeal;
+        meta = (DisplayName = "Potion Result Delta Map", ToolTip = "Базовая дельта заражения для каждого исхода (EPotionResult)"))
+    TMap<EPotionResult, float> PotionResultDeltaMap;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Not Heal", ToolTip = "Базовый урон от заражения при неисцелении клиента"))
-    float BasicDeltaNotHeal;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Poison Demon", ToolTip = "Базовый урон по заражению при отравлении демона"))
-    float BasicDeltaPoisonDemon;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Not Poison Demon", ToolTip = "Базовый урон от заражения при неотравлении демона"))
-    float BasicDeltaNotPoisonDemon;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
-        meta = (DisplayName = "Basic Delta Poison Client", ToolTip = "Базовый урон от заражения при отравлении клиента"))
-    float BasicDeltaPoisonClient;
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Language", meta = (DisplayName = "Language Bind"))
+    TMap<FName, FLanguageData> LanguageBind;
 };

@@ -87,7 +87,11 @@ private:
     void InitializeViewer();
 
     FVisualOverlayPoolEntry* GetPoolEntry(UStaticMeshComponent* Root, UMaterialInterface* Material);
-    USubstanceGraphInstance* CopyGraphAndSetMaterial(USubstanceGraphInstance* Graph, UMaterialInterface* MainMaterial, UMaterialInstanceDynamic* DimMaterial);
+    USubstanceGraphInstance* CopyGraphAndSetMaterial(
+        USubstanceGraphInstance* graph,
+        UMaterialInterface* mainMaterial,
+        UMaterialInstanceDynamic* dimMaterial
+    );
     const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> SelectBodySymptomsByType(const TArray<FSymptomRow>& Symptoms);
 
     UPROPERTY()

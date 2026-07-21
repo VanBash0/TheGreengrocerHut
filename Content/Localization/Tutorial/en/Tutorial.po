@@ -1,0 +1,253 @@
+﻿# Tutorial English translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Tutorial\n"
+"POT-Creation-Date: 2026-07-21 14:09\n"
+"PO-Revision-Date: 2026-07-21 14:09\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	B7E6150D4E7E029CC9158C8680CFC843
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.NeedToMixText
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.NeedToMixText
+msgctxt ",B7E6150D4E7E029CC9158C8680CFC843"
+msgid "Размешаем зелье до однородности..."
+msgstr ""
+
+#. Key:	77EDF66C45FAB3F84F5583A4D8AFCF4E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.PlayerFailedPotionText
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.PlayerFailedPotionText
+msgctxt ",77EDF66C45FAB3F84F5583A4D8AFCF4E"
+msgid "Кажется, порядок не тот..."
+msgstr ""
+
+#. Key:	73A68E7D4CAE669447210986E11A5810
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(0 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(0 - Value).Thoughts_Value
+msgctxt ",73A68E7D4CAE669447210986E11A5810"
+msgid "Утро начинается с бересты..."
+msgstr ""
+
+#. Key:	371BF39249F7A72FA8FAD3ABD6E150AA
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(1 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(1 - Value).Thoughts_Value
+msgctxt ",371BF39249F7A72FA8FAD3ABD6E150AA"
+msgid "Пора осмотреть прихожан..."
+msgstr ""
+
+#. Key:	E76422534877EDBB00CF759B521F6D32
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(10 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(10 - Value).Thoughts_Value
+msgctxt ",E76422534877EDBB00CF759B521F6D32"
+msgid "Для этого снадобья чеснок нужно порезать..."
+msgstr ""
+
+#. Key:	5D07D9A54969ABE8493128BBFB21173E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(11 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(11 - Value).Thoughts_Value
+msgctxt ",5D07D9A54969ABE8493128BBFB21173E"
+msgid "Похоже, это бес! Нужно дать ему отраву..."
+msgstr ""
+
+#. Key:	3B16EC58424D1EA580367F8B7AC35F06
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(12 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(12 - Value).Thoughts_Value
+msgctxt ",3B16EC58424D1EA580367F8B7AC35F06"
+msgid "Это нужно растолочь. Сначала порежем ингредиент..."
+msgstr ""
+
+#. Key:	7074232846D052BA9D56D9AA44F851FE
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(13 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(13 - Value).Thoughts_Value
+msgctxt ",7074232846D052BA9D56D9AA44F851FE"
+msgid "А теперь растолчем..."
+msgstr ""
+
+#. Key:	854F174446AE28FF3703DCB8CF432F36
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(14 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(14 - Value).Thoughts_Value
+msgctxt ",854F174446AE28FF3703DCB8CF432F36"
+msgid "Наберем полученное снадобье..."
+msgstr ""
+
+#. Key:	D06B1E82491C828789F3A9BDBC5617FF
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(2 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(2 - Value).Thoughts_Value
+msgctxt ",D06B1E82491C828789F3A9BDBC5617FF"
+msgid "Надо уточнить ингредиенты в книге..."
+msgstr ""
+
+#. Key:	29812DCC4FE003C900B06E90798649A8
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(3 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(3 - Value).Thoughts_Value
+msgctxt ",29812DCC4FE003C900B06E90798649A8"
+msgid "Сперва добавим воду."
+msgstr ""
+
+#. Key:	9AD05C5748E2B5B095641FA780A0B443
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(4 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(4 - Value).Thoughts_Value
+msgctxt ",9AD05C5748E2B5B095641FA780A0B443"
+msgid "Далее положим основной ингредиент – желудь."
+msgstr ""
+
+#. Key:	1E8D99754D65D33F8246F69E518BC693
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(5 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(5 - Value).Thoughts_Value
+msgctxt ",1E8D99754D65D33F8246F69E518BC693"
+msgid "Стоит избавиться от брака в печи..."
+msgstr ""
+
+#. Key:	1EACE01041B748C447784BACCB2AEDF0
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(6 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(6 - Value).Thoughts_Value
+msgctxt ",1EACE01041B748C447784BACCB2AEDF0"
+msgid "Наконец, отдадим его посетителю..."
+msgstr ""
+
+#. Key:	0D80320B489BF3E5654B8BB1894CD208
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(7 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(7 - Value).Thoughts_Value
+msgctxt ",0D80320B489BF3E5654B8BB1894CD208"
+msgid "Теперь поддерживающий ингредиент – крапива..."
+msgstr ""
+
+#. Key:	07104AE947E41348AA2BEC9F27B1CD85
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(8 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(8 - Value).Thoughts_Value
+msgctxt ",07104AE947E41348AA2BEC9F27B1CD85"
+msgid "Наберем получившееся снадобье..."
+msgstr ""
+
+#. Key:	6F30C9164D310DD249C15AAA5831685E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(9 - Value).Thoughts_Value
+#: /Game/GemeLevel/Tutorial/BP_TutorialManager.Default__BP_TutorialManager_C.Thoughts(9 - Value).Thoughts_Value
+msgctxt ",6F30C9164D310DD249C15AAA5831685E"
+msgid "С таким количеством недугов нужен травяной отвар..."
+msgstr ""
+
+#. Key:	650C50AE41C39C7E4FC71EA56D714BCB
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(0 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(0 - Value).DisplayNameMap
+msgctxt ",650C50AE41C39C7E4FC71EA56D714BCB"
+msgid "Newspaper"
+msgstr ""
+
+#. Key:	965739D343E0F3E8E1236495F612442E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(1 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(1 - Value).DisplayNameMap
+msgctxt ",965739D343E0F3E8E1236495F612442E"
+msgid "DoorWindow"
+msgstr ""
+
+#. Key:	95FE09C84BC5621AD6029DAEE0B394D3
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(10 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(10 - Value).DisplayNameMap
+msgctxt ",95FE09C84BC5621AD6029DAEE0B394D3"
+msgid "Stove"
+msgstr ""
+
+#. Key:	3DBFCF3147745BB58BF3629996B6BF23
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(11 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(11 - Value).DisplayNameMap
+msgctxt ",3DBFCF3147745BB58BF3629996B6BF23"
+msgid "DoorPotionSlot"
+msgstr ""
+
+#. Key:	AFC16B5B48A4EDB6EE5667B8556790DC
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(12 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(12 - Value).DisplayNameMap
+msgctxt ",AFC16B5B48A4EDB6EE5667B8556790DC"
+msgid "Bed"
+msgstr ""
+
+#. Key:	8BC6FB2641B24104FD46C9833863C0F3
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(13 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(13 - Value).DisplayNameMap
+msgctxt ",8BC6FB2641B24104FD46C9833863C0F3"
+msgid "GrassBase"
+msgstr ""
+
+#. Key:	7C085CCB48E3E46AF7F251AA0B71D08B
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(14 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(14 - Value).DisplayNameMap
+msgctxt ",7C085CCB48E3E46AF7F251AA0B71D08B"
+msgid "PoisonBase"
+msgstr ""
+
+#. Key:	911675B94DCE575126DC11B1D4EED590
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(15 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(15 - Value).DisplayNameMap
+msgctxt ",911675B94DCE575126DC11B1D4EED590"
+msgid "Mortar"
+msgstr ""
+
+#. Key:	8546030944A6606314304FA9D7167BB8
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(16 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(16 - Value).DisplayNameMap
+msgctxt ",8546030944A6606314304FA9D7167BB8"
+msgid "KitchenBoardBeforeMortar"
+msgstr ""
+
+#. Key:	18C94BB04EF8ED3EC0C67B96FD290D87
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(2 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(2 - Value).DisplayNameMap
+msgctxt ",18C94BB04EF8ED3EC0C67B96FD290D87"
+msgid "Book"
+msgstr ""
+
+#. Key:	4561EA6D43D86907A8F18FBA0E0C53BF
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(3 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(3 - Value).DisplayNameMap
+msgctxt ",4561EA6D43D86907A8F18FBA0E0C53BF"
+msgid "None"
+msgstr ""
+
+#. Key:	42FE81584A5FE1E4C5745B873FF14C8E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(4 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(4 - Value).DisplayNameMap
+msgctxt ",42FE81584A5FE1E4C5745B873FF14C8E"
+msgid "KitchenBoard"
+msgstr ""
+
+#. Key:	54AB4B6B494F8DF12FDBDE9E654D0A91
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(5 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(5 - Value).DisplayNameMap
+msgctxt ",54AB4B6B494F8DF12FDBDE9E654D0A91"
+msgid "WaterBase"
+msgstr ""
+
+#. Key:	6F1766E447819FAA3F993B9FEE8630A3
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(6 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(6 - Value).DisplayNameMap
+msgctxt ",6F1766E447819FAA3F993B9FEE8630A3"
+msgid "Cauldron"
+msgstr ""
+
+#. Key:	BB3D560A4CDEAB1966D8EFA46FBE3DB8
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(7 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(7 - Value).DisplayNameMap
+msgctxt ",BB3D560A4CDEAB1966D8EFA46FBE3DB8"
+msgid "Acorn"
+msgstr ""
+
+#. Key:	F9402B654A59F680886C819E85AE5C33
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(8 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(8 - Value).DisplayNameMap
+msgctxt ",F9402B654A59F680886C819E85AE5C33"
+msgid "Nettles"
+msgstr ""
+
+#. Key:	3A4315A94FA84ACE9C33739C55CC8A7E
+#. SourceLocation:	/Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(9 - Value).DisplayNameMap
+#: /Game/GemeLevel/Tutorial/E_ActorType.E_ActorType.DisplayNameMap(9 - Value).DisplayNameMap
+msgctxt ",3A4315A94FA84ACE9C33739C55CC8A7E"
+msgid "Bottle"
+msgstr ""
+

@@ -74,3 +74,7 @@ Plugins/**/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+# Substance plugin third-party static libraries: these ARE tracked in git
+# (small enough for regular git, no LFS needed) despite the global *.lib rule above.
+!Plugins/Runtime/Substanc16fa4e5b3fbcV28/Libs/Release/Win64/*.lib
+!Plugins/Runtime/Substanc16fa4e5b3fbcV28/DLLs/Release/Win64/*.dll
