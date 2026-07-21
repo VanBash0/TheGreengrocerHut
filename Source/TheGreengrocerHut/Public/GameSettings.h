@@ -22,6 +22,19 @@ public:
     TMap<bool, FText> FeedbackResultText;
 };
 
+USTRUCT(BlueprintType)
+struct FLanguageData
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FString LangCode;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TObjectPtr<UTexture2D> LangIcon;
+};
+
 UCLASS(BlueprintType, Blueprintable)
 class UGameSettings : public UDataAsset
 {
@@ -141,4 +154,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Infection Rate",
         meta = (DisplayName = "Potion Result Delta Map", ToolTip = "Базовая дельта заражения для каждого исхода (EPotionResult)"))
     TMap<EPotionResult, float> PotionResultDeltaMap;
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Language", meta = (DisplayName = "Language Bind"))
+    TMap<FName, FLanguageData> LanguageBind;
 };
