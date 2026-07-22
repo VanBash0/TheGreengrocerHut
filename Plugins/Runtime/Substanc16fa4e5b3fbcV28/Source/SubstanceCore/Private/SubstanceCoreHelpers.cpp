@@ -370,21 +370,18 @@ void UpdateSubstanceOutput(UTexture2D* TextureOutput, const SubstanceTexture& Re
 	for (int32 IdxMip = 0; IdxMip < ResultText.mipmapCount; ++IdxMip)
 	{
 		MipMap = &Texture->Mips[IdxMip];
-
 		//Get the size of the mip's content
 		const SIZE_T ImageSize = CalculateImageBytes(
-		                             MipMap->SizeX,
-		                             MipMap->SizeY,
-		                             0,
-		                             Texture->PixelFormat);
+			MipMap->SizeX,
+			MipMap->SizeY,
+			0,
+			Texture->PixelFormat);
 		check(0 != ImageSize);
-
 		void* TheMipDataPtr = nullptr;
-
 		//Copy the data
 		//some flags may not allow mips to be loaded into memory and will crash on lock for read/write
-		if (MipMap->BulkData.GetBulkDataSize() != ImageSize 
-			|| MipMap->BulkData.GetBulkDataFlags() & EBulkDataFlags::BULKDATA_PayloadInSeperateFile 
+		if (MipMap->BulkData.GetBulkDataSize() != ImageSize
+			|| MipMap->BulkData.GetBulkDataFlags() & EBulkDataFlags::BULKDATA_PayloadInSeperateFile
 			|| MipMap->BulkData.GetBulkDataFlags() & EBulkDataFlags::BULKDATA_SingleUse)
 		{
 			MipMap->BulkData = FByteBulkData();
@@ -395,30 +392,50 @@ void UpdateSubstanceOutput(UTexture2D* TextureOutput, const SubstanceTexture& Re
 		{
 			TheMipDataPtr = MipMap->BulkData.Lock(LOCK_READ_WRITE);
 		}
-
 		if (bDownsampleFrom16Bit)
 		{
 			const SIZE_T SourceImageSize = ImageSize * 2;
 			const uint16* SrcPixels16 = (const uint16*)(Mipstart + MipOffset);
 			uint8* DstPixels = (uint8*)TheMipDataPtr;
 			const SIZE_T NumPixels = ImageSize / 4;
-
 			for (SIZE_T PixelIdx = 0; PixelIdx < NumPixels; ++PixelIdx)
 			{
 				const uint16* SrcPixel = SrcPixels16 + PixelIdx * 4;
 				uint8* DstPixel = DstPixels + PixelIdx * 4;
-
 				DstPixel[0] = (uint8)(SrcPixel[2] >> 8); // B = исходный R
 				DstPixel[1] = (uint8)(SrcPixel[1] >> 8); // G = G
 				DstPixel[2] = (uint8)(SrcPixel[0] >> 8); // R = исходный B
 				DstPixel[3] = (uint8)(SrcPixel[3] >> 8); // A = A
 			}
-
 			MipOffset += SourceImageSize;
 		}
 		else
 		{
-			FMemory::Memcpy(TheMipDataPtr, (void*)(Mipstart + MipOffset), ImageSize);
+			// WORKAROUND: the 'arm' output on some graphs (e.g. Symptoms/SYM_Smudge, 8-bit
+			// PF_B8G8R8A8 case) comes out with R/B channels swapped relative to basecolor,
+			// even though both go through the same pixel format. Swap explicitly just for
+			// this identifier instead of assuming all PF_B8G8R8A8 outputs share byte order.
+			const FString PackageName = TextureOutput->GetOutermost()->GetName();
+			const bool bIsArmSwapCase = Texture->PixelFormat == PF_B8G8R8A8 && PackageName.EndsWith(TEXT("_arm"), ESearchCase::IgnoreCase);
+
+			if (bIsArmSwapCase)
+			{
+				uint8* SrcPixels = (uint8*)(Mipstart + MipOffset);
+				uint8* DstPixels = (uint8*)TheMipDataPtr;
+
+				for (SIZE_T Idx = 0; Idx < ImageSize; Idx += 4)
+				{
+					DstPixels[Idx + 0] = SrcPixels[Idx + 2]; // B = исходный R
+					DstPixels[Idx + 1] = SrcPixels[Idx + 1]; // G = G
+					DstPixels[Idx + 2] = SrcPixels[Idx + 0]; // R = исходный B
+					DstPixels[Idx + 3] = SrcPixels[Idx + 3]; // A = A
+				}
+			}
+			else
+			{
+				FMemory::Memcpy(TheMipDataPtr, (void*)(Mipstart + MipOffset), ImageSize);
+			}
+
 			MipOffset += ImageSize;
 		}
 
@@ -846,19 +863,15 @@ void CreateSubstanceTexture2D(SubstanceAir::OutputInstance* Output, bool Transie
 {
 	check(Output);
 	check(InOuter);
-
 	UTexture2D* Texture = nullptr;
 	Texture = NewObject<UTexture2D>(InOuter, FName(*Name), Transient ? RF_NoFlags : RF_Public | RF_Standalone);
-
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	AssetRegistryModule.Get().AssetCreated(Texture);
-
 	Texture->MarkPackageDirty();
 	(*Cast<UTexture>(Texture)->GetRunningPlatformData()) = new FTexturePlatformData();
 	FTexturePlatformData* TexturePlatformData = *Cast<UTexture>(Texture)->GetRunningPlatformData();
 	Texture->AddressX = TextureAddress::TA_Wrap;
 	Texture->AddressY = TextureAddress::TA_Wrap;
-
 	// Reuse existing USubstanceOutputData object
 	USubstanceOutputData* OutputLinkData = nullptr;
 	USubstanceOutputData** pOutputLinkData = ParentInst->OutputInstances.Find(Output->mDesc.mUid);
@@ -870,20 +883,30 @@ void CreateSubstanceTexture2D(SubstanceAir::OutputInstance* Output, bool Transie
 	}
 	else
 	{
-		OutputLinkData = NewObject<USubstanceOutputData>(ParentInst,FName(), RF_Public);
+		OutputLinkData = NewObject<USubstanceOutputData>(ParentInst, FName(), RF_Public);
 		ParentInst->OutputInstances.Add(Output->mDesc.mUid, OutputLinkData);
 	}
-
 	OutputLinkData->ParentInstance = ParentInst;
 	OutputLinkData->SetData(Texture);
 	OutputLinkData->CacheGuid = FGuid::NewGuid();
-
 	Output->mUserData = (size_t)OutputLinkData;
-
 	const SubstanceAir::OutputDesc* Desc = &Output->mDesc;
 	const SubstanceAir::ChannelUse OutputChannel = Desc->defaultChannelUse();
 
-	if (OutputChannel == SubstanceAir::Channel_Normal)
+	// WORKAROUND: "arm" (packed AO/Roughness/Metallic) outputs are not covered by any of the
+	// standard Substance ChannelUse cases below, so they were falling through to UTexture2D's
+	// default SRGB=true, which is wrong for linear packed mask data and caused color distortion.
+	// Match by output identifier explicitly and force Masks (no sRGB), matching the graph's
+	// own "Color Space: Linear" output setting.
+	const FString OutputIdentifierName = FString(Output->mDesc.mIdentifier.c_str());
+	const bool bIsArmOutput = OutputIdentifierName.Equals(TEXT("arm"), ESearchCase::IgnoreCase);
+
+	if (bIsArmOutput)
+	{
+		Texture->SRGB = false;
+		Texture->CompressionSettings = TC_Masks;
+	}
+	else if (OutputChannel == SubstanceAir::Channel_Normal)
 	{
 		Texture->SRGB = false;
 		Texture->CompressionSettings = TC_Normalmap;
@@ -908,20 +931,21 @@ void CreateSubstanceTexture2D(SubstanceAir::OutputInstance* Output, bool Transie
 		Texture->CompressionSettings = TC_Grayscale;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[SubstanceDebug] CreateSubstanceTexture2D: OutputIdentifier='%s' OutputChannel=%d bIsArmOutput=%s -> SRGB=%s CompressionSettings=%d"),
+		*OutputIdentifierName, (int32)OutputChannel, bIsArmOutput ? TEXT("true") : TEXT("false"),
+		Texture->SRGB ? TEXT("true") : TEXT("false"), (int32)Texture->CompressionSettings);
+
 	//Set the initial format. This will be overwritten on output computed.
 	TexturePlatformData->PixelFormat = Substance::Helpers::SubstanceToUe4Format((SubstancePixelFormat)Output->mDesc.mFormat, Substance_ChanOrder_RGBA);
-
 #if WITH_EDITORONLY_DATA
 	Texture->MipGenSettings = TextureMipGenSettings::TMGS_LeaveExistingMips;
 #endif
-
 	//Unsupported format
 	if (PF_Unknown == Texture->GetPixelFormat())
 	{
 		Texture->ClearFlags(RF_Standalone);
 		return;
 	}
-
 	switch (Texture->GetPixelFormat())
 	{
 	case PF_G8:
@@ -946,15 +970,12 @@ void CreateSubstanceTexture2D(SubstanceAir::OutputInstance* Output, bool Transie
 		break;
 #endif //WITH_EDITOR
 	}
-
 	Texture->GetPlatformData()->SizeX = 0;
 	Texture->GetPlatformData()->SizeY = 0;
-
 #if WITH_EDITORONLY_DATA
 	Texture->UpdateResource();
 	Texture->PostEditChange();
 #endif
-
 	Output->mEnabled = true;
 	Output->flagAsDirty();
 }
