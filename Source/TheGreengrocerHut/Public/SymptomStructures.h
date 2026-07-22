@@ -12,30 +12,6 @@
 #include "SubstanceGraphInstance.h"
 #include "SymptomStructures.generated.h"
 
-UENUM(BlueprintType, Meta = (Bitflags = "true", UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class ETextureChannel : uint8
-{
-    None = 0        UMETA(Hidden),
-    R = 1 << 0,
-    G = 1 << 1,
-    B = 1 << 2,
-    A = 1 << 3
-};
-ENUM_CLASS_FLAGS(ETextureChannel)
-
-inline FVector4 TextureChannelToVector4(const TArray<ETextureChannel>& channels)
-{
-    uint8 mask = 0;
-    for (ETextureChannel c : channels) { mask |= (uint8)c; }
-
-    return FVector4(
-        (mask & 1) ? 1.0f : 0.0f,
-        (mask & 2) ? 1.0f : 0.0f,
-        (mask & 4) ? 1.0f : 0.0f,
-        (mask & 8) ? 1.0f : 0.0f
-    );
-}
-
 UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EBodyPart : uint8
 {
@@ -97,7 +73,7 @@ struct FVisualOverlay : public FVisualBase
     TObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ETextureChannel> LayerChannel = { ETextureChannel::R };
+    FVector4 LayerChannel;
 };
 
 USTRUCT(BlueprintType)

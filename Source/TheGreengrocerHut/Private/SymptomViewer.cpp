@@ -235,7 +235,7 @@ void ASymptomViewer::SetNewSymptoms_Implementation(const FClient& newClient)
 
             if (element->DynamicMaterial)
             {
-                element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Channel")), TextureChannelToVector4(overlay.LayerChannel));
+                element->DynamicMaterial->SetVectorParameterValue(FName(TEXT("Channel")), overlay.LayerChannel);
                 element->DynamicMaterial->SetTextureParameterValue(FName(TEXT("Mask")), maskToUse);
                 UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] DynamicMaterial params set on %s (Mask=%s)"),
                     *GetNameSafe(element->DynamicMaterial), *GetNameSafe(maskToUse));
