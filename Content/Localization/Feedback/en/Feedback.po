@@ -1,0 +1,225 @@
+﻿# Feedback English translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Feedback\n"
+"POT-Creation-Date: 2026-07-22 00:54\n"
+"PO-Revision-Date: 2026-07-22 00:54\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	FC5C33A54259F0A05212C7B5C3FB6789
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.DisplayName
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.DisplayName
+msgctxt ",FC5C33A54259F0A05212C7B5C3FB6789"
+msgid "Базовый"
+msgstr ""
+
+#. Key:	8D14227347191F59D2378192B70EAEF5
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+msgctxt ",8D14227347191F59D2378192B70EAEF5"
+msgid "База зелья подобрана верно"
+msgstr ""
+
+#. Key:	F262A5B34E106DBC9D20C88E5E2FACA1
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(0 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+msgctxt ",F262A5B34E106DBC9D20C88E5E2FACA1"
+msgid "База зелья подобрана неверно"
+msgstr ""
+
+#. Key:	FA807762409E4F5E30408AB1B1C5685A
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.DisplayName
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.DisplayName
+msgctxt ",FA807762409E4F5E30408AB1B1C5685A"
+msgid "Основной"
+msgstr ""
+
+#. Key:	0D17E10B4D03058EC1C9FFA4943F3323
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+msgctxt ",0D17E10B4D03058EC1C9FFA4943F3323"
+msgid "Основной ингредиент подобран верно"
+msgstr ""
+
+#. Key:	875412814D30EFF2BD341ABFDEE94D54
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(1 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+msgctxt ",875412814D30EFF2BD341ABFDEE94D54"
+msgid "Основной ингредиент подобран неверно"
+msgstr ""
+
+#. Key:	715AF697406D769C1E13119BE2E84F67
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.DisplayName
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.DisplayName
+msgctxt ",715AF697406D769C1E13119BE2E84F67"
+msgid "Поддерживающий"
+msgstr ""
+
+#. Key:	3398CA8E44E5B6A3468DA5A734C500F6
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+msgctxt ",3398CA8E44E5B6A3468DA5A734C500F6"
+msgid "Дополняющий ингредиент подобран верно"
+msgstr ""
+
+#. Key:	73E6E0984F59A0C8D1A54E9F90F7226C
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(2 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+msgctxt ",73E6E0984F59A0C8D1A54E9F90F7226C"
+msgid "Дополняющий ингредиент подобран верно"
+msgstr ""
+
+#. Key:	FA7873AF4D9AB377F8E4E38850F0B7A6
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.DisplayName
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.DisplayName
+msgctxt ",FA7873AF4D9AB377F8E4E38850F0B7A6"
+msgid "Связывающий"
+msgstr ""
+
+#. Key:	9DB7224E451CCA577F06DD81B6482A15
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.FeedbackResultText(0 - Value).FeedbackResultText
+msgctxt ",9DB7224E451CCA577F06DD81B6482A15"
+msgid "Поддерживающий ингредиент подобран верно"
+msgstr ""
+
+#. Key:	5D5DD2064CB794EADEEBFF8326EDC786
+#. SourceLocation:	/Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+#: /Game/Data_New/GameSettings/DA_GameSettings.DA_GameSettings.IngredientPriorityData(3 - Value).IngredientPriorityData.FeedbackResultText(1 - Value).FeedbackResultText
+msgctxt ",5D5DD2064CB794EADEEBFF8326EDC786"
+msgid "Поддерживающий ингредиент подобран верно"
+msgstr ""
+
+#. Key:	76E461BB4A284EBC558B519443E23A28
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonDeath
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonDeath
+msgctxt ",76E461BB4A284EBC558B519443E23A28"
+msgid "Отрава достигла цели"
+msgstr ""
+
+#. Key:	A4C4A82542C6F588D407F790021D13C4
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonInformationField
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonInformationField
+msgctxt ",A4C4A82542C6F588D407F790021D13C4"
+msgid "Посетитель оказался демоном"
+msgstr ""
+
+#. Key:	4D862EA841BEE0232346F4A886CA3254
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonNotDeath
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonNotDeath
+msgctxt ",4D862EA841BEE0232346F4A886CA3254"
+msgid "Отрава не достигла цели"
+msgstr ""
+
+#. Key:	67AD0D3C41A1743125D3AF910682262F
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonNotTakePotion
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonNotTakePotion
+msgctxt ",67AD0D3C41A1743125D3AF910682262F"
+msgid "Демон не получил желанного зелья"
+msgstr ""
+
+#. Key:	D41DE2474DD7701EB84D7B963FA564F2
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonTakePotion
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.DemonTakePotion
+msgctxt ",D41DE2474DD7701EB84D7B963FA564F2"
+msgid "Желанное зелье было украдено"
+msgstr ""
+
+#. Key:	D9DA4D6A4BFC4E584A554FB7BAE49CF6
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(0 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(0 - Value).LabelTextBind_Value
+msgctxt ",D9DA4D6A4BFC4E584A554FB7BAE49CF6"
+msgid "Полное выздоровление"
+msgstr ""
+
+#. Key:	E81D867B43A2CABF709C4092E3F21A70
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(1 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(1 - Value).LabelTextBind_Value
+msgctxt ",E81D867B43A2CABF709C4092E3F21A70"
+msgid "Зелье не удалось"
+msgstr ""
+
+#. Key:	DE65B527430EE6A514C13792B0D890E7
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(2 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(2 - Value).LabelTextBind_Value
+msgctxt ",DE65B527430EE6A514C13792B0D890E7"
+msgid "Прихожанин отравлен"
+msgstr ""
+
+#. Key:	89D3F6954B70A891E9609C9BB3A5212B
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(3 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(3 - Value).LabelTextBind_Value
+msgctxt ",89D3F6954B70A891E9609C9BB3A5212B"
+msgid "Демон повержен"
+msgstr ""
+
+#. Key:	982CF832496003A0AEA655A63C9B2F0C
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(4 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(4 - Value).LabelTextBind_Value
+msgctxt ",982CF832496003A0AEA655A63C9B2F0C"
+msgid "Демон ушел невредимым"
+msgstr ""
+
+#. Key:	4905EC88470A478E54156189B23AEE0B
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(5 - Value).LabelTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.LabelTextBind(5 - Value).LabelTextBind_Value
+msgctxt ",4905EC88470A478E54156189B23AEE0B"
+msgid "Демон обхитрил тебя"
+msgstr ""
+
+#. Key:	E003A4884C58A8F4EE641DBB25F67E31
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(0 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(0 - Value).ResultTextBind_Value
+msgctxt ",E003A4884C58A8F4EE641DBB25F67E31"
+msgid "Болезнь начинает отступать"
+msgstr ""
+
+#. Key:	4046DAAC4B1634D3033DABB1A155291D
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(1 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(1 - Value).ResultTextBind_Value
+msgctxt ",4046DAAC4B1634D3033DABB1A155291D"
+msgid "Болезнь продолжает распространяться"
+msgstr ""
+
+#. Key:	D193489B4A6734EF20D79F8C93F47DFD
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(2 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(2 - Value).ResultTextBind_Value
+msgctxt ",D193489B4A6734EF20D79F8C93F47DFD"
+msgid "Болезнь свирепствует пуще прежнего"
+msgstr ""
+
+#. Key:	6D4567E641BAD7CE38EEE7BB1C93DCB1
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(3 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(3 - Value).ResultTextBind_Value
+msgctxt ",6D4567E641BAD7CE38EEE7BB1C93DCB1"
+msgid "Деревня может спать спокойно"
+msgstr ""
+
+#. Key:	A755A29148A78901464E62A26B819C3E
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(4 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(4 - Value).ResultTextBind_Value
+msgctxt ",A755A29148A78901464E62A26B819C3E"
+msgid "Нечисть продолжает буйствовать"
+msgstr ""
+
+#. Key:	4FFBDFAF4FC32E114B939897E5682A70
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(5 - Value).ResultTextBind_Value
+#: /Game/Widgets/Feedback/WBP_Feedback.Default__WBP_Feedback_C.ResultTextBind(5 - Value).ResultTextBind_Value
+msgctxt ",4FFBDFAF4FC32E114B939897E5682A70"
+msgid "Силы тьмы укрепили свои позиции"
+msgstr ""
+
+#. Key:	8A1629C54399A29181A202AFC4621869
+#. SourceLocation:	/Game/Widgets/Feedback/WBP_Feedback_Field.WBP_Feedback_Field_C:WidgetTree.Text.Text
+#: /Game/Widgets/Feedback/WBP_Feedback_Field.WBP_Feedback_Field_C:WidgetTree.Text.Text
+msgctxt ",8A1629C54399A29181A202AFC4621869"
+msgid "какая-то инфа какая-то инфа какая-то инфа"
+msgstr ""
+
