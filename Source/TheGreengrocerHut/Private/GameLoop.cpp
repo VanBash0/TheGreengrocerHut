@@ -16,6 +16,12 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
         GameSettings = ProjectSettings->GameSettingsAsset.LoadSynchronous();
     }
 
+    if (!GameSettings)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GameSettings asset failed to load! Check GameSettingsAsset in Project Settings and cook configuration."));
+        return;
+    }
+
     LoadSave();
 
     FString MapName = World->GetMapName();
