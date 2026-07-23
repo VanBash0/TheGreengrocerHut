@@ -263,10 +263,7 @@ FName ClientsGenerator::SelectSymptomFromPool(const TSet<EBodyPart>& occupiedPar
 
 void ClientsGenerator::FillSymptoms()
 {
-    if (demonsNum > 0) 
-    {
-        GenerateDemonSymptoms();
-    }
+    GenerateDemonSymptoms();
 
     for (int i = 0; i < daySnapshot.DayClients.Num(); ++i)
     {
