@@ -1,0 +1,43 @@
+﻿# Converters English translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Converters\n"
+"POT-Creation-Date: 2026-07-23 02:24\n"
+"PO-Revision-Date: 2026-07-23 02:24\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	5EE741DD4D3921BE59D3AEB2278AACA1
+#. SourceLocation:	/Game/Data_New/Ingredient/Converters/DA_KitchenBoard.DA_KitchenBoard.Description
+#: /Game/Data_New/Ingredient/Converters/DA_KitchenBoard.DA_KitchenBoard.Description
+msgctxt ",5EE741DD4D3921BE59D3AEB2278AACA1"
+msgid "<Bold>Режущий инструмент, на котором делят целое на части.</> <News>Неотъемлемый артефакт знахаря что разделит головку чеснока на дольки, рубит коренья, режет кору — и всё для того, чтобы целебная сила вышла наружу.</>"
+msgstr ""
+
+#. Key:	743225A54353C2B6804584860ED16545
+#. SourceLocation:	/Game/Data_New/Ingredient/Converters/DA_KitchenBoard.DA_KitchenBoard.DisplayName
+#: /Game/Data_New/Ingredient/Converters/DA_KitchenBoard.DA_KitchenBoard.DisplayName
+msgctxt ",743225A54353C2B6804584860ED16545"
+msgid "Доска"
+msgstr "Board"
+
+#. Key:	308D46864FE592103F44B5AEAAA59835
+#. SourceLocation:	/Game/Data_New/Ingredient/Converters/DA_Mortar.DA_Mortar.Description
+#: /Game/Data_New/Ingredient/Converters/DA_Mortar.DA_Mortar.Description
+msgctxt ",308D46864FE592103F44B5AEAAA59835"
+msgid "<Bold>Каменная или чугунная ёмкость, что перемалывает твёрдое в пыль.</> Тяжёлая, с толстыми стенками, пест к ней под стать — дубовый, увесистый. Трут до тех пор, пока не получится мелкий порошок — его потом и в отвар, и в настой."
+msgstr ""
+
+#. Key:	6C30A1AB4B28614105CDAF9D18DC669F
+#. SourceLocation:	/Game/Data_New/Ingredient/Converters/DA_Mortar.DA_Mortar.DisplayName
+#: /Game/Data_New/Ingredient/Converters/DA_Mortar.DA_Mortar.DisplayName
+msgctxt ",6C30A1AB4B28614105CDAF9D18DC669F"
+msgid "Ступа"
+msgstr "Mortar"
+

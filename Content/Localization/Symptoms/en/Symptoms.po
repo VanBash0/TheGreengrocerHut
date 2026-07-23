@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Symptoms\n"
-"POT-Creation-Date: 2026-07-22 00:19\n"
-"PO-Revision-Date: 2026-07-22 00:19\n"
+"POT-Creation-Date: 2026-07-23 02:44\n"
+"PO-Revision-Date: 2026-07-23 02:44\n"
 "Language-Team: \n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Bones.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Bones.Description
 msgctxt ",BBD3E65A454075593706D1832692FEDD"
-msgid "Истончение плоти уводит человеческий дух в сторону Нави. Болящий чувствует невесомость и слабость, словно тело его превратилось в сухой камыш, готовый сломаться от ветра."
+msgid "Тело истончается и готово уйти к тёмным силам. Болящий чувствует невесомость и слабость, словно тело стало лёгким, как тростинка, готовая сломаться."
 msgstr ""
 
 #. Key:	BC578FDF4908CD04406D7580D9147BCA
@@ -25,13 +25,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Bones.Name
 msgctxt ",BC578FDF4908CD04406D7580D9147BCA"
 msgid "Полупрозрачная кожа"
-msgstr ""
+msgstr "Translucent Skin"
 
 #. Key:	23609DB043162432ECD7A2B42F357BE6
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Green.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Green.Description
 msgctxt ",23609DB043162432ECD7A2B42F357BE6"
-msgid "Болотная морока и нутряной хлад проникают в глубину тела. Человека бьёт непрерывная крупная дрожь, из-за которой он не может согреться даже под несколькими тяжелыми кожухами."
+msgid "Болотная хворь проникает в глубину тела и вытягивает тепло. Человека бьёт крупная дрожь, он не может согреться, хотя наденет на себя всё, что есть в избе."
 msgstr ""
 
 #. Key:	CC552BED4B206312870EAAA80D850AA2
@@ -39,13 +39,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Green.Name
 msgctxt ",CC552BED4B206312870EAAA80D850AA2"
 msgid "Зеленоватый подтон"
-msgstr ""
+msgstr "Greenish Undertone"
 
 #. Key:	2598B6C34837C2D25E4E7BADEE0BDDA0
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Rash.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Rash.Description
 msgctxt ",2598B6C34837C2D25E4E7BADEE0BDDA0"
-msgid "Сухой подкожный зуд пробивается мелким зерном.Болящий не может найти покоя ни днём, ни ночью, непрестанно расчёсывая кожу и не спав от мучительного зуда."
+msgid "Зуд пробивается мелкими точками сквозь кожу. Болящий не может найти покоя ни днём, ни ночью, непрестанно чешется и не может уснуть от мучений."
 msgstr ""
 
 #. Key:	4D826F5D49EC202F64B24FAE714A25A8
@@ -53,13 +53,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Rash.Name
 msgctxt ",4D826F5D49EC202F64B24FAE714A25A8"
 msgid "Красная сыпь на теле"
-msgstr ""
+msgstr "Red Body Rash"
 
 #. Key:	BFC9DA384AADDAC7D22B24B0F7CEC40D
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Red_Smudge.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Red_Smudge.Description
 msgctxt ",BFC9DA384AADDAC7D22B24B0F7CEC40D"
-msgid "Подкожный жар закипает и выступает багровыми кругами. Человек испытывает сильный нутряной зуд и жжение в груди, неотступно требуя прохладного обдува."
+msgid "Жар бьёт изнутри и оставляет следы на коже. Человек испытывает сильный зуд и жжение по всему телу, непрестанно чешется и просит прохлады."
 msgstr ""
 
 #. Key:	191552354D7190A599D43CA31BF2A186
@@ -67,13 +67,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Body_Red_Smudge.Name
 msgctxt ",191552354D7190A599D43CA31BF2A186"
 msgid "Красные пятна"
-msgstr ""
+msgstr "Red Patches"
 
 #. Key:	F3CBD3204C200C29A32DEE9C50330714
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Big.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Big.Description
 msgctxt ",F3CBD3204C200C29A32DEE9C50330714"
-msgid "Заушный нарыв и тяжелый шум закрывают слуховой проход. Болящий испытывает пульсирующую боль в голове, словно внутри уха бьётся и шумит дикий шмель."
+msgid "Воспаление распухло внутри уха и давит на слух. Болящий испытывает пульсирующую боль в голове, словно внутри уха бьётся маленькое сердце, и не может ничего слышать."
 msgstr ""
 
 #. Key:	4A4EAB654F6390120F5717818101AD62
@@ -81,13 +81,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Big.Name
 msgctxt ",4A4EAB654F6390120F5717818101AD62"
 msgid "Опухшие уши"
-msgstr ""
+msgstr "Swollen Ears"
 
 #. Key:	6C3F6C004A4A18497253DCAD07BFCF5B
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Elf.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Elf.Description
 msgctxt ",6C3F6C004A4A18497253DCAD07BFCF5B"
-msgid "Лесной зазыв путает мысли и дурманит человеческий слух. Человек слышит несмолкаемый лесной свист и гул, переспрашивает каждое слово и рвется уйти в глухую чащу."
+msgid "Чужой голос зовёт из леса и дурманит разум. Человек слышит несмолкаемый шум и гул в голове, переспрашиваеткаждое слово и рвётся уйти из избы."
 msgstr ""
 
 #. Key:	1F3E38C44AA118E6E06E70BFC4A588D7
@@ -95,13 +95,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Elf.Name
 msgctxt ",1F3E38C44AA118E6E06E70BFC4A588D7"
 msgid "Заостренные уши"
-msgstr ""
+msgstr "Pointed Ears"
 
 #. Key:	78C5232F4F0714B2EBE5D9B2FF9E70A7
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Rash.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Rash.Description
 msgctxt ",78C5232F4F0714B2EBE5D9B2FF9E70A7"
-msgid "Заушная сушь и растрескивание кожи источают боль. Человек испытывает резкую боль при каждом повороте головы, а прикосновение к одежде вызывает жжение."
+msgid "Кожа за ушами пересыхает, трескается и не заживает. Человек испытывает резкую боль при каждом повороте головы, а одежда при касании вызывает жжение."
 msgstr ""
 
 #. Key:	D3DF1AE440FF697BABFFCEB8C642EA56
@@ -109,13 +109,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Rash.Name
 msgctxt ",D3DF1AE440FF697BABFFCEB8C642EA56"
 msgid "Раздражение за ушами"
-msgstr ""
+msgstr "Irritation Behind Ears"
 
 #. Key:	820282CA4BB7D37886D990B8321FD25A
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Red.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Red.Description
 msgctxt ",820282CA4BB7D37886D990B8321FD25A"
-msgid "Чужой напрасный оглас зажигает ушные раковины. Человеку кажется, будто за его спиной непрерывно шепчутся и бранятся, отчего уши горят как раскаленные угли."
+msgid "Чужой шёпот за спиной не даёт ушам остыть. Человеку кажется, что все вокруг говорят о нём, шепчутся и смеются, отчего уши горят как на огне."
 msgstr ""
 
 #. Key:	473CF26D4B45F8D6038C31AC37F0A0C4
@@ -123,13 +123,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Ear_Red.Name
 msgctxt ",473CF26D4B45F8D6038C31AC37F0A0C4"
 msgid "Покрасневшие уши"
-msgstr ""
+msgstr "Reddened Ears"
 
 #. Key:	2E4DE7FA461F4E47D289EB945A823F19
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Multicolored.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Multicolored.Description
 msgctxt ",2E4DE7FA461F4E47D289EB945A823F19"
-msgid "Лесной морок и чужеродная воля туманят взор. Болящий слышит чужие шепоты, смотрит диким, непонимающим взглядом и не узнаёт родных, переступающих порог избы."
+msgid "Чужой морок путает разум и туманит взор. Болящий смотрит диким, отсутствующим взглядом, не узнаёт близких и отвечает невпопад, словно слышит чужие голоса."
 msgstr ""
 
 #. Key:	22FFBE5F40BAD1037299FEA2D828B09A
@@ -137,13 +137,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Multicolored.Name
 msgctxt ",22FFBE5F40BAD1037299FEA2D828B09A"
 msgid "Странные глаза"
-msgstr ""
+msgstr "Strange Eyes"
 
 #. Key:	DB04A30E4E1B9BC54ED7B6967875DA92
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_red.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_red.Description
 msgctxt ",DB04A30E4E1B9BC54ED7B6967875DA92"
-msgid "Огненная лихорадка и бессонная мука сушат очесные сосуды. Болящий стенает от рези в очах, будто в глаза сыпанули сухой лесной сажи, и явно не может уснуть уже третью ночь."
+msgid "Жар сжигает глаза изнутри и не даёт спать. Болящий жалуется на острую резь в глазах, будто в них насыпали песка, и не может уснуть уже который день."
 msgstr ""
 
 #. Key:	0DABDA7741E69CA71D0C40A8413A4209
@@ -151,13 +151,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_red.Name
 msgctxt ",0DABDA7741E69CA71D0C40A8413A4209"
 msgid "Красные глаза"
-msgstr ""
+msgstr "Red Eyes"
 
 #. Key:	8500235242394C488103BB820EE53063
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_yellow.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_yellow.Description
 msgctxt ",8500235242394C488103BB820EE53063"
-msgid "Змеиный яд или дурная желчь бродят в нутряных жилах. Человек мучится горечью во рту, нутряным жаром и жалобно просит холодной колодезной воды, не в силах смотреть на свет."
+msgid "Желчь затаилась в теле и отравляет кровь. Человек мучается с горечью во рту, всем телом бросает в жар, и он не может смотреть на яркий свет."
 msgstr ""
 
 #. Key:	83CCDE2E4DC637DC613B9F9DA983DFD5
@@ -165,13 +165,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Sclera_yellow.Name
 msgctxt ",83CCDE2E4DC637DC613B9F9DA983DFD5"
 msgid "Желчица"
-msgstr ""
+msgstr "Yellow Jaundice"
 
 #. Key:	F9B6F04A4C136CC4C936A782BC61ACFD
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Swelling.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Swelling.Description
 msgctxt ",F9B6F04A4C136CC4C936A782BC61ACFD"
-msgid "Застоявшаяся водяная тяжесть затворяет человеческий взор. Человек чувствует распирающую тупую боль над бровями, ходит по избе на ощупь и спотыкается о каждую лавку."
+msgid "Лишняя вода копится над глазами и давит на веки. Человек чувствует распирающую тяжесть над бровями, ходит по избе осторожно и спотыкается на ровном месте."
 msgstr ""
 
 #. Key:	30956952426EDFF8ABA2879EAFA86265
@@ -179,13 +179,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Eye_Swelling.Name
 msgctxt ",30956952426EDFF8ABA2879EAFA86265"
 msgid "Опухшие веки"
-msgstr ""
+msgstr "Swollen Eyelids"
 
 #. Key:	FEC2AA0D4F041A8EEE30BFB587A92C9C
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Earthy.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Earthy.Description
 msgctxt ",FEC2AA0D4F041A8EEE30BFB587A92C9C"
-msgid "Могильная сырость вытягивает из тела природный румянец. Человека одолевает беспросветная тоска, дыхание становится коротким и слабым, а руки становятся холодными, как речной лёд."
+msgid "Смертный холод вытягивает из тела живую краску. Человека одолевает усталость, дыхание становится слабым, а руки — ледяными, будто он долго пробыл на морозе."
 msgstr ""
 
 #. Key:	34394E6645FFD9FC80B3989BE8FE8C38
@@ -193,13 +193,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Earthy.Name
 msgctxt ",34394E6645FFD9FC80B3989BE8FE8C38"
 msgid "Землистый оттенок лица"
-msgstr ""
+msgstr "Earthy Face Complexion"
 
 #. Key:	2556404843DA64E6738914917C30324C
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Red_spots.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Red_spots.Description
 msgctxt ",2556404843DA64E6738914917C30324C"
-msgid "Подкожный пыл закипает без нутряной лихорадки. Болящий жалуется, будто его щеки непрестанно прижигают горячим углём, хотя температура тела остается обычной."
+msgid "Жар без болезни горит под кожей щёк. Болящий жалуется, что щёки горят, хотя температура тела в норме и никакой другой хвори нет."
 msgstr ""
 
 #. Key:	132150B04A6CF5DB0D9FE2AFC3F3093C
@@ -207,13 +207,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Red_spots.Name
 msgctxt ",132150B04A6CF5DB0D9FE2AFC3F3093C"
 msgid "Покраснения на лице"
-msgstr ""
+msgstr "Facial Redness"
 
 #. Key:	ABEDDBB7448031E8B8EBE98D49FC1DED
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Sunken.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Sunken.Description
 msgctxt ",ABEDDBB7448031E8B8EBE98D49FC1DED"
-msgid "Коварный остуд сосёт нутро, оставляя кости да кожу. Болящий жалуется, будто внутри него засел сухой холод. Еда не сытит, а ноги подкашиваются после пары шагов по избе."
+msgid "Болезнь вытягивает жизнь, оставляя одно лицо. Болящий жалуется, что внутри пусто и холодно. Еда не идёт впрок, а ноги подкашиваются от слабости."
 msgstr ""
 
 #. Key:	E3AE21DD4504075D583E95883688B9C8
@@ -221,13 +221,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Sunken.Name
 msgctxt ",E3AE21DD4504075D583E95883688B9C8"
 msgid "Впалые щёки"
-msgstr ""
+msgstr "Sunken Cheeks"
 
 #. Key:	51E3867A44DCDB9F3A0555936AD27C24
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Veins.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Veins.Description
 msgctxt ",51E3867A44DCDB9F3A0555936AD27C24"
-msgid "Навья паутина плетется по жилам, охлаждая кровь. Человек чувствует ледяное покалывание в щеках и ломоту в челюсти, словно лицо зажали в железные тиски."
+msgid "Чужеродная сила плетётся под кожей и холодит щёки. Человек чувствует покалывание и ломоту в лице, словно щёки зажаты в тугие тиски и не могут расслабиться."
 msgstr ""
 
 #. Key:	1C4EDB594675C7C11002D888E9CE97D1
@@ -235,13 +235,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Face_Veins.Name
 msgctxt ",1C4EDB594675C7C11002D888E9CE97D1"
 msgid "Вены на лице"
-msgstr ""
+msgstr "Facial Veins"
 
 #. Key:	C99C6F6342E03BEC45CE32AF6682E086
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Bold.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Bold.Description
 msgctxt ",C99C6F6342E03BEC45CE32AF6682E086"
-msgid "От нечистого выстрига, отмирания корня и упадка волосяной силы. Волос у человека вылезает целыми прядями, обнажая бледную, сухую кожу черепа, будто бес ночью ножницами прошёлся. Человек стесняется покрова и прячет голову под плат."
+msgid "Тело слабеет, и волосы перестают расти. Человек жалуется на зуд и странный холодок на голове, будто волосы стали редкими и ниоткуда не берут силу."
 msgstr ""
 
 #. Key:	0A419F5145838C7C9BC29E99C31FE691
@@ -249,13 +249,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Bold.Name
 msgctxt ",0A419F5145838C7C9BC29E99C31FE691"
 msgid "Плешина"
-msgstr ""
+msgstr "Bald Patch"
 
 #. Key:	186E371D45D3DEE163794CA72F6A1B42
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Dandruff.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Dandruff.Description
 msgctxt ",186E371D45D3DEE163794CA72F6A1B42"
-msgid "Печная гарь и сухой пожарный морок въедаются в косы. Человек чувствует першение в горле и сухость кожи, а сами косы становятся ломкими, словно высохшая на солнце солома."
+msgid "Болезнь оставляет на волосах мёртвый серый след. Человек чувствует сухость кожи на голове, а волосы становятся ломкими и безжизненными, словно старая солома."
 msgstr ""
 
 #. Key:	0D6FE4EC48EF7277F6ACAB9D4A498137
@@ -263,13 +263,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Dandruff.Name
 msgctxt ",0D6FE4EC48EF7277F6ACAB9D4A498137"
 msgid "Пепельный налёт"
-msgstr ""
+msgstr "Ashy Coating"
 
 #. Key:	7EF22DEF479E64D248DCF59144DED5D2
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Gray.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Gray.Description
 msgctxt ",7EF22DEF479E64D248DCF59144DED5D2"
-msgid "Нутряной тук закипает и выходит наружу через голову. Болящий ощущает несносный душный жар и туман в голове, из-за чего мысли путаются, а сон становится тревожным."
+msgid "Жар из нутра поднимается и лоснится на голове. Болящий ощущает душный жар и туман в голове, мысли путаются, а сон становится тревожным и беспокойным."
 msgstr ""
 
 #. Key:	99E0CDB545CACAD1C383CFB172BB2DC4
@@ -277,13 +277,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Gray.Name
 msgctxt ",99E0CDB545CACAD1C383CFB172BB2DC4"
 msgid "Седые корни волос"
-msgstr ""
+msgstr "Graying Hair Roots"
 
 #. Key:	B1D499B54072F44717326F8CE6A2F36B
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Wet.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Wet.Description
 msgctxt ",B1D499B54072F44717326F8CE6A2F36B"
-msgid "Болотная остуда застревает в прядях и источает хлад. Болящий ощущает тяжесть в затылке и ледяную ломоту в черепе, из-за которой не может согреться даже у растопленной печи."
+msgid "Сырость изнутри пропитывает голову и не даёт согреться. Болящий ощущает тяжесть в затылке и ломоту в черепе, из-за которой не может согреться даже у печи."
 msgstr ""
 
 #. Key:	AF7119F949AD6384C6E2B48F773F6CD0
@@ -291,13 +291,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hair_Wet.Name
 msgctxt ",AF7119F949AD6384C6E2B48F773F6CD0"
 msgid "Мокрые волосы"
-msgstr ""
+msgstr "Wet Hair"
 
 #. Key:	DB07BE694F5C39906D569AB7EF343635
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Long_fingers.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Long_fingers.Description
 msgctxt ",DB07BE694F5C39906D569AB7EF343635"
-msgid "Нечистая навья сила тянет человеческие кости. Человек с ужасом чувствует, как фаланги пальцев теряют силу, становясь неловкими, словно сухие лесные ветви."
+msgid "Чужеродная сила вытягивает кости и сушит суставы. Человек с ужасом замечает, что пальцы стали длиннее и слабее, словно сухие ветки, готовые сломаться."
 msgstr ""
 
 #. Key:	F2BD2AD043C7337D967654B854226D47
@@ -305,13 +305,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Long_fingers.Name
 msgctxt ",F2BD2AD043C7337D967654B854226D47"
 msgid "Удлиненные пальцы"
-msgstr ""
+msgstr "Elongated Fingers"
 
 #. Key:	2D637F6B423A011A44B753AA0074B680
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Red_joints.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Red_joints.Description
 msgctxt ",2D637F6B423A011A44B753AA0074B680"
-msgid "Студёная ломота загоняет воспаление в пальцевые суставы. Болящий не может согнуть пальцы в кулак или удержать ложку — каждое движение отдаётся острой стреляющей болью."
+msgid "Воспаление засело в пальцах и не даёт согнуть руку. Болящий не может сжать кулак или удержать ложку — каждое движение отдаёт острой, стреляющей болью."
 msgstr ""
 
 #. Key:	2FA009F44DDFDE035F93FB900B383514
@@ -319,13 +319,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Red_joints.Name
 msgctxt ",2FA009F44DDFDE035F93FB900B383514"
 msgid "Красные суставы"
-msgstr ""
+msgstr "Red Joints"
 
 #. Key:	92BAB66A47EF75E458FF7C89654C5AAA
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Wavy_nails.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Wavy_nails.Description
 msgctxt ",92BAB66A47EF75E458FF7C89654C5AAA"
-msgid "Смолистое голодание сушит роговую ткань на руках. Пальцы становятся чувствительными к малейшему удару, а сами ногти цепляются за одежду и причиняют мучительную боль."
+msgid "Ногти пересыхают, трескаются и теряют форму. Пальцы стали чувствительными к любому удару, а ногти цепляются за одежду и причиняют боль."
 msgstr ""
 
 #. Key:	5D0C2DE140A7757DF36214A3BF043359
@@ -333,13 +333,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Wavy_nails.Name
 msgctxt ",5D0C2DE140A7757DF36214A3BF043359"
 msgid "Деформированные ногти"
-msgstr ""
+msgstr "Deformed Nails"
 
 #. Key:	FF0AA17F4AED1EC47C5896AB8C5F6D1E
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Yellow_nails.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Yellow_nails.Description
 msgctxt ",FF0AA17F4AED1EC47C5896AB8C5F6D1E"
-msgid "Костяная болезнь разрушает ногтевые ложа. Болящий жалуется на ноющую боль в кончиках пальцев, из-за которой невозможно выполнять работу по дому."
+msgid "Болезнь добралась до костей и портит ногти. Болящий жалуется на ноющую боль в кончиках пальцев, а ногти стали жёлтыми и ломкими."
 msgstr ""
 
 #. Key:	ACCFF1BB459C4BC6040DDA87BD63B792
@@ -347,13 +347,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Hand_Yellow_nails.Name
 msgctxt ",ACCFF1BB459C4BC6040DDA87BD63B792"
 msgid "Пожелтевшие ногти"
-msgstr ""
+msgstr "Yellowed Nails"
 
 #. Key:	30CE063646C991C4D49FC390B14DF870
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Dark_joints.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Dark_joints.Description
 msgctxt ",30CE063646C991C4D49FC390B14DF870"
-msgid "Костная тьма и студеный осад заседают в суставах. При каждом шаге человек слышит сухой скрежет в коленях, испытывая острую боль при попытке присесть или встать с лавки."
+msgid "Холод заседает в коленях и не пускает согнуться. При каждом шаге человек слышит скрип в коленях и испытывает резкую боль, когда пытается присесть или встать."
 msgstr ""
 
 #. Key:	ED10ACB54A91A282CB48C58ED44CF3ED
@@ -361,13 +361,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Dark_joints.Name
 msgctxt ",ED10ACB54A91A282CB48C58ED44CF3ED"
 msgid "Потемневшие суставы"
-msgstr ""
+msgstr "Darkened Joints"
 
 #. Key:	E50F399F41AFA995D20394B5014D6E41
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Red_spots.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Red_spots.Description
 msgctxt ",E50F399F41AFA995D20394B5014D6E41"
-msgid "Кровавый застой пробивается сквозь подкожные жилки. Болящего мучит непрерывное мелкое покалывание в голенях, словно по ногам бегают тысячи лесных муравьев."
+msgid "Болезнь пробивается мелкими точками сквозь кожу ног. Болящего мучает мелкое покалывание в голенях, словно по ногам бегают муравьи, и никак не может найти покоя."
 msgstr ""
 
 #. Key:	095233564E1215AF20A087A726B7ACCE
@@ -375,13 +375,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Red_spots.Name
 msgctxt ",095233564E1215AF20A087A726B7ACCE"
 msgid "Красная сыпь на ногах"
-msgstr ""
+msgstr "Red Rash on Legs"
 
 #. Key:	128913B8461D3045807D8DA2F3236DA4
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Swelling.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Swelling.Description
 msgctxt ",128913B8461D3045807D8DA2F3236DA4"
-msgid "Водяные кандалы наливают ноги свинцовой тяжестью. Человек не может надеть обувь, ступни становятся неповоротливыми, а каждый шаг отдаётся тупой ломотой в пояснице."
+msgid "Вода скапливается внизу ног и тянет к земле. Человек не может нормально обуться, ступни становятся тяжёлыми и неповоротливыми, а каждый шаг отдаёт болью."
 msgstr ""
 
 #. Key:	2C0AAC0A4EC5B91071B9BABAF85261C6
@@ -389,13 +389,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Swelling.Name
 msgctxt ",2C0AAC0A4EC5B91071B9BABAF85261C6"
 msgid "Отёк лодыжек"
-msgstr ""
+msgstr "Swollen Ankles"
 
 #. Key:	538296B04774DBEC4618B29ADA1A44F9
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Veins.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Veins.Description
 msgctxt ",538296B04774DBEC4618B29ADA1A44F9"
-msgid "Тяжёлая страда и застой крови скручивают жилы узлами. Человек не может ступить на ногу от непрерывной гудящей боли, будто к икрам привязали тяжелые мельничные жернова."
+msgid "Кровь застаивается в ногах и скручивает жилы. Человек не может нормально ходить — ноги гудят, ноют и отекают к вечеру, словно к ним привязали тяжёлые мешки."
 msgstr ""
 
 #. Key:	25836D6047506505925D2396E0688F2A
@@ -403,13 +403,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Leg_Veins.Name
 msgctxt ",25836D6047506505925D2396E0688F2A"
 msgid "Выступающие вены"
-msgstr ""
+msgstr "Protruding Veins"
 
 #. Key:	2BE862514415B789AB4AAE921038D3E0
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Asymmetry.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Asymmetry.Description
 msgctxt ",2BE862514415B789AB4AAE921038D3E0"
-msgid "Нервный зажим и онемение сковывают лицевую мышцу. Человек не может вымолвить членораздельного слова, питьё выливается изо рта, а сам болящий испуган внезапным бессилием."
+msgid "Мышцы лица отказываются служить и обвисают. Человек не может нормально говорить и пить — жидкость вытекает изо рта, а сам он пугается своей слабости."
 msgstr ""
 
 #. Key:	D30BE9B0451D52546F3F1AB160F1ADBD
@@ -417,13 +417,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Asymmetry.Name
 msgctxt ",D30BE9B0451D52546F3F1AB160F1ADBD"
 msgid "Опущенный уголок рта"
-msgstr ""
+msgstr "Drooping Mouth Corner"
 
 #. Key:	8B71C25C474AD98A552219B08AB1AB1F
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Gray.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Gray.Description
 msgctxt ",8B71C25C474AD98A552219B08AB1AB1F"
-msgid "Истощение плоти оставляет зольный след вокруг уст. Человек ощущает сухость и ссаднение в губах, а обычный хлеб кажется ему горьким, словно печной пепел."
+msgid "Тело истощено и не может держать здоровый цвет. Человек ощущает сухость и стянутость губ, а обычная еда кажется ему безвкусной и чуждой."
 msgstr ""
 
 #. Key:	DE895B3647E72634BCC01E99364232FC
@@ -431,13 +431,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Gray.Name
 msgctxt ",DE895B3647E72634BCC01E99364232FC"
 msgid "Посеревшая кожа"
-msgstr ""
+msgstr "Grayish Skin"
 
 #. Key:	9BEB50D84B70AE96844F85A8FDD9EC18
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Irritation.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Irritation.Description
 msgctxt ",9BEB50D84B70AE96844F85A8FDD9EC18"
-msgid "Едкий подкожный сок разъедает нежную кожу уст. Болящий испытывает сильную боль при попытке раскрыть рот, а каждая крошка еды вызовет жгучие слезы."
+msgid "Едкая хворь разъедает нежную кожу уст. Болящий не может открыть рот без боли, а любая еда вызывает жжение и слёзы на глазах."
 msgstr ""
 
 #. Key:	D6143B8B4C977E183399A5893CE68E08
@@ -445,13 +445,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Irritation.Name
 msgctxt ",D6143B8B4C977E183399A5893CE68E08"
 msgid "Раздражение вокруг губ"
-msgstr ""
+msgstr "Irritation Around Lips"
 
 #. Key:	57DFB56E4F27E12D6AA303800E5EC2C7
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Pale.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Pale.Description
 msgctxt ",57DFB56E4F27E12D6AA303800E5EC2C7"
-msgid "Жизненный огонь угасает, поддаваясь холодному сну. Дыхание человека становится еле слышным, голос превращается в тихий шелест, а сам болящий впадает в глубокое забытье."
+msgid "Жизнь уходит из тела, и губы теряют цвет. Дыхание становится еле слышным, голос — тихим шёпотом, а сам человек едва держится в сознании."
 msgstr ""
 
 #. Key:	5A34A06D4D899FDED8B2B98A800A54ED
@@ -459,13 +459,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Mouth_Pale.Name
 msgctxt ",5A34A06D4D899FDED8B2B98A800A54ED"
 msgid "Бледные губы"
-msgstr ""
+msgstr "Pale Lips"
 
 #. Key:	71CBEB854045E974F70D1D84463D80F4
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Black_spots.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Black_spots.Description
 msgctxt ",71CBEB854045E974F70D1D84463D80F4"
-msgid "Подкожная скверность въедается в поры. Человек испытывает постоянный зуд и ощущение грязи, которую не удается смыть даже горячей банной водой."
+msgid "Грязь забивается в поры и не вымывается. Человек испытывает постоянный зуд на носу и ощущение грязи, которую не удаётся смыть даже горячей водой."
 msgstr ""
 
 #. Key:	287B29F8481315D22A2B1A89764C1BEB
@@ -473,13 +473,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Black_spots.Name
 msgctxt ",287B29F8481315D22A2B1A89764C1BEB"
 msgid "Черные точки"
-msgstr ""
+msgstr "Blackheads"
 
 #. Key:	0CE3DA6C452C21231FD0E88F44247365
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Blue.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Blue.Description
 msgctxt ",0CE3DA6C452C21231FD0E88F44247365"
-msgid "Лютый хлад замораживает кровь в мелких сосудах. Болящий абсолютно не чувствует прикосновений к носу и жалуется на тяжелый гул в затылке от переохлаждения."
+msgid "Холод замораживает кровь в мелких сосудах носа. Болящий почти не чувствует носа, а в голове стоит тяжёлый гул от переохлаждения всего тела."
 msgstr ""
 
 #. Key:	CED1C9A44CE46DBA6C661E99F1CAF625
@@ -487,13 +487,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Blue.Name
 msgctxt ",CED1C9A44CE46DBA6C661E99F1CAF625"
 msgid "Посиневший нос"
-msgstr ""
+msgstr "Blue Nose"
 
 #. Key:	BB97115A4CE7E671CE9AABAFB653B736
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Red.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Red.Description
 msgctxt ",BB97115A4CE7E671CE9AABAFB653B736"
-msgid "Дурной подкожный жар сбивается к кончику носа. Болящий ощущает пульсирующее дерганье и жжение, словно к носу приложили раскаленный печной заслон."
+msgid "Жар скапливается на кончике носа и не даёт остыть. Болящий ощущает пульсирующее жжение на носу, словно к нему приложили горячую сковороду."
 msgstr ""
 
 #. Key:	385E30034294701ED24BA1A6CF02E947
@@ -501,13 +501,13 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Red.Name
 msgctxt ",385E30034294701ED24BA1A6CF02E947"
 msgid "Красноватый нос"
-msgstr ""
+msgstr "Reddish Nose"
 
 #. Key:	96967FC245CA27F194E6718939F897B1
 #. SourceLocation:	/Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Yellow.Description
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Yellow.Description
 msgctxt ",96967FC245CA27F194E6718939F897B1"
-msgid "Печёночная слабость омертвляет лицевые хрящи. Человек жалуется на онемение лица и тошноту от любого запаха еды, приготовленной в печи."
+msgid "Болезнь добралась до хрящей и убивает цвет лица. Человек жалуется на онемение лица и тошноту от любых запахов пищи, даже любимой."
 msgstr ""
 
 #. Key:	BE9ADE4B42B705D69064FD8F18B7C071
@@ -515,5 +515,5 @@ msgstr ""
 #: /Game/Data_New/Symptoms/DT_Symptoms.DT_Symptoms.Nose_Yellow.Name
 msgctxt ",BE9ADE4B42B705D69064FD8F18B7C071"
 msgid "Пожелтевший нос"
-msgstr ""
+msgstr "Yellowed Nose"
 
