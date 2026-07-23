@@ -1,0 +1,589 @@
+﻿# IngredientsNEW English translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: IngredientsNEW\n"
+"POT-Creation-Date: 2026-07-23 04:03\n"
+"PO-Revision-Date: 2026-07-23 04:03\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	F381810E45D50A1816123EAF5186F67E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Березовый сок.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Березовый сок.Description
+msgctxt ",F381810E45D50A1816123EAF5186F67E"
+msgid "Прозрачная, чуть сладкая влага, медленно текущая из надреза белой берёзы. Она пахнет весной — талым снегом, светом и молодой корой. В ладони сок кажется живым, словно дерево делится своей тихой силой. Пьёшь его — и будто слышишь, как пробуждается лес."
+msgstr ""
+
+#. Key:	37A221A541E8D021B1DDEC9D4E8FC87A
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Березовый сок.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Березовый сок.DisplayName
+msgctxt ",37A221A541E8D021B1DDEC9D4E8FC87A"
+msgid "Березовый сок"
+msgstr ""
+
+#. Key:	49A7A5DB4DE181D27E14D8B2E5A03A2F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко.Description
+msgctxt ",49A7A5DB4DE181D27E14D8B2E5A03A2F"
+msgid "Ядовитый куст с красными ягодами, что выжигает хвори с кожи.\r\nКуст растёт в чаще, с виду неприметный, но трогать его голыми руками — себе вредить. Сок у него жгучий, едкий, оставляет на коже следы, как от крапивы, только хуже."
+msgstr ""
+
+#. Key:	661EB57B4ACB13DC9E464FB314075F57
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко.DisplayName
+msgctxt ",661EB57B4ACB13DC9E464FB314075F57"
+msgid "Волчье лыко"
+msgstr ""
+
+#. Key:	C3302A8846B9D81E741D388E6AB0C79B
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Р.Description
+msgctxt ",C3302A8846B9D81E741D388E6AB0C79B"
+msgid "Выжигает свежую чесотку и зуд. Ядовито.\r\nРезаная ягода сразу пускает едкий сок, и отвар берёт кожную заразу, пока она свежа. "
+msgstr ""
+
+#. Key:	61EFB7A84599DADE7F95899F76A24C59
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Р.DisplayName
+msgctxt ",61EFB7A84599DADE7F95899F76A24C59"
+msgid "Ломтики волчьего лыка"
+msgstr ""
+
+#. Key:	AAA9356948D622FC49E171B43E74B86E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Т.Description
+msgctxt ",AAA9356948D622FC49E171B43E74B86E"
+msgid "Растирают в едкий порошок. Ядовито.\r\nСтёртая в порошок ягода вспыхивает всей едкостью сразу. Хватит крохотной щепоти, а больше — уже не лекарство, а яд.\r\nСухую ягоду толкли и присыпали лишай крохотной мерой, боясь пересыпать."
+msgstr ""
+
+#. Key:	C3F47B3F4A4F558DFAF8A5A96509E632
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.ВолчьеЛыко_Т.DisplayName
+msgctxt ",C3F47B3F4A4F558DFAF8A5A96509E632"
+msgid "Толчёное волчье лыко"
+msgstr ""
+
+#. Key:	51879D21424AFB43E27E6ABD8EB1B2BD
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика.Description
+msgctxt ",51879D21424AFB43E27E6ABD8EB1B2BD"
+msgid "Лесная ягода, что возвращает уставшему силы и прочищает голову.\r\nПоспевает в конце лета, когда лес полон ягод. Спелая голубика тёмно-синяя, сладкая, с лёгким дурманящим духом — объешься и голова кружится, словно в лету."
+msgstr ""
+
+#. Key:	8287C730449E4F359A6097B1E7B8B31F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика.DisplayName
+msgctxt ",8287C730449E4F359A6097B1E7B8B31F"
+msgid "Голубика"
+msgstr ""
+
+#. Key:	15A7769447229EFE389C1F9F38A7F5D7
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Р.Description
+msgctxt ",15A7769447229EFE389C1F9F38A7F5D7"
+msgid "Cвежие ягоды разрезают пополам и заливают горячей водой. Если вены на ногах вздуваются и болят от долгой работы — настоем растирают больные места."
+msgstr ""
+
+#. Key:	45E1AB6A49867587B78EA2AB8E182CE8
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Р.DisplayName
+msgctxt ",45E1AB6A49867587B78EA2AB8E182CE8"
+msgid "Рубленая голубика"
+msgstr ""
+
+#. Key:	BEF0BEA14AFB519E86358297B4F2F42D
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Т.Description
+msgctxt ",BEF0BEA14AFB519E86358297B4F2F42D"
+msgid "Быстро бодрит и снимает дурноту.\r\nРастёртая в кашицу, она отдаёт всю сладкую силу разом. Короткое питьё, чтобы взбодрить и прогнать слабость."
+msgstr ""
+
+#. Key:	AE95B67C4D93D984EE9B05ACA7635C28
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Голубика_Т.DisplayName
+msgctxt ",AE95B67C4D93D984EE9B05ACA7635C28"
+msgid "Толчёная голубика"
+msgstr ""
+
+#. Key:	8F09B8A74CB47D3BC2A555ADCDBB816E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь.Description
+msgctxt ",8F09B8A74CB47D3BC2A555ADCDBB816E"
+msgid "Целые жёлуди не держат в доме больного — считается, что дубовый дух перетянет на себя живую силу. Зато здоровым полезно: жёлуди сушат, толкут в муку и пекут лепёшки. Крепость земли переходит в тело. Если тело зеленеет — жёлуди варят и пьют отвар."
+msgstr ""
+
+#. Key:	7FC03D154F4CC3F804758788224D2FC2
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь.DisplayName
+msgctxt ",7FC03D154F4CC3F804758788224D2FC2"
+msgid "Желудь"
+msgstr ""
+
+#. Key:	15F4FBF2426BE2061864E68CC7A91192
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Р.Description
+msgctxt ",15F4FBF2426BE2061864E68CC7A91192"
+msgid "Резаные жёлуди рубят на четвертинки, вымачивают в воде несколько дней. Потом варят и едят как кашу. Если лицо горит и щёки краснеют без жара в теле — отваром умываются."
+msgstr ""
+
+#. Key:	B87588E74B2DA2EA5FD584AD0B7D7702
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Р.DisplayName
+msgctxt ",B87588E74B2DA2EA5FD584AD0B7D7702"
+msgid "Раскрытый желудь"
+msgstr ""
+
+#. Key:	2BDD68394CE08CC9715C3BB486329E12
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Т.Description
+msgctxt ",2BDD68394CE08CC9715C3BB486329E12"
+msgid "Толчёные жёлуди превращаются в муку. Если кожа на лице стала как земля, серая и безжизненная — муку заваривают и пьют, она наполняет тело крепостью изнутри."
+msgstr ""
+
+#. Key:	866D4B8F475164189D9D9F85D38889E1
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Желудь_Т.DisplayName
+msgctxt ",866D4B8F475164189D9D9F85D38889E1"
+msgid "Толчёный желудь"
+msgstr ""
+
+#. Key:	F46EE27C442D514F58D8FC9C4151D2DE
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива.Description
+msgctxt ",F46EE27C442D514F58D8FC9C4151D2DE"
+msgid "Первая весенняя сила, которая жжёт, но от того и лечит.\r\nКак только снег сойдёт, крапива уже лезет из земли — первая зелень. Жжёт руки так, что отдёрнешь, но её и едят в первых щах, и веником в бане хлещутся. Жгучесть её и есть та сила, что прогоняет из тела всякую хворь."
+msgstr ""
+
+#. Key:	FD39676846D65FC968D352838063EFE4
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива.DisplayName
+msgctxt ",FD39676846D65FC968D352838063EFE4"
+msgid "Крапива"
+msgstr ""
+
+#. Key:	CA8B470C497F7500F94E1990978A5DD2
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Р.Description
+msgctxt ",CA8B470C497F7500F94E1990978A5DD2"
+msgid "Резаная крапива идёт в щи и похлёбку — для укрепления крови и поднятия сил. Режут молодые стебли вместе с листьями, варят до мягкости. Едят такой суп всю весну, чтобы не знать малокровия."
+msgstr ""
+
+#. Key:	3709D2874962FAF48B6299BE3FC35C8D
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Р.DisplayName
+msgctxt ",3709D2874962FAF48B6299BE3FC35C8D"
+msgid "Рубленая крапива"
+msgstr ""
+
+#. Key:	15C2CBFB430CC27038277D83AA379380
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Т.Description
+msgctxt ",15C2CBFB430CC27038277D83AA379380"
+msgid "Толчёная крапива превращается в едкую зелёную кашицу. Её разбавляют водой и протирают тело при сильных воспалениях — жжение означает, что процесс пошёл, хворь вытягивается наружу. После неё тело горит, но потом отпускает."
+msgstr ""
+
+#. Key:	1FA1BB0E41A80947710EA19B457D3B9A
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Крапива_Т.DisplayName
+msgctxt ",1FA1BB0E41A80947710EA19B457D3B9A"
+msgid "Толчёная крапива"
+msgstr ""
+
+#. Key:	56E1F88442F0AB3F9E4886BE29EA68F0
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш.Description
+msgctxt ",56E1F88442F0AB3F9E4886BE29EA68F0"
+msgid "Майский цветок, что лечит сердце, но ядовит при неосторожности.\r\nСтавят в избе, но не на ночь — аромат у них пьянящий, дурманит голову.  В народе зовут слёзками Богородицы. Ядовит, но в малых дозах исцеляет. "
+msgstr ""
+
+#. Key:	170F3DEB4DAAB7B239125685D7734594
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш.DisplayName
+msgctxt ",170F3DEB4DAAB7B239125685D7734594"
+msgid "Ландыш"
+msgstr ""
+
+#. Key:	3010608B4518185CABC0BCA3D6BCF92C
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Р.Description
+msgctxt ",3010608B4518185CABC0BCA3D6BCF92C"
+msgid "Говорят, что ландыш прогоняет мышиный дух.\r\nВыравнивает частое, сбитое биение сердца. Ядовит.\r\nРезаные цветки заваривали слабым настоем и поили по счёту глотков."
+msgstr ""
+
+#. Key:	5CD053D84877773E454F5AB405C20A8C
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Р.DisplayName
+msgctxt ",5CD053D84877773E454F5AB405C20A8C"
+msgid "Резаный ландыш"
+msgstr ""
+
+#. Key:	C103B84A42E1A851636733B56091535D
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Т.Description
+msgctxt ",C103B84A42E1A851636733B56091535D"
+msgid "Растирают в ароматный порошок из сушёных цветков. Ядовит.\r\nЕсли на лице появляются чёрные точки и поры забиваются так, что не смываются — порошок заваривают и умываются."
+msgstr ""
+
+#. Key:	420BE25946414BD29C524DB4170FE1A1
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Ландыш_Т.DisplayName
+msgctxt ",420BE25946414BD29C524DB4170FE1A1"
+msgid "Толчёный ландыш"
+msgstr ""
+
+#. Key:	3D99572B4844F90920D6AEBE0612EC8E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка.Description
+msgctxt ",3D99572B4844F90920D6AEBE0612EC8E"
+msgid "Целую лисичку жарят на сале — она пускает густой душистый сок, которым поливают кашу. Съесть сковородку грибов после болезни — вернуть себе былую силу. Лисички не бывают червивыми. Если уши стали слышать слишком много — лисичку варят и пьют отвар."
+msgstr ""
+
+#. Key:	A50016834E215AA33C05EAB640861FEA
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка.DisplayName
+msgctxt ",A50016834E215AA33C05EAB640861FEA"
+msgid "Лисичка"
+msgstr ""
+
+#. Key:	8B72D70D4197138ACFADE9A048A46C53
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Р.Description
+msgctxt ",8B72D70D4197138ACFADE9A048A46C53"
+msgid "Прогоняет озноб и внутренний холод после хвори.\r\nНарезанный гриб быстрее отдаёт тепло, а ломтики лисичек тушили и давали ослабшим, чтобы согреть."
+msgstr ""
+
+#. Key:	5CDBBCEF495141FF2F1E628CFD93B8C9
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Р.DisplayName
+msgctxt ",5CDBBCEF495141FF2F1E628CFD93B8C9"
+msgid "Рубленая лисичка"
+msgstr ""
+
+#. Key:	486E6C124609772EBB2AC8A23D450A61
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Т.Description
+msgctxt ",486E6C124609772EBB2AC8A23D450A61"
+msgid "Резко поднимает силы угасающему.\r\nЕсли суставы скрипят и болят — порошок заваривают и пьют, он проникает в кости и разгоняет холод."
+msgstr ""
+
+#. Key:	FC8192B844FBB9CCE98BAA9E721BE658
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Лисичка_Т.DisplayName
+msgctxt ",FC8192B844FBB9CCE98BAA9E721BE658"
+msgid "Толчёная лисичка"
+msgstr ""
+
+#. Key:	0243919043B741EC0E188A8DD5EE1CDF
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь.Description
+msgctxt ",0243919043B741EC0E188A8DD5EE1CDF"
+msgid "Целую морковь хранят в подполе в песке — так она остаётся свежей до весны. Если суставы на пальцах распухают и краснеют — варёную морковь толкут прямо в котле и прикладывают к больным местам."
+msgstr ""
+
+#. Key:	E4A628BF4FE295B1AD7D839C0479E6AD
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь.DisplayName
+msgctxt ",E4A628BF4FE295B1AD7D839C0479E6AD"
+msgid "Морковь"
+msgstr ""
+
+#. Key:	3615D9F9484E5CAA3A616686FCC2EB58
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Р.Description
+msgctxt ",3615D9F9484E5CAA3A616686FCC2EB58"
+msgid "Подкрепляет ослабшего, кому нужны силы уже сейчас.\r\nНарезанный корень быстрее отдаёт сок, и отваром из него обтирают кожу от красных пятен. Отлично идет в похлебки и каши."
+msgstr ""
+
+#. Key:	2BEFD6644140779A02F29D94B89F8391
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Р.DisplayName
+msgctxt ",2BEFD6644140779A02F29D94B89F8391"
+msgid "Ломтики моркови"
+msgstr ""
+
+#. Key:	08B9DEB942CFC10E473766BC699E29B6
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Т.Description
+msgctxt ",08B9DEB942CFC10E473766BC699E29B6"
+msgid "Растирают в мягкую кашицу. Её едят ложкой или добавляют в зелья. Если кожа вокруг рта сереет и высыхает — кашицу накладывают на губы и держат, пока не впитается."
+msgstr ""
+
+#. Key:	C26628A444579A7C5F284B83A03739B7
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Морковь_Т.DisplayName
+msgctxt ",C26628A444579A7C5F284B83A03739B7"
+msgid "Толчёная морковь"
+msgstr ""
+
+#. Key:	966806C04A5FB1DF4522A2A066428D36
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мочевина.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мочевина.Description
+msgctxt ",966806C04A5FB1DF4522A2A066428D36"
+msgid "Грубая белёсая жидкость с едким, тяжёлым духом, который щекочет нос. Простому человеку он кажется неприятным и резким, но в нём таится странная, суровая сила. Старые зелейники говорят, что бесы чуят этот запах за версту и корчатся от него. Неприметная на вид, она действует как плеть на нечисть, заставляя её бежать прочь."
+msgstr ""
+
+#. Key:	84F46EA84156C93DB690D7B7ADF79DBE
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мочевина.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мочевина.DisplayName
+msgctxt ",84F46EA84156C93DB690D7B7ADF79DBE"
+msgid "Мочевина"
+msgstr ""
+
+#. Key:	B0451CDC4C2C86CFF5D173BE3D3C3372
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор.Description
+msgctxt ",B0451CDC4C2C86CFF5D173BE3D3C3372"
+msgid "Красный смертельно ядовитый гриб с белыми точками.\r\nЯркий, красивый, но страшный. В малой дозе — лекарство, в большой — смерть. Дают его только в крайних случаях, когда человек уже одной ногой в могиле и обычные травы бессильны. Сила у него страшная, но именно она может вытащить с того света."
+msgstr ""
+
+#. Key:	3B7598BC4D9B6293281F9DA397B3EB69
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор.DisplayName
+msgctxt ",3B7598BC4D9B6293281F9DA397B3EB69"
+msgid "Мухомор"
+msgstr ""
+
+#. Key:	CFF4F0724276AE8334B7F89091839DB6
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Р.Description
+msgctxt ",CFF4F0724276AE8334B7F89091839DB6"
+msgid "Снимает жестокую ломоту в костях и суставах. Ядовит.\r\nНарезанная шляпка выделяет яд-лекарство, и отвар глушит нестерпимую боль.\r\nРезаными шляпками растирали ломоту в костях, оберегая рот от зелья."
+msgstr ""
+
+#. Key:	2754D9BD4C735CD4829B70909497C764
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Р.DisplayName
+msgctxt ",2754D9BD4C735CD4829B70909497C764"
+msgid "Ломтики мухомора"
+msgstr ""
+
+#. Key:	B09936F540882CC9C673D2B6D3138775
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Т.Description
+msgctxt ",B09936F540882CC9C673D2B6D3138775"
+msgid "Последний удар, когда всё иное бессильно. Ядовит.\r\nЕсли кожа вокруг рта раздражена и горит — порошок заваривают и делают примочки, но осторожно, каплями."
+msgstr ""
+
+#. Key:	42BE7272461DF06341339682B275A7A9
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Мухомор_Т.DisplayName
+msgctxt ",42BE7272461DF06341339682B275A7A9"
+msgid "Толчёный мухомор"
+msgstr ""
+
+#. Key:	07BBAA5847E967951E4B9EACB50820A6
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник.Description
+msgctxt ",07BBAA5847E967951E4B9EACB50820A6"
+msgid "Целые листья подорожника знает каждый ребёнок — сорвал, приложил к царапине, и кровь останавливается. Растёт у порога, у дороги, где только ступит нога путника. Лист плотный, жилистый, держит форму даже под весом. Если в глазах помутилось или белки пожелтели — свежий лист прикладывают к закрытым векам и держат, пока не успокоится."
+msgstr ""
+
+#. Key:	C0EA7B8C4405E84BC9BE69912E2C9005
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник.DisplayName
+msgctxt ",C0EA7B8C4405E84BC9BE69912E2C9005"
+msgid "Подорожник"
+msgstr ""
+
+#. Key:	C8499A284E29E3BE775E9CBFBEAF7591
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Р.Description
+msgctxt ",C8499A284E29E3BE775E9CBFBEAF7591"
+msgid "Резаный подорожник идёт в отвар, когда ран на теле несколько или когда глазам нужна общая поддержка. Режут свежие листья и варят в чистой воде, потом пьют по ложке. Если зрение затуманивается или в глазах двоится — отвар процеживают и промывают им глаза."
+msgstr ""
+
+#. Key:	2E0F7AE4433D542CE17506A06034770C
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Р.DisplayName
+msgctxt ",2E0F7AE4433D542CE17506A06034770C"
+msgid "Резаный подорожник"
+msgstr ""
+
+#. Key:	C09537D248DB073C2EEAF99909672F37
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Т.Description
+msgctxt ",C09537D248DB073C2EEAF99909672F37"
+msgid "Толчёный подорожник превращается в зелёную сочную массу. Её выкладывают на тряпку и делают компресс на воспалённые глаза. Если веки распухли так, что невозможно открыть глаза — кашица вытянет жар и вернёт ясность взгляду."
+msgstr ""
+
+#. Key:	41B57F66495C525BDC809F9656EB9B5F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Подорожник_Т.DisplayName
+msgctxt ",41B57F66495C525BDC809F9656EB9B5F"
+msgid "Подорожная кашица"
+msgstr ""
+
+#. Key:	B88EDC18470684034F9BFC94887751E3
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Родниковая вода.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Родниковая вода.Description
+msgctxt ",B88EDC18470684034F9BFC94887751E3"
+msgid "Живая основа всякого зелья.\r\nЧистая студёная вода из лесного родника, взятая до восхода. Без неё травам не в чем раскрыть силу.\r\nТакую «живую» воду брали для отваров и заговоров. Наливай её первой."
+msgstr ""
+
+#. Key:	5D32967942DFF42F068599B20D6F4FE4
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Родниковая вода.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Родниковая вода.DisplayName
+msgctxt ",5D32967942DFF42F068599B20D6F4FE4"
+msgid "Родниковая вода"
+msgstr ""
+
+#. Key:	5D3DCBAC45A0747FA6AFE8AADDC31780
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Склянка.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Склянка.Description
+msgctxt ",5D3DCBAC45A0747FA6AFE8AADDC31780"
+msgid "Сосуд для готового зелья.\r\nМутноватая склянка с притёртой пробкой. Без неё отвар не унести и не отдать через окошко.\r\nЗелья держали в стекле и глине, чтобы они не выдохлись."
+msgstr ""
+
+#. Key:	E757CB2B43AB053F150DB791432A8A3F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Склянка.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Склянка.DisplayName
+msgctxt ",E757CB2B43AB053F150DB791432A8A3F"
+msgid "Склянка"
+msgstr ""
+
+#. Key:	8DCEE5B048B962D6FD66C1BCDA4C7658
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Травяной отвар.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Травяной отвар.Description
+msgctxt ",8DCEE5B048B962D6FD66C1BCDA4C7658"
+msgid "Готовое зелье, сваренное по уму.\r\nТёмный душистый отвар, что томился в котле. Если травы правильные — поднимет хворого на ноги.\r\nВ таком деле важен состав, в каком травы шли в котёл."
+msgstr ""
+
+#. Key:	09890B514860A0D85819F8AC83CFF13E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Травяной отвар.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Травяной отвар.DisplayName
+msgctxt ",09890B514860A0D85819F8AC83CFF13E"
+msgid "Травяной отвар"
+msgstr ""
+
+#. Key:	D46F21E84217BA8C32F15A9BB5B28F7B
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква.Description
+msgctxt ",D46F21E84217BA8C32F15A9BB5B28F7B"
+msgid "Те кто могут себе ее позволить - хранятее  в подполе, считается, что это к достатку в доме. Мякоть пекут в печи, едят с мёдом или просто так. Сладкая, сытная, приземляет разгулявшиеся нервы. Если волосы лоснятся нездоровым блеском или на голове появился жирный начёс — тыквенным соком ополаскивают голову."
+msgstr ""
+
+#. Key:	96D9632647BDDD179F5204AE5AC40538
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква.DisplayName
+msgctxt ",96D9632647BDDD179F5204AE5AC40538"
+msgid "Тыква"
+msgstr ""
+
+#. Key:	EFBF9A5148FF25D537D347B4FC73AE00
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Р.Description
+msgctxt ",EFBF9A5148FF25D537D347B4FC73AE00"
+msgid "Идёт в отвар — мякоть режут на куски и варят до мягкости. Получается густой напиток. Если на ногах выступают мелкие красные точки и зудят — отваром обтирают голени."
+msgstr ""
+
+#. Key:	61160F9045213CF41F8C38A478EACCCB
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Р.DisplayName
+msgctxt ",61160F9045213CF41F8C38A478EACCCB"
+msgid "Ломтики тыквы"
+msgstr ""
+
+#. Key:	010192FA400D03A579379C91D10372AF
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Т.Description
+msgctxt ",010192FA400D03A579379C91D10372AF"
+msgid " Получается густая оранжевая масса. Если на теле выступает мелкая сыпь и тело невыносимо зудит — кашицу наносят на зудящие места."
+msgstr ""
+
+#. Key:	FB2FA7314DE047FC38F99A8236529F8F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Тыква_Т.DisplayName
+msgctxt ",FB2FA7314DE047FC38F99A8236529F8F"
+msgid "Толчёная тыква"
+msgstr ""
+
+#. Key:	5F787B8948C057128E1802AB1620EE57
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок.Description
+msgctxt ",5F787B8948C057128E1802AB1620EE57"
+msgid "Целый чеснок вешают над дверью или кроватями — считается, что он отгоняет хвори и дурной глаз. В доме больного чеснок должен быть всегда. Едкий дух его крепок, проходит сквозь любую затычку и пробирает до мозга костей. Если голова болит так, что невозможно думать — чеснок надо поставить на подоконник на ночь, чтобы вытягивал хворь на себя."
+msgstr ""
+
+#. Key:	FABFF46D4262FDDA2DD36690E8AA477E
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок.DisplayName
+msgctxt ",FABFF46D4262FDDA2DD36690E8AA477E"
+msgid "Чеснок"
+msgstr ""
+
+#. Key:	A1AD41D54E23F6D98561C8B6C2231B5B
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Р.Description
+msgctxt ",A1AD41D54E23F6D98561C8B6C2231B5B"
+msgid "Резаный чеснок сразу пускает сок, жгучий и острый. Дольки бросают в горячую похлёбку, когда нужно быстро прогреть простуженную голову. Действует сразу, но и держится недолго — на один день. Если нос перестал дышать или в голове стоит свинцовая тяжесть — резаный чеснок в отваре прочистит всё насквозь."
+msgstr ""
+
+#. Key:	A8C463CD490FC37ED27DB6960667E4D9
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Р.DisplayName
+msgctxt ",A8C463CD490FC37ED27DB6960667E4D9"
+msgid "Ломтики чеснока"
+msgstr ""
+
+#. Key:	92128E6F4EFD9FC9C326D28D705C12DE
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Т.Description
+msgctxt ",92128E6F4EFD9FC9C326D28D705C12DE"
+msgid "Толчёный чеснок превращается в жгучую кашицу. Её заворачивают в тряпку и прикладывают к вискам при сильной мигрени. Если лицо бледнеет, а под глазами ложатся тени — кашицу накладывают на щёки. Запах у неё такой, что и хворь отойдёт, и носоглотку прожжёт насквозь."
+msgstr ""
+
+#. Key:	A2F469374122417D3F758CB7104C0FCC
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Чеснок_Т.DisplayName
+msgctxt ",A2F469374122417D3F758CB7104C0FCC"
+msgid "Толчёный чеснок"
+msgstr ""
+
+#. Key:	26AD98864913E3C6241A7F9D700B18B5
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка.Description
+msgctxt ",26AD98864913E3C6241A7F9D700B18B5"
+msgid "Целую шишку подсушивают и кладут под подушку — от неё перестаёшь храпеть, сон становится спокойным. Если ногти на руках крошатся или меняют форму — отваром из шишек мажут больные места."
+msgstr ""
+
+#. Key:	E8FAC99E4D6C6CA7B77BC99BF0FA84D1
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка.DisplayName
+msgctxt ",E8FAC99E4D6C6CA7B77BC99BF0FA84D1"
+msgid "Шишка"
+msgstr ""
+
+#. Key:	91359638414B23897BB277B592F2F605
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Р.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Р.Description
+msgctxt ",91359638414B23897BB277B592F2F605"
+msgid "Расщеплённая шишка сразу отдаёт смолистый дух, и если белки глаз наливаются кровью — отваром промывают глаза."
+msgstr ""
+
+#. Key:	B84801CA4FDE3637ABFC358C7C63076F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Р.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Р.DisplayName
+msgctxt ",B84801CA4FDE3637ABFC358C7C63076F"
+msgid "Ломтики шишки"
+msgstr ""
+
+#. Key:	C0C8E77D4576DC98E34DD8956592D94B
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Т.Description
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Т.Description
+msgctxt ",C0C8E77D4576DC98E34DD8956592D94B"
+msgid "Превращается в мелкую смолистую пыль. Если веки отекают — пыль добавляют в отвар и мажут на ночь. "
+msgstr ""
+
+#. Key:	4DCE04CA469E0221449256BC175DB56F
+#. SourceLocation:	/Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Т.DisplayName
+#: /Game/Data_New/Ingredient/NEW/DT_IngredientsNEW.DT_IngredientsNEW.Шишка_Т.DisplayName
+msgctxt ",4DCE04CA469E0221449256BC175DB56F"
+msgid "Измельченная шишка"
+msgstr ""
+
