@@ -50,7 +50,8 @@ void ClientsGenerator::GenerateDemonSymptoms()
     TSet<EBodyPart> occupiedParts;
     occupiedParts.Reserve(static_cast<int32>(EBodyPart::MAX));
 
-    for (int i = 0; i < demonSymptomCount; ++i) {
+    for (int i = 0; i < demonSymptomCount; ++i)
+    {
         FName chosenSymptom = SelectSymptomFromPool(occupiedParts, true);
 
         if (chosenSymptom.IsNone()) { break; }
@@ -58,17 +59,19 @@ void ClientsGenerator::GenerateDemonSymptoms()
         daySnapshot.DemonSymptoms.Add(chosenSymptom);
         occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
 
-        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom)) { Data->DemonWeight = 0.0f; }
+        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom))
+        {
+            Data->DemonWeight = gameSettings->WeightMinValue;
+        }
     }
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
+
     for (auto& unlockedSymptom : gameMetrics.SymptomMetrics)
     {
         float& currentWeight = unlockedSymptom.Value.DemonWeight;
-        if (currentWeight > 0.0f)
-        {
-            currentWeight = FMath::Min(currentWeight + recoveryRate, gameSettings->WeightMinValue);
-        }
+
+        currentWeight = currentWeight + recoveryRate;
     }
 }
 
@@ -265,9 +268,12 @@ void ClientsGenerator::FillSymptoms()
 {
     GenerateDemonSymptoms();
 
+    float recoveryRate = gameSettings->WeightRecoveryRate;
+
     for (int i = 0; i < daySnapshot.DayClients.Num(); ++i)
     {
         gameMetrics.MaxClientSymptomCount = FMath::Max(gameMetrics.MaxClientSymptomCount, daySnapshot.DayClients[i].Symptoms.Num());
+
         if (daySnapshot.DayClients[i].IsDemon)
         {
             for (int j = 0; j < demonSymptomCount; ++j)
@@ -281,33 +287,47 @@ void ClientsGenerator::FillSymptoms()
         else
         {
             GenerateSymptomsForClient(daySnapshot.DayClients[i]);
+
+            for (auto& unlockedSymptom : gameMetrics.SymptomMetrics)
+            {
+                float& currentWeight = unlockedSymptom.Value.Weight;
+                currentWeight = currentWeight + recoveryRate;
+            }
         }
     }
 }
 
-void ClientsGenerator::GenerateSymptomsForClient(FClient& client) {
+void ClientsGenerator::GenerateSymptomsForClient(FClient& client)
+{
     TSet<EBodyPart> occupiedParts;
     occupiedParts.Reserve(static_cast<int32>(EBodyPart::MAX));
 
-    for (int i = 0; i < client.Symptoms.Num(); ++i) {
+    if (daySnapshot.DemonSymptoms.Num() > 0)
+    {
+        int32 RandomDemonIdx = FMath::RandRange(0, daySnapshot.DemonSymptoms.Num() - 1);
+        FName BlockedDemonSymptom = daySnapshot.DemonSymptoms[RandomDemonIdx];
+
+        if (FSymptomWithWeightsData* DemonData = gameMetrics.SymptomMetrics.Find(BlockedDemonSymptom))
+        {
+            occupiedParts.Add(DemonData->BodyPart);
+        }
+    }
+
+    for (int i = 0; i < client.Symptoms.Num(); ++i)
+    {
         FName chosenSymptom = SelectSymptomFromPool(occupiedParts, false);
 
-        if (chosenSymptom.IsNone()) {
+        if (chosenSymptom.IsNone())
+        {
             break;
         }
 
         occupiedParts.Add(gameMetrics.SymptomMetrics[chosenSymptom].BodyPart);
         client.Symptoms[i] = chosenSymptom;
 
-        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom)) { Data->Weight = 0.0f; }
-    }
-
-    float recoveryRate = gameSettings->WeightRecoveryRate;
-    for (auto& unlockedSymptom : gameMetrics.SymptomMetrics)
-    {
-        float& currentWeight = unlockedSymptom.Value.Weight;
-        if (currentWeight > 0.0f) {
-            currentWeight = FMath::Min(currentWeight + recoveryRate, gameSettings->WeightMinValue);
+        if (FSymptomWithWeightsData* Data = gameMetrics.SymptomMetrics.Find(chosenSymptom))
+        {
+            Data->Weight = gameSettings->WeightMinValue;
         }
     }
 }
