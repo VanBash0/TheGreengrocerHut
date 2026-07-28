@@ -559,6 +559,7 @@ void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContex
         if (Compare.IsPoison)
         {
             OutResult.Result = EPotionResult::Demon_Poisoned;
+            OutResult.IsPotionGood = true;
         }
         else if (Compare.PotionMatchScore >= 0.5f)
         {
@@ -578,6 +579,7 @@ void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContex
         else if (Compare.ValidFraction >= 0.5f)
         {
             OutResult.Result = EPotionResult::Human_Healed;
+            OutResult.IsPotionGood = true;
         }
         else
         {
@@ -601,7 +603,7 @@ void UIngredientFunctionLibary::CalculateClientResult(const UObject* WorldContex
         break;
 
     case EPotionResult::Human_NotHealed:
-        delta *= (1.f - Compare.ValidFraction);
+        delta *= dayMultiplier * gameMetrics.KillingFactor * (1.f - Compare.ValidFraction);
         break;
 
     case EPotionResult::Human_Poisoned:

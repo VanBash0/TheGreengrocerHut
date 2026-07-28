@@ -91,6 +91,9 @@ struct FClientResult
     // Ключ = Priority, значение = совпал ли этот уровень целиком.
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     TMap<int32, bool> TierMatchResults;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Client Result")
+    bool IsPotionGood = false;
 };
 
 USTRUCT(BlueprintType)
