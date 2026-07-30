@@ -111,6 +111,46 @@ void UGameLoop::IncrementCurrentClient()
                 [this]()
                 {
                     currentClientIndex_++;
+
+                    // Логирование симптомов
+                    if (_currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_))
+                    {
+                        const FClient& Client = _currentDaySnapshot.DayClients[currentClientIndex_];
+
+                        FString SymptomsString;
+                        for (const FName& Symptom : Client.Symptoms)
+                        {
+                            SymptomsString += Symptom.ToString() + TEXT(", ");
+                        }
+
+                        if (!SymptomsString.IsEmpty())
+                        {
+                            SymptomsString.LeftChopInline(2); // убрать последнюю ", "
+                        }
+                        else
+                        {
+                            SymptomsString = TEXT("No symptoms");
+                        }
+
+                        // Print String
+                        if (GEngine)
+                        {
+                            GEngine->AddOnScreenDebugMessage(
+                                -1,
+                                8.f,
+                                FColor::Green,
+                                FString::Printf(TEXT("Client %d: %s"),
+                                    currentClientIndex_,
+                                    *SymptomsString)
+                            );
+                        }
+
+                        // И в Output Log тоже
+                        UE_LOG(LogTemp, Warning, TEXT("Client %d symptoms: %s"),
+                            currentClientIndex_,
+                            *SymptomsString);
+                    }
+
                     SetNewState(EGameState::SpawnClient);
                 },
                 SpawnDelay,
