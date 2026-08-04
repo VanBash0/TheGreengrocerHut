@@ -199,6 +199,9 @@ public:
     static void GetBasePotions(const UObject* WorldContextObject, const int& MaxClientSymptomCount, const bool& HasDemonAppeared, TArray<FName>& BasePotions);
 
     UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
+    static void GetAllIngredientsForDay(const UObject* WorldContextObject, const UGameLoop* GameLoop, TArray<FName>& IngredientNames);
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient", meta = (WorldContext = "WorldContextObject"))
     static void GetBasePotionBySumptomCount(const UObject* WorldContextObject, const UGameSettings* GameSettings, const int& ClientSymptomCount, FName& Potion);
 
     // ============================================================

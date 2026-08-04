@@ -1082,3 +1082,21 @@ void UIngredientFunctionLibary::GetNewIngredientsOfToday(const UObject* WorldCon
         }
     }
 }
+
+void UIngredientFunctionLibary::GetAllIngredientsForDay(const UObject* WorldContextObject, const UGameLoop* GameLoop, TArray<FName>& IngredientNames)
+{
+    IngredientNames.Empty();
+    
+    FDaySnapshot daySnapshot;
+    GameLoop->GetDaySnapshot(daySnapshot);
+    TArray<FName> ingredientRowNames;
+    GetIngredientsBySymptoms(WorldContextObject, daySnapshot.DaySymptoms, ingredientRowNames);
+
+    FGameMetrics gameMetrics;
+    GameLoop->GetGameMetrics(gameMetrics);
+    TArray<FName> basePotions;
+    GetBasePotions(WorldContextObject, gameMetrics.MaxClientSymptomCount, gameMetrics.HasDemonPrevious, basePotions);
+
+    IngredientNames.Append(basePotions);
+    IngredientNames.Append(ingredientRowNames);
+}
