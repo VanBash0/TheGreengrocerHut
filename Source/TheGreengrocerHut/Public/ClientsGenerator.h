@@ -26,6 +26,7 @@ private:
     void GenerateSymptomsForClient(FClient& client);
     bool TryHandleTutorialDay();
     FName SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon);
+    void EnsureSymptomsDontMatchDemon(FClient& client);
 
     FGameMetrics gameMetrics;
     FDaySnapshot daySnapshot;

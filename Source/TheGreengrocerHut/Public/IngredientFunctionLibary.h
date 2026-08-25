@@ -182,6 +182,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Cache|Symptoms", meta = (WorldContext = "WorldContextObject"))
     static TArray<FSymptomRow> GetAllSymptoms(const UObject* WorldContextObject);
 
+    UFUNCTION(BlueprintCallable, Category = "Ingredients")
+    static void GetAllSymptomsWithRowNames(const UObject* WorldContextObject, TMap<FName, FSymptomRow>& OutSymptoms);
+
     UFUNCTION(BlueprintCallable, Category = "Cache|Symptoms", meta = (WorldContext = "WorldContextObject"))
     static const FSymptomRow& GetSymptomByRowName(const UObject* WorldContextObject, FName RowName, bool& bFound);
 

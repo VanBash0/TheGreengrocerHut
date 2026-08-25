@@ -76,9 +76,19 @@ public:
     int MaxClients;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Clients",
+        meta = (DisplayName = "Min Demons", ToolTip = "Минимальное количество демонов в день",
+            ClampMin = "1", UIMin = "1"))
+    int MinDemons;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Clients",
         meta = (DisplayName = "Max Demons", ToolTip = "Максимальное количество демонов в день",
             ClampMin = "1", UIMin = "1"))
     int MaxDemons;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Clients",
+        meta = (DisplayName = "Demon Continue Chance", ToolTip = "Шанс добавления еще одного демона",
+            ClampMin = "0.0", UIMin = "1.0"))
+    float DemonContinueChance;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
         meta = (DisplayName = "Min Symptoms", ToolTip = "Минимальное количество симптомов у клиента",
@@ -93,6 +103,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
         meta = (DisplayName = "Error", ToolTip = "Погрешность (на сколько симптомов может максимум отклониться количество симптомов у пациента/демона от мат. ожидания симптомов у всех пациентов за день)"))
     float Error;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evaluation|Potion Thresholds")
+    float HumanHealThreshold = 0.5f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evaluation|Potion Thresholds")
+    float DemonStealThreshold = 0.5f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms|Weights",
         meta = (DisplayName = "Weight Recovery Rate", ToolTip = "Величина, на которую восстанавливается вес симптома, если он не выпадает",

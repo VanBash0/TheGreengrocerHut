@@ -26,8 +26,6 @@ enum class EPotionResult : uint8
     Demon_GivenGoodPotion
 };
 
-// Чистый результат сравнения поданного зелья с каноническим рецептом.
-// Не знает ничего про демонов/людей/дельты заражения — только "что дали" и "насколько верно".
 USTRUCT(BlueprintType)
 struct FPotionCompareResult
 {
@@ -38,17 +36,11 @@ struct FPotionCompareResult
     TArray<FName> GivenIngredients;
 
     // Валидность каждого ингредиента из GivenIngredients (по индексу, для подсветки в UI).
-    // Валидность i>0 считается только если весь рецепт совпал целиком (см. PotionMatchScore == 1.0).
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     TArray<bool> IngredientValidity;
 
-    // Насколько поданные ингредиенты (включая базу) совпадают с каноническим рецептом,
-    // сгруппированным по AddPriority. Между уровнями приоритета порядок важен,
-    // ВНУТРИ уровня — не важен (сравнение как мультимножество). 0.0..1.0
-    UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
-    float PotionMatchScore = 0.f;
-
-    // Доля валидных ингредиентов по итогам проверки неубывающего порядка приоритетов.
+    // Единая оценка зелья 0.0..1.0 — доля ингредиентов, положенных на своё место
+    // с соблюдением неубывающего порядка приоритетов (-1 База, 0 Основной, 1 Дополнительный, 2 Связывающий).
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     float ValidFraction = 0.f;
 
@@ -83,17 +75,50 @@ struct FClientResult
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     TArray<bool> IngredientValidity;
 
+    // Единая оценка зелья 0.0..1.0
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
-    float PotionMatchScore = 0.f;
+    float ValidFraction = 0.f;
 
-    // Совпадение по каждому уровню приоритета — прокинуто из FPotionCompareResult,
-    // чтобы в BP не пришлось отдельно дёргать ComparePotionToRecipe для UI-фидбека.
-    // Ключ = Priority, значение = совпал ли этот уровень целиком.
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     TMap<int32, bool> TierMatchResults;
 
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     bool IsPotionGood = false;
+
+    FString ToString() const
+    {
+        TArray<FString> IngredientStrings;
+        IngredientStrings.Reserve(GivenIngredients.Num());
+        for (const FName& Name : GivenIngredients)
+        {
+            IngredientStrings.Add(Name.ToString());
+        }
+
+        FString IngredientsStr = FString::Join(IngredientStrings, TEXT(", "));
+
+        FString ValidityStr;
+        for (bool bValid : IngredientValidity)
+        {
+            ValidityStr += bValid ? TEXT("1 ") : TEXT("0 ");
+        }
+
+        FString TierStr;
+        for (const auto& Pair : TierMatchResults)
+        {
+            TierStr += FString::Printf(TEXT("[%d:%s] "), Pair.Key, Pair.Value ? TEXT("true") : TEXT("false"));
+        }
+
+        return FString::Printf(
+            TEXT("Result=%s, Delta=%.2f, IsDemon=%s, Ingredients=[%s], Validity=[%s], Score=%.2f, Tiers=[%s], IsGood=%s"),
+            *UEnum::GetValueAsString(Result),
+            DeltaInfectionRate,
+            Client.IsDemon ? TEXT("true") : TEXT("false"),
+            *IngredientsStr,
+            *ValidityStr,
+            ValidFraction,
+            *TierStr,
+            IsPotionGood ? TEXT("true") : TEXT("false"));
+    }
 };
 
 USTRUCT(BlueprintType)
