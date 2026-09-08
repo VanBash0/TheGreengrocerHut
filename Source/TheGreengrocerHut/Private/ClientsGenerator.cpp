@@ -249,7 +249,9 @@ void ClientsGenerator::InitializeClients()
 
     int peopleNum = clientsNum - demonsNum;
 
-    float expectedValue = gameSettings->MinSymptoms + (gameSettings->MaxSymptoms - gameSettings->MinSymptoms) * (1 - infectionRateNormalized);
+    const float symptomInfluence = FMath::Clamp(gameSettings->SymptomInfectionInfluence, 0.0f, 1.0f);
+    const float smoothedInfectionRate = 0.5f + (infectionRateNormalized - 0.5f) * symptomInfluence;
+    float expectedValue = gameSettings->MinSymptoms + (gameSettings->MaxSymptoms - gameSettings->MinSymptoms) * (1 - smoothedInfectionRate);
 
     TSet<EBodyPart> distinctUnlockedParts;
     for (const auto& pair : gameMetrics.SymptomMetrics)
@@ -285,7 +287,7 @@ void ClientsGenerator::InitializeClients()
 #if !UE_BUILD_SHIPPING
     if (maxAvailableSymptoms < gameSettings->MinSymptoms)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] День %d: доступно только %d уникальных BodyPart, а MinSymptoms=%d. Баланс новых симптомов не поспевает за сложностью."), gameMetrics.DayNumber, maxAvailableSymptoms, gameSettings->MinSymptoms);
+        UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] Р”РµРЅСЊ %d: РґРѕСЃС‚СѓРїРЅРѕ С‚РѕР»СЊРєРѕ %d СѓРЅРёРєР°Р»СЊРЅС‹С… BodyPart, Р° MinSymptoms=%d. Р‘Р°Р»Р°РЅСЃ РЅРѕРІС‹С… СЃРёРјРїС‚РѕРјРѕРІ РЅРµ РїРѕСЃРїРµРІР°РµС‚ Р·Р° СЃР»РѕР¶РЅРѕСЃС‚СЊСЋ."), gameMetrics.DayNumber, maxAvailableSymptoms, gameSettings->MinSymptoms);
     }
 #endif
 }
@@ -392,8 +394,8 @@ void ClientsGenerator::FillSymptoms()
 {
     GenerateDemonSymptoms();
 
-    // demonSymptomCount мог быть посчитан оптимистично,
-    // а GenerateDemonSymptoms мог реально набрать меньше — синхронизируем.
+    // demonSymptomCount РјРѕРі Р±С‹С‚СЊ РїРѕСЃС‡РёС‚Р°РЅ РѕРїС‚РёРјРёСЃС‚РёС‡РЅРѕ,
+    // Р° GenerateDemonSymptoms РјРѕРі СЂРµР°Р»СЊРЅРѕ РЅР°Р±СЂР°С‚СЊ РјРµРЅСЊС€Рµ вЂ” СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµРј.
     demonSymptomCount = daySnapshot.DemonSymptoms.Num();
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
@@ -402,8 +404,8 @@ void ClientsGenerator::FillSymptoms()
     {
         if (daySnapshot.DayClients[i].IsDemon)
         {
-            // Обрезаем массив демона под реально собранный список DemonSymptoms —
-            // никаких "хвостов" из None.
+            // РћР±СЂРµР·Р°РµРј РјР°СЃСЃРёРІ РґРµРјРѕРЅР° РїРѕРґ СЂРµР°Р»СЊРЅРѕ СЃРѕР±СЂР°РЅРЅС‹Р№ СЃРїРёСЃРѕРє DemonSymptoms вЂ”
+            // РЅРёРєР°РєРёС… "С…РІРѕСЃС‚РѕРІ" РёР· None.
             daySnapshot.DayClients[i].Symptoms.SetNum(demonSymptomCount);
             for (int j = 0; j < demonSymptomCount; ++j)
             {
@@ -466,7 +468,7 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 {
     if (client.Symptoms.Num() == 0 || client.Symptoms.Num() != daySnapshot.DemonSymptoms.Num())
     {
-        return; // разное количество симптомов — совпасть как множество не может
+        return; // СЂР°Р·РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРїС‚РѕРјРѕРІ вЂ” СЃРѕРІРїР°СЃС‚СЊ РєР°Рє РјРЅРѕР¶РµСЃС‚РІРѕ РЅРµ РјРѕР¶РµС‚
     }
 
     TSet<FName> clientSet(client.Symptoms);
@@ -474,10 +476,10 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 
     if (clientSet.Num() != demonSet.Num() || clientSet.Difference(demonSet).Num() != 0)
     {
-        return; // не совпадает — всё ок
+        return; // РЅРµ СЃРѕРІРїР°РґР°РµС‚ вЂ” РІСЃС‘ РѕРє
     }
 
-    // Полное совпадение — подменяем один случайный симптом клиента на что-то другое.
+    // РџРѕР»РЅРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ вЂ” РїРѕРґРјРµРЅСЏРµРј РѕРґРёРЅ СЃР»СѓС‡Р°Р№РЅС‹Р№ СЃРёРјРїС‚РѕРј РєР»РёРµРЅС‚Р° РЅР° С‡С‚Рѕ-С‚Рѕ РґСЂСѓРіРѕРµ.
     TSet<EBodyPart> occupiedParts;
     for (const FName& Symptom : client.Symptoms)
     {
@@ -492,7 +494,7 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 
     if (const FSymptomWithWeightsData* OldData = gameMetrics.SymptomMetrics.Find(OldSymptom))
     {
-        occupiedParts.Remove(OldData->BodyPart); // освобождаем часть тела, чтобы можно было выбрать замену
+        occupiedParts.Remove(OldData->BodyPart); // РѕСЃРІРѕР±РѕР¶РґР°РµРј С‡Р°СЃС‚СЊ С‚РµР»Р°, С‡С‚РѕР±С‹ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ РІС‹Р±СЂР°С‚СЊ Р·Р°РјРµРЅСѓ
     }
 
     FName NewSymptom = SelectSymptomFromPool(occupiedParts, false);

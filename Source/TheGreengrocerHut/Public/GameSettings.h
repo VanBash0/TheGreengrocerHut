@@ -77,7 +77,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Clients",
         meta = (DisplayName = "Min Demons", ToolTip = "Минимальное количество демонов в день",
-            ClampMin = "1", UIMin = "1"))
+            ClampMin = "0", UIMin = "0"))
     int MinDemons;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Clients",
@@ -103,6 +103,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
         meta = (DisplayName = "Error", ToolTip = "Погрешность (на сколько симптомов может максимум отклониться количество симптомов у пациента/демона от мат. ожидания симптомов у всех пациентов за день)"))
     float Error;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
+        meta = (DisplayName = "Symptom Infection Influence", ToolTip = "????????? ?????? infection rate ?????? ?? ??????? ?????????? ?????????. 0 ? ??????? ?????????, 1 ? ???????????? ?????? ???????? infection rate.",
+            ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    float SymptomInfectionInfluence = 0.35f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evaluation|Potion Thresholds")
     float HumanHealThreshold = 0.5f;
