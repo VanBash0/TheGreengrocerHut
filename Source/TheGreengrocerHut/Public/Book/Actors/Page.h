@@ -28,11 +28,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
-	void InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPageNumber, int32 InPageIndex, bool bInIsRightSide, TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL);
+	void InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPageNumber, bool bInIsRightSide);
 
-protected:
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
-	void InitializeWidgets(TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL);
+	void InitializeWidgets(int32 PageIndex, TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")

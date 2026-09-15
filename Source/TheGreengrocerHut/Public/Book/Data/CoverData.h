@@ -27,6 +27,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimSequence> AS_Fade_Cover;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UPoseAsset> PoseCloseRightSide;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UPoseAsset> PoseCloseLeftSide;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Detect")
 	FName BoneToDetect_Side_R;
 

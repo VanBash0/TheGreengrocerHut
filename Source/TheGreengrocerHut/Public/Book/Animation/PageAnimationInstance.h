@@ -4,7 +4,9 @@
 #include "Animation/AnimInstance.h"
 #include "PageAnimationInstance.generated.h"
 
-UCLASS()
+class APage;
+
+UCLASS(BlueprintType)
 class THEGREENGROCERHUT_API UPageAnimationInstance : public UAnimInstance
 {
 	GENERATED_BODY()

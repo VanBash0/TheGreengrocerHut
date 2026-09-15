@@ -54,12 +54,11 @@ void APage::BeginPlay()
 	}
 }
 
-void APage::InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPageNumber, int32 InPageIndex, bool bInIsRightSide, TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL)
+void APage::InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPageNumber, bool bInIsRightSide)
 {
 	OwnerBook = InOwnerBook;
 	PageData = InPageData;
 	PageNumber = InPageNumber;
-	PageIndex = InPageIndex;
 	bOnRightSide = bInIsRightSide;
 
 	bIsFlippingProcess = false;
@@ -87,12 +86,12 @@ void APage::InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPa
 			MID_Page = Mesh->CreateDynamicMaterialInstance(0, PageData->MaterialVariantion[materialIndex]);
 		}
 	}
-
-	InitializeWidgets(InWidgetPageR, InWidgetPageL);
 }
 
-void APage::InitializeWidgets(TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL)
+void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL)
 {
+	PageIndex = InPageIndex;
+
 	if (Front && InWidgetPageR)
 	{
 		if (UBookPageBase* RightWidget = CreateWidget<UBookPageBase>(GetWorld(), InWidgetPageR))
@@ -151,7 +150,7 @@ void APage::ReleasePage()
 	bIsHover = false;
 	bIsFlippingProcess = false;
 
-	InitializeWidgets(nullptr, nullptr);
+	InitializeWidgets(0, nullptr, nullptr);
 	HidePage();
 
 	if (OwnerBook)
@@ -167,7 +166,7 @@ void APage::ReleasePage()
 
 void APage::PageActionOnClick()
 {
-	if (OwnerBook)
+	if (OwnerBook && !OwnerBook->bIsFlippingSequenceActive)
 	{
 		if (bOnRightSide)
 		{
@@ -190,7 +189,7 @@ void APage::ShowPage()
 void APage::HidePage()
 {
 	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
+	SetPageActive(false);
 }
 
 void APage::SetPageActive(bool bActiveClicked)
@@ -233,7 +232,7 @@ void APage::CheckHovering()
 		}
 		else
 		{
-			UnHoverPage();
+			bIsHover = false;
 		}
 	}
 }
