@@ -38,14 +38,14 @@ public:
 	void ReleasePage();
 
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
-	void PageActionOnClick();
+	bool PageActionOnClick();
 
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
 	void OnFinish();
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Base|Actions")
-	void FlipPage();
+	bool FlipPage();
 
 	UFUNCTION(BlueprintCallable, Category = "Base|Actions")
 	void HoverPage();

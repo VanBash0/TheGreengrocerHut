@@ -46,6 +46,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Page|Control")
 	void GoToPage(int32 TargetPage);
 
+protected:
+	UFUNCTION(BlueprintPure, Category = "Page|Control")
+	int32 GetNextPageNumber(int32 From) const;
+
+	UFUNCTION(BlueprintPure, Category = "Page|Control")
+	int32 GetPreviousPageNumber(int32 From) const;
+
+	void SetCurrentPage(int32 NewPage);
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Page|Metrics")
 	void PageFlipProgress(float& Progress);
@@ -56,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Page|Pool|Helpers")
 	void GetPageWidgetData(int32 PageN, int32& PageIndex, TSubclassOf<UBookPageBase>& Widget_R, TSubclassOf<UBookPageBase>& Widget_L);
+
+	UFUNCTION(BlueprintPure, Category = "Page|Pool|Helpers")
+	bool ShouldFullyInitializePage(int32 PageN) const;
 
 	UFUNCTION(BlueprintPure, Category = "Page|Pool|Helpers")
 	bool IsPageNumberShowed(int32 PageN);
@@ -109,11 +121,7 @@ public:
 	void FlipToTargetPageProcess();
 
 	UFUNCTION(BlueprintCallable, Category = "Page|Fade")
-	void HandleLastPageFlipped();
-
-public:
-	UFUNCTION(BlueprintCallable, Category = "Page|Event")
-	void OnPageStartFlipping();
+	void TryFinishFlipSequence();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
@@ -141,6 +149,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
 	int32 FlippingShowInitializedPages;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
+	float FlipOverlapDelay = 0.12f;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
+	int32 FlippingWindowSize = 10;
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Runtime|Flags")
 	bool bCanFlipPage;
@@ -163,19 +177,22 @@ public:
 	int32 FinalTargetPage;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
-	bool bIsFlippingSequenceActive;
+	int32 SequenceStartPage;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
-	TArray<int32> TargetAnimationPages;
+	bool bIsFlippingSequenceActive;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
 	int32 TargetAnimationPagesTotal;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
-	TObjectPtr<APage> LastFlippedPage;
+	int32 PreSequenceWindowSize;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
-	FTimerHandle FlipSequenceTimerHandle;
+	FTimerHandle FlipOverlapTimerHandle;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime|PageFlipping")
+	FTimerHandle FlipSettleTimerHandle;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Page|Pool")

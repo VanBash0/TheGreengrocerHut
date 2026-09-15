@@ -37,6 +37,11 @@ void APage::OnFinish()
 	bOnRightSide = !bOnRightSide;
 	bIsFlippingProcess = false;
 
+	if (OwnerBook)
+	{
+		OwnerBook->UpdatePagesActivation();
+	}
+
 	CheckHovering();
 
 	OnFinishFlip.Broadcast();
@@ -77,7 +82,7 @@ void APage::InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPa
 			{
 				Mesh->SetSkeletalMesh(PageData->SM_Page);
 			}
-			
+
 			int32 materialIndex = PageData->RandomSeedForSelectMaterial % 3;
 			materialIndex *= PageNumber / 2;
 			materialIndex += PageData->RandomSeedForSelectMaterial / 11;
@@ -117,26 +122,26 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 	}
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
 		{
-			if (MID_Page)
-			{
-				if (Front)
+			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
 				{
-					MID_Page->SetTextureParameterValue(TEXT("FrontSide"), Front->GetRenderTarget());
-				}
-				
-				if (Back)
-				{
-					MID_Page->SetTextureParameterValue(TEXT("BackSide"), Back->GetRenderTarget());
-				}
-			}
+					if (MID_Page)
+					{
+						if (Front)
+						{
+							MID_Page->SetTextureParameterValue(TEXT("FrontSide"), Front->GetRenderTarget());
+						}
 
-			Front->SetVisibility(false);
-			Back->SetVisibility(false);
+						if (Back)
+						{
+							MID_Page->SetTextureParameterValue(TEXT("BackSide"), Back->GetRenderTarget());
+						}
+					}
+
+					Front->SetVisibility(false);
+					Back->SetVisibility(false);
+				}));
 		}));
-	}));
 }
 
 void APage::ReleasePage()
@@ -164,21 +169,22 @@ void APage::ReleasePage()
 	OnRelease.Broadcast();
 }
 
-void APage::PageActionOnClick()
+bool APage::PageActionOnClick()
 {
-	if (OwnerBook && !OwnerBook->bIsFlippingSequenceActive)
-	{
-		if (bOnRightSide)
-		{
-			OwnerBook->NextPage();
-		}
-		else
-		{
-			OwnerBook->PreviousPage();
-		}
+	if (!OwnerBook) { return false; }
 
-		OwnerBook->UpdateWindow();
+	const int32 PageNumberBefore = OwnerBook->CurPageNumber;
+
+	if (bOnRightSide)
+	{
+		OwnerBook->NextPage();
 	}
+	else
+	{
+		OwnerBook->PreviousPage();
+	}
+
+	return OwnerBook->CurPageNumber != PageNumberBefore;
 }
 
 void APage::ShowPage()
@@ -200,11 +206,23 @@ void APage::SetPageActive(bool bActiveClicked)
 	}
 }
 
-void APage::FlipPage()
+bool APage::FlipPage()
 {
+	if (bIsFlippingProcess) { return false; }
+
 	bIsFlippingProcess = true;
 
+	if (!PageActionOnClick())
+	{
+		bIsFlippingProcess = false;
+		return false;
+	}
+
+	SetPageActive(false);
+
 	OnClick.Broadcast();
+
+	return true;
 }
 
 void APage::HoverPage()
@@ -239,7 +257,7 @@ void APage::CheckHovering()
 
 void APage::HandleClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
-	if (!bIsFlippingProcess && bIsHover)
+	if (bIsHover && OwnerBook && !OwnerBook->bIsFlippingSequenceActive)
 	{
 		FlipPage();
 	}

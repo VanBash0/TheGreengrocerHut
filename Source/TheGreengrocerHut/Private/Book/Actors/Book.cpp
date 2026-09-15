@@ -101,85 +101,72 @@ void ABook::OnCloseBook_Implementation()
 	UpdateWindow();
 }
 
+int32 ABook::GetNextPageNumber(int32 From) const
+{
+	if (From == -1) { return 0; }
+	if (From == TotalPageCount) { return TotalPageCount + 1; }
+
+	return From + 2;
+}
+
+int32 ABook::GetPreviousPageNumber(int32 From) const
+{
+	if (From > TotalPageCount) { return TotalPageCount; }
+	if (From == 0) { return -1; }
+
+	return From - 2;
+}
+
+void ABook::SetCurrentPage(int32 NewPage)
+{
+	PrevPageNumber = CurPageNumber;
+	CurPageNumber = NewPage;
+
+	OnPageChanged.Broadcast(PrevPageNumber, CurPageNumber);
+
+	const bool bCoverTransition = (PrevPageNumber < 0 || PrevPageNumber > TotalPageCount
+		|| CurPageNumber < 0 || CurPageNumber > TotalPageCount);
+
+	if (!bCoverTransition)
+	{
+		UpdateWindow();
+	}
+}
+
 void ABook::NextPage()
 {
 	if (!bCanFlipPage) { return; }
-
 	if (CurPageNumber > TotalPageCount) { return; }
 
-	PrevPageNumber = CurPageNumber;
-
-	if (CurPageNumber == -1)
-	{
-		CurPageNumber = 0;
-	}
-	else if (CurPageNumber == TotalPageCount)
-	{
-		CurPageNumber = TotalPageCount + 1;
-	}
-	else
-	{
-		CurPageNumber += 2;
-	}
-
-	OnPageChanged.Broadcast(PrevPageNumber, CurPageNumber);
+	SetCurrentPage(GetNextPageNumber(CurPageNumber));
 }
 
 void ABook::PreviousPage()
 {
 	if (!bCanFlipPage) { return; }
-
 	if (CurPageNumber < 0) { return; }
 
-	PrevPageNumber = CurPageNumber;
-
-	if (CurPageNumber > TotalPageCount)
-	{
-		CurPageNumber = TotalPageCount;
-	}
-	else if (CurPageNumber == 0)
-	{
-		CurPageNumber = -1;
-	}
-	else
-	{
-		CurPageNumber -= 2;
-	}
-
-	OnPageChanged.Broadcast(PrevPageNumber, CurPageNumber);
+	SetCurrentPage(GetPreviousPageNumber(CurPageNumber));
 }
 
 void ABook::GoToPage(int32 TargetPage)
 {
 	if (!bCanFlipPage) { return; }
+	if (bIsFlippingSequenceActive) { return; }
+
+	if (CurPageNumber < 0 || CurPageNumber > TotalPageCount) { return; }
+
 	if (TargetPage == CurPageNumber) { return; }
 	if (TargetPage < 0 || TargetPage > TotalPageCount) { return; }
 
-	TargetAnimationPages.Empty();
-
 	FinalTargetPage = TargetPage;
+	SequenceStartPage = CurPageNumber;
+	TargetAnimationPagesTotal = FMath::Abs(TargetPage - CurPageNumber) / 2;
 
-	const int32 Dir = TargetPage > CurPageNumber ? 2 : -2;
-	const int32 TotalSlots = FMath::Abs(TargetPage - CurPageNumber) / 2;
+	PreSequenceWindowSize = CurrentWindowSize;
+	CurrentWindowSize = FMath::Max(CurrentWindowSize, FlippingWindowSize);
 
-	int32 CurRun = CurPageNumber;
-
-
-	while (CurRun != TargetPage)
-	{
-		if (Dir > 0)
-		{
-			TargetAnimationPages.Add(CurRun);
-			CurRun += Dir;
-		}
-		else
-		{
-			CurRun += Dir;
-			TargetAnimationPages.Add(CurRun);
-		}
-	}
-
-	TargetAnimationPagesTotal = TotalSlots;
+	bIsFlippingSequenceActive = true;
 
 	FlipToTargetPageProcess();
 }
@@ -205,6 +192,18 @@ void ABook::GetPageWidgetData(int32 PageN, int32& PageIndex, TSubclassOf<UBookPa
 	PageIndex = PageN;
 	Widget_R = Widget;
 	Widget_L = Widget;
+}
+
+bool ABook::ShouldFullyInitializePage(int32 PageN) const
+{
+	if (!bIsFlippingSequenceActive) { return true; }
+
+	const int32 K = FMath::Max(CurrentWindowSize / 2, FlippingShowInitializedPages);
+
+	const int32 StepsFromStart = FMath::Abs(PageN - SequenceStartPage) / 2;
+	const int32 StepsToTarget = FMath::Abs(FinalTargetPage - PageN) / 2;
+
+	return StepsFromStart < K || StepsToTarget <= K;
 }
 
 bool ABook::IsPageNumberShowed(int32 PageN)
@@ -261,7 +260,6 @@ void ABook::CreateNewPage(int32 PageN, APage*& Page)
 {
 	Page = GetWorld()->SpawnActor<APage>(PageClass ? *PageClass : APage::StaticClass());
 	Page->AttachToComponent(PageRoot, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	Page->OnClick.AddDynamic(this, &ABook::OnPageStartFlipping);
 }
 
 void ABook::InitializePage(APage*& Page, int32 PageNumber, bool bFullInit)
@@ -340,7 +338,7 @@ void ABook::CreateMissingWindowPages(int32 WindowMin, int32 WindowMax)
 		if (!IsPageNumberShowed(pageN))
 		{
 			APage* page = nullptr;
-			GetOrCreatePage(pageN, page);
+			GetOrCreatePage(pageN, page, ShouldFullyInitializePage(pageN));
 		}
 	}
 }
@@ -388,7 +386,9 @@ void ABook::UpdateOffsetPageProcess()
 		FVector A = page->GetRootComponent()->GetRelativeLocation();
 		FVector B = GetPageOffset(page->PageNumber);
 
-		page->SetActorRelativeLocation(FMath::VInterpTo(A, B, 0.05f, 7.5f));
+		float speed = page->PageNumber == PrevPageNumber - 2 || page->PageNumber == PrevPageNumber ? 1.5f : 7.5f;
+
+		page->SetActorRelativeLocation(FMath::VInterpTo(A, B, 0.05f, speed));
 	}
 }
 
@@ -404,69 +404,59 @@ void ABook::StopOffsetPageProcess()
 	}
 }
 
-void ABook::OnPageStartFlipping()
-{
-	for (const auto& page : ShowedPages)
-	{
-		page->SetPageActive(false);
-	}
-}
-
 void ABook::FlipToTargetPageProcess()
 {
-	if (TargetAnimationPages.IsEmpty()) { return; }
-
-	bIsFlippingSequenceActive = true;
-	//CurrentWindowSize = 10;
-
-	//const int32 Index = TargetAnimationPagesTotal - TargetAnimationPages.Num();
-	//const int32 K = FlippingShowInitializedPages;
-	//const bool bFullInit = (Index < K) || (Index >= TargetAnimationPagesTotal - K);
-
-	//const int32 PageN = TargetAnimationPages[0];
-	//TargetAnimationPages.RemoveAt(0);
-	
-	const int32 PageN = TargetAnimationPages[0];
-	TargetAnimationPages.RemoveAt(0);
-
-	APage* Page = GetPageByNumber(PageN);
-	if (Page == nullptr)
+	if (CurPageNumber == FinalTargetPage)
 	{
-		GetOrCreatePage(PageN, Page, true);
+		TryFinishFlipSequence();
+		return;
 	}
 
-	PrevPageNumber = CurPageNumber;
-	CurPageNumber = PageN;
-	OnPageChanged.Broadcast(PrevPageNumber, CurPageNumber);
+	const bool bGoingForward = FinalTargetPage > CurPageNumber;
 
-	if (!Page) { return; }
+	const int32 OutgoingPageNumber = bGoingForward ? CurPageNumber : CurPageNumber - 2;
 
-	Page->FlipPage();
-
-	if (!TargetAnimationPages.IsEmpty())
+	APage* OutgoingPage = GetPageByNumber(OutgoingPageNumber);
+	if (OutgoingPage == nullptr)
 	{
-		GetWorldTimerManager().SetTimer(FlipSequenceTimerHandle, this, &ABook::FlipToTargetPageProcess, 0.1f, false);
+		GetOrCreatePage(OutgoingPageNumber, OutgoingPage, ShouldFullyInitializePage(OutgoingPageNumber));
+	}
+
+	if (OutgoingPage == nullptr)
+	{
+		TryFinishFlipSequence();
+		return;
+	}
+
+	if (!OutgoingPage->FlipPage())
+	{
+		TryFinishFlipSequence();
+		return;
+	}
+
+	if (CurPageNumber != FinalTargetPage)
+	{
+		GetWorldTimerManager().SetTimer(FlipOverlapTimerHandle, this, &ABook::FlipToTargetPageProcess, FlipOverlapDelay, false);
 	}
 	else
 	{
-		LastFlippedPage = Page;
-		LastFlippedPage->OnFinishFlip.AddDynamic(this, &ABook::HandleLastPageFlipped);
+		TryFinishFlipSequence();
 	}
 }
 
-void ABook::HandleLastPageFlipped()
+void ABook::TryFinishFlipSequence()
 {
-	CurrentWindowSize = DefaultWindowSize;
+	for (const auto& page : ShowedPages)
+	{
+		if (page->bIsFlippingProcess)
+		{
+			GetWorldTimerManager().SetTimer(FlipSettleTimerHandle, this, &ABook::TryFinishFlipSequence, 0.05f, false);
+			return;
+		}
+	}
 
+	CurrentWindowSize = PreSequenceWindowSize;
 	UpdateWindow();
 
-	ReleaseOutOfWindowPages(CurPageNumber - CurrentWindowSize, CurPageNumber + CurrentWindowSize, true);
-
 	bIsFlippingSequenceActive = false;
-
-	if (LastFlippedPage)
-	{
-		LastFlippedPage->OnFinishFlip.RemoveDynamic(this, &ABook::HandleLastPageFlipped);
-		LastFlippedPage = nullptr;
-	}
 }
