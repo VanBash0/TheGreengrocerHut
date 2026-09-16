@@ -386,7 +386,8 @@ void ABook::UpdateOffsetPageProcess()
 		FVector A = page->GetRootComponent()->GetRelativeLocation();
 		FVector B = GetPageOffset(page->PageNumber);
 
-		float speed = page->PageNumber == PrevPageNumber - 2 || page->PageNumber == PrevPageNumber ? 1.5f : 7.5f;
+		const bool bWasFrontPair = (page->PageNumber == PrevPageNumber) || (page->PageNumber == PrevPageNumber - 2);
+		const float speed = bWasFrontPair ?  NearPagesOffsetSpeed : DefaultOffsetSpeed;
 
 		page->SetActorRelativeLocation(FMath::VInterpTo(A, B, 0.05f, speed));
 	}

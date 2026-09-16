@@ -144,15 +144,21 @@ public:
 	FVector PageOffsetDirLeft;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	float DefaultOffsetSpeed = 7.5f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	float NearPagesOffsetSpeed = 7.5f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	TSubclassOf<UBookPageBase> Widget;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|PageFlipping")
 	int32 FlippingShowInitializedPages;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|PageFlipping")
 	float FlipOverlapDelay = 0.12f;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Settings|PageFlipping")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|PageFlipping")
 	int32 FlippingWindowSize = 10;
 
 public:
