@@ -38,4 +38,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Detect")
 	FName BoneToDetect_Side_L;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Bookmark")
+	FName BoneToAttachBookmark_Side_R;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Bookmark")
+	FName BoneToAttachBookmark_Side_L;
 };

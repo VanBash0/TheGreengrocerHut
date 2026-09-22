@@ -14,9 +14,6 @@ class THEGREENGROCERHUT_API UPageAnimationInstance : public UAnimInstance
 public:
 	virtual void NativeInitializeAnimation() override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Page Anim")
-	TObjectPtr<APage> OwningPage;
-
 protected:
 	UFUNCTION()
 	void HandleHover(bool bIsHovered);
@@ -26,4 +23,8 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_OnFinished();
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Page Anim")
+	TObjectPtr<APage> OwningPage;
 };

@@ -16,9 +16,6 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaTimeX) override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Book Anim")
-	TObjectPtr<ABook> OwningBook;
-
 protected:
 	UFUNCTION()
 	void OnPageChanged(int32 PrevPage, int32 CurPage);
@@ -28,6 +25,10 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_OnEnd();
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Book Anim")
+	TObjectPtr<ABook> OwningBook;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Book Anim")

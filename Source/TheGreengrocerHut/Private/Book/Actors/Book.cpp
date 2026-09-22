@@ -1,7 +1,9 @@
 #include "Book/Actors/Book.h"
 #include "Book/Actors/Page.h"
+#include "Book/Actors/PageBookmark.h"
 #include "Book/Widget/BookPageBase.h"
 #include "Book/Data/BookData.h"
+#include "Engine/EngineTypes.h"
 
 ABook::ABook()
 {
@@ -9,6 +11,9 @@ ABook::ABook()
 
 	PageRoot = CreateDefaultSubobject<USceneComponent>(TEXT("PageRoot"));
 	PageRoot->SetupAttachment(RootComponent);
+
+	BookCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoolCollison"));
+	BookCollision->SetupAttachment(RootComponent);
 }
 
 void ABook::BeginPlay()
@@ -21,11 +26,13 @@ void ABook::BeginPlay()
 	{
 		Mesh->OnClicked.AddDynamic(this, &ABook::OnBookCliked);
 	}
+
+	BookCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABook::OnBookCliked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
-	if (!bCanFlipPage) { return; }
+	if (!bCanFlipPage || bIsFlippingSequenceActive) { return; }
 
 	ETraceTypeQuery VisibilityTrace = UEngineTypes::ConvertToTraceType(ECC_Visibility);
 
@@ -81,11 +88,70 @@ void ABook::InitializeBook()
 	}
 
 	CurrentWindowSize = DefaultWindowSize;
+
+	ComputeTotalPageCount();
+	CreateBookmarks();
+	CreateExitBookmark();
+}
+
+void ABook::ComputeTotalPageCount()
+{
+	if (!BookData) { return; }
+	if (BookData->PagesInfo.IsEmpty()) { return; }
+
+	TotalPageCount = 0;
+
+	for (const auto& Info : BookData->PagesInfo)
+	{
+		FChapterRuntimeInfo RInfo;
+
+		RInfo.PageCount = Info.NeedCreateBookmark ? 1 : 0;
+		if (UBookPageBase* ChapterWidget = CreateWidget<UBookPageBase>(GetWorld(), Info.PageType))
+		{
+			RInfo.PageCount += ChapterWidget->GetPageCount();
+		}
+
+		RInfo.PadedPageCount = RInfo.PageCount % 2 + RInfo.PageCount;
+
+		RInfo.StartIndex = TotalPageCount;
+
+		TotalPageCount += RInfo.PadedPageCount;
+
+		ChapterMetrics.Add(Info.PageType, RInfo);
+	}
+}
+
+void ABook::CreateBookmarks()
+{
+	if (!BookData || BookData->PagesInfo.IsEmpty()) { return; }
+
+	for (const auto& Data : BookData->PagesInfo)
+	{
+		if (!Data.NeedCreateBookmark) { continue; }
+
+		APageBookmark* Bookmark = GetWorld()->SpawnActor<APageBookmark>(BookmarkClass ? *BookmarkClass : APageBookmark::StaticClass());
+		if (!Bookmark) { continue; }
+
+		Bookmark->InitializeBookmark(this, Data.PageType);
+	}
+}
+
+void ABook::CreateExitBookmark()
+{
+	if (!ExitBookmarkClass) { return; }
+	if (TotalPageCount < 2) { return; }
+
+	APageBookmark* Bookmark = GetWorld()->SpawnActor<APageBookmark>(ExitBookmarkClass);
+	if (!Bookmark) { return; }
+
+	Bookmark->InitializeFixedBookmark(this, TotalPageCount - 2, ExitBookmarkYOffset);
 }
 
 void ABook::OnOpenBook_Implementation()
 {
 	CurrentWindowSize = DefaultWindowSize;
+
+	BookCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	UpdateWindow();
 
@@ -99,6 +165,9 @@ void ABook::OnCloseBook_Implementation()
 	CurrentWindowSize = 2;
 
 	UpdateWindow();
+
+	bool IsBookClosed = CurPageNumber == -1 || CurPageNumber > TotalPageCount;
+	BookCollision->SetCollisionEnabled(IsBookClosed ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
 }
 
 int32 ABook::GetNextPageNumber(int32 From) const
@@ -154,19 +223,60 @@ void ABook::GoToPage(int32 TargetPage)
 	if (!bCanFlipPage) { return; }
 	if (bIsFlippingSequenceActive) { return; }
 
-	if (CurPageNumber < 0 || CurPageNumber > TotalPageCount) { return; }
-
 	if (TargetPage == CurPageNumber) { return; }
-	if (TargetPage < 0 || TargetPage > TotalPageCount) { return; }
+
+	if (TargetPage < 0 || TargetPage > TotalPageCount - 2) { return; }
 
 	FinalTargetPage = TargetPage;
+	bIsFlippingSequenceActive = true;
+
+	if (CurPageNumber < 0)
+	{
+		NextPage();
+		UpdatePageRoot();
+
+		bCanFlipPage = false;
+
+		WaitForCoverThenFlip();
+		return;
+	}
+
+	if (CurPageNumber > TotalPageCount)
+	{
+		PreviousPage();
+		UpdatePageRoot();
+		bCanFlipPage = false;
+		WaitForCoverThenFlip();
+		return;
+	}
+
+	StartFlippingSequence();
+}
+
+void ABook::WaitForCoverThenFlip()
+{
+	if (!bCanFlipPage)
+	{
+		GetWorldTimerManager().SetTimer(FlipSettleTimerHandle, this, &ABook::WaitForCoverThenFlip, 0.05f, false);
+		return;
+	}
+
+	if (CurPageNumber < 0 || CurPageNumber > TotalPageCount)
+	{
+		bIsFlippingSequenceActive = false;
+		return;
+	}
+
+	StartFlippingSequence();
+}
+
+void ABook::StartFlippingSequence()
+{
 	SequenceStartPage = CurPageNumber;
-	TargetAnimationPagesTotal = FMath::Abs(TargetPage - CurPageNumber) / 2;
+	TargetAnimationPagesTotal = FMath::Abs(FinalTargetPage - CurPageNumber) / 2;
 
 	PreSequenceWindowSize = CurrentWindowSize;
 	CurrentWindowSize = FMath::Max(CurrentWindowSize, FlippingWindowSize);
-
-	bIsFlippingSequenceActive = true;
 
 	FlipToTargetPageProcess();
 }
@@ -189,9 +299,30 @@ UPageData* ABook::GetPageInitializeData(int32 PageN)
 
 void ABook::GetPageWidgetData(int32 PageN, int32& PageIndex, TSubclassOf<UBookPageBase>& Widget_R, TSubclassOf<UBookPageBase>& Widget_L)
 {
-	PageIndex = PageN;
-	Widget_R = Widget;
-	Widget_L = Widget;
+	PageIndex = 0;
+
+	if (!BookData) { return; }
+
+	for (const auto& Chapter : BookData->PagesInfo)
+	{
+		FChapterRuntimeInfo* RInfo = ChapterMetrics.Find(Chapter.PageType);
+		if (!RInfo) { continue; }
+
+		const int32 Threshold = RInfo->StartIndex + RInfo->PadedPageCount;
+
+		if (!Widget_R && PageN < Threshold)
+		{
+			Widget_R = Chapter.PageType;
+			PageIndex = PageN - RInfo->StartIndex;
+		}
+
+		if (!Widget_L && PageN + 1 < Threshold)
+		{
+			Widget_L = Chapter.PageType;
+		}
+
+		if (Widget_R && Widget_L) { break; }
+	}
 }
 
 bool ABook::ShouldFullyInitializePage(int32 PageN) const
@@ -270,6 +401,33 @@ void ABook::InitializePage(APage*& Page, int32 PageNumber, bool bFullInit)
 
 	Page->InitializePage(this, data, PageNumber, rightSideSign);
 
+	for (const auto& Info : ChapterMetrics)
+	{
+		if (PageNumber == Info.Value.StartIndex)
+		{
+			if (TObjectPtr<APageBookmark>* FoundBookmark = Bookmarks.Find(Info.Key))
+			{
+				APageBookmark* Bookmark = *FoundBookmark;
+
+				GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [Page, Bookmark]()
+					{
+						Bookmark->AttachToPage(Page);
+					}));
+			}
+			break;
+		}
+	}
+
+	if (ExitBookmark && PageNumber == TotalPageCount - 2)
+	{
+		APageBookmark* Bookmark = ExitBookmark;
+
+		GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [Page, Bookmark]()
+			{
+				Bookmark->AttachToPage(Page);
+			}));
+	}
+
 	if (bFullInit)
 	{
 		int32 pageIndex;
@@ -293,6 +451,20 @@ void ABook::ReleaseAllPage()
 	for (const auto& page : TempToRelease)
 	{
 		page->ReleasePage();
+	}
+}
+
+void ABook::TrimPagePool()
+{
+	while (PagePool.Num() > MaxPooledPages)
+	{
+		APage* Excess = PagePool[0];
+		PagePool.RemoveAt(0);
+
+		if (IsValid(Excess))
+		{
+			Excess->Destroy();
+		}
 	}
 }
 
@@ -387,9 +559,19 @@ void ABook::UpdateOffsetPageProcess()
 		FVector B = GetPageOffset(page->PageNumber);
 
 		const bool bWasFrontPair = (page->PageNumber == PrevPageNumber) || (page->PageNumber == PrevPageNumber - 2);
-		const float speed = bWasFrontPair ?  NearPagesOffsetSpeed : DefaultOffsetSpeed;
+		const float speed = bWasFrontPair ? NearPagesOffsetSpeed : DefaultOffsetSpeed;
 
 		page->SetActorRelativeLocation(FMath::VInterpTo(A, B, 0.05f, speed));
+	}
+
+	for (const auto& Bookmark : Bookmarks)
+	{
+		Bookmark.Value->SetActorRelativeLocation(GetBookmarkAttachedLocation(Bookmark.Key));
+	}
+
+	if (ExitBookmark)
+	{
+		ExitBookmark->SetActorRelativeLocation(GetBookmarkLocationForPage(TotalPageCount - 2, ExitBookmarkYOffset));
 	}
 }
 
@@ -459,5 +641,71 @@ void ABook::TryFinishFlipSequence()
 	CurrentWindowSize = PreSequenceWindowSize;
 	UpdateWindow();
 
+	TrimPagePool();
+
 	bIsFlippingSequenceActive = false;
+}
+
+FVector ABook::GetBookmarkLocationForPage(int32 StartPage, float YOffset) const
+{
+	if (TotalPageCount <= 0) { return FVector::Zero(); }
+
+	FVector offsetVector(0.0f, YOffset, 0.0f);
+
+	int32 ClampedCurrentPage = FMath::Clamp(CurPageNumber, 0, TotalPageCount);
+
+	float Boundary = FMath::Lerp(BookmarkZInterval.X, BookmarkZInterval.Y, CurPageNumber / (float)TotalPageCount);
+
+	float from = 0.0f;
+	float to = 0.0f;
+	float alpha = 0.0f;
+	if (StartPage <= CurPageNumber)
+	{
+		from = BookmarkZInterval.X;
+		to = Boundary;
+		alpha = ClampedCurrentPage > 0 ? StartPage / (float)ClampedCurrentPage : 0.0f;
+	}
+	else
+	{
+		from = Boundary;
+		to = BookmarkZInterval.Y;
+
+		const int32 Denominator = TotalPageCount - ClampedCurrentPage;
+		alpha = Denominator > 0 ? (StartPage - ClampedCurrentPage) / (float)Denominator : 0.0f;
+	}
+
+	offsetVector.Z = FMath::Lerp(from, to, alpha);
+
+	return offsetVector;
+}
+
+FVector ABook::GetBookmarkAttachedLocation(TSubclassOf<UBookPageBase> ChapterType)
+{
+	if (!BookData) { return FVector::Zero(); }
+
+	float YOffset = 0.0f;
+	int32 BookmarkExistCount = 0;
+	for (const auto& ChapterData : BookData->PagesInfo)
+	{
+		if (ChapterType == ChapterData.PageType)
+		{
+			YOffset = BookmarkYSpawnOffset * BookmarkExistCount;
+			break;
+		}
+		else
+		{
+			if (ChapterData.NeedCreateBookmark)
+			{
+				BookmarkExistCount++;
+			}
+		}
+	}
+
+	int32 StartPage = 0;
+	if (FChapterRuntimeInfo* RInfo = ChapterMetrics.Find(ChapterType))
+	{
+		StartPage = RInfo->StartIndex;
+	}
+
+	return GetBookmarkLocationForPage(StartPage, YOffset);
 }

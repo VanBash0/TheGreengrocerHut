@@ -2,14 +2,32 @@
 
 #include "CoreMinimal.h"
 #include "Animation/SkeletalMeshActor.h"
+#include "Components/BoxComponent.h"
 #include "Book.generated.h"
 
 class APage;
+class APageBookmark;
 class UBookData;
 class UPageData;
 class UBookPageBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPageChanged, int32, PrevPageN, int32, CurPageN);
+
+USTRUCT(BlueprintType)
+struct FChapterRuntimeInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base")
+	int32 PageCount = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base")
+	int32 PadedPageCount = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base")
+	int32 StartIndex = 0;
+};
 
 UCLASS(BlueprintType)
 class THEGREENGROCERHUT_API ABook : public ASkeletalMeshActor
@@ -27,6 +45,15 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Base")
 	void InitializeBook();
+
+	UFUNCTION(BlueprintCallable, Category = "Base")
+	void ComputeTotalPageCount();
+
+	UFUNCTION(BlueprintCallable, Category = "Base")
+	void CreateBookmarks();
+
+	UFUNCTION(BlueprintCallable, Category = "Base")
+	void CreateExitBookmark();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Base")
 	void OnOpenBook();
@@ -54,6 +81,11 @@ protected:
 	int32 GetPreviousPageNumber(int32 From) const;
 
 	void SetCurrentPage(int32 NewPage);
+
+	UFUNCTION(BlueprintCallable, Category = "Page|Control")
+	void WaitForCoverThenFlip();
+
+	void StartFlippingSequence();
 
 public:
 	UFUNCTION(BlueprintPure, Category = "Page|Metrics")
@@ -90,6 +122,9 @@ public:
 	void ReleaseAllPage();
 
 	UFUNCTION(BlueprintCallable, Category = "Page|Pool")
+	void TrimPagePool();
+
+	UFUNCTION(BlueprintCallable, Category = "Page|Pool")
 	void UpdateWindow();
 
 	UFUNCTION(BlueprintCallable, Category = "Page|Pool")
@@ -123,9 +158,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Page|Fade")
 	void TryFinishFlipSequence();
 
+	UFUNCTION(BlueprintCallable, Category = "Page|Chapter")
+	FVector GetBookmarkAttachedLocation(TSubclassOf<UBookPageBase> ChapterType);
+
+	UFUNCTION(BlueprintPure, Category = "Page|Chapter")
+	FVector GetBookmarkLocationForPage(int32 StartPage, float YOffset) const;
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
 	TObjectPtr<USceneComponent> PageRoot;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
+	TObjectPtr<UBoxComponent> BookCollision;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Base")
@@ -133,6 +177,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Base")
 	TSubclassOf<APage> PageClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Base")
+	TSubclassOf<APageBookmark> BookmarkClass;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	int32 DefaultWindowSize;
@@ -149,9 +196,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	float NearPagesOffsetSpeed = 7.5f;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
-	TSubclassOf<UBookPageBase> Widget;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|PageFlipping")
 	int32 FlippingShowInitializedPages;
 
@@ -160,6 +204,21 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|PageFlipping")
 	int32 FlippingWindowSize = 10;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Pool")
+	int32 MaxPooledPages = 12;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Bookmark")
+	float BookmarkYSpawnOffset = -25.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Bookmark")
+	FVector2D BookmarkZInterval = FVector2D(0, -20.0f);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Bookmark")
+	TSubclassOf<APageBookmark> ExitBookmarkClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Bookmark")
+	float ExitBookmarkYOffset = 0.0f;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Runtime|Flags")
@@ -210,6 +269,16 @@ public:
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Page|Fade")
 	FTimerHandle OffsetTimerHandler;
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Page|Chapter")
+	TMap<TSubclassOf<UBookPageBase>, FChapterRuntimeInfo> ChapterMetrics;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Page|Chapter")
+	TMap<TSubclassOf<UBookPageBase>, TObjectPtr<APageBookmark>> Bookmarks;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Page|Chapter")
+	TObjectPtr<APageBookmark> ExitBookmark;
 
 public:
 	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Default")

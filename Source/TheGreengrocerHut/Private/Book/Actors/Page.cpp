@@ -69,6 +69,8 @@ void APage::InitializePage(ABook* InOwnerBook, UPageData* InPageData, int32 InPa
 	bIsFlippingProcess = false;
 	bIsHover = false;
 
+	WidgetInitGeneration++;
+
 	if (USkeletalMeshComponent* Mesh = GetSkeletalMeshComponent())
 	{
 		if (Mesh->GetAnimInstance())
@@ -97,6 +99,8 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 {
 	PageIndex = InPageIndex;
 
+	const int32 ThisGeneration = WidgetInitGeneration;
+
 	if (Front && InWidgetPageR)
 	{
 		if (UBookPageBase* RightWidget = CreateWidget<UBookPageBase>(GetWorld(), InWidgetPageR))
@@ -121,10 +125,12 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 		}
 	}
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
+	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, ThisGeneration]()
 		{
-			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
+			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, ThisGeneration]()
 				{
+					if (WidgetInitGeneration != ThisGeneration) { return; }
+
 					if (MID_Page)
 					{
 						if (Front)

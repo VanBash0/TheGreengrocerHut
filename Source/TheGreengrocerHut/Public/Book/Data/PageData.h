@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UPoseAsset> PoseForBlendRightAndLeftSide;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Bookmark")
+	FName BoneToAttachBookmark;
 };

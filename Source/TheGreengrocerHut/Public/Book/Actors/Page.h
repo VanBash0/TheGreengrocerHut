@@ -98,17 +98,20 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime")
 	TObjectPtr<UMaterialInstanceDynamic> MID_Page;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Runtime")
+	int32 WidgetInitGeneration = 0;
+
 public:
-	UPROPERTY(BlueprintAssignable, Category = "Default")
+	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnClick OnClick;
 
-	UPROPERTY(BlueprintAssignable, Category = "Default")
+	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnHovering OnHovering;
 
-	UPROPERTY(BlueprintAssignable, Category = "Default")
+	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnRelease OnRelease;
 
-	UPROPERTY(BlueprintAssignable, Category = "Default")
+	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnFinishFlip OnFinishFlip;
 
 private:
