@@ -716,7 +716,7 @@ void ASymptomViewer::RenderTick()
     {
         UE_LOG(LogTemp, Warning, TEXT("[SymptomViewer] RenderTick: finalizing render for graph=%s"), *GetNameSafe(graph));
 
-        for (auto& pair : graph->OutputInstances)
+        /*for (auto& pair : graph->OutputInstances)
         {
             SubstanceAir::OutputInstance* output = Substance::Helpers::GetSubstanceOutputByID(graph, pair.Key);
             if (output)
@@ -727,7 +727,7 @@ void ASymptomViewer::RenderTick()
 
         TArray<SubstanceAir::shared_ptr<SubstanceAir::GraphInstance>> singleGraph;
         singleGraph.Add(graph->Instance);
-        Substance::Helpers::RenderSync(singleGraph, true);
+        Substance::Helpers::RenderSync(singleGraph, true);*/
 
         _toRender.Remove(graph);
 
