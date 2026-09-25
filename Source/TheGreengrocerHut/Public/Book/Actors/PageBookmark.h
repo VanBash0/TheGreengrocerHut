@@ -87,6 +87,6 @@ public:
 	float FixedYOffset = 0.0f;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Event")
+	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Event")
 	FOnBookmarkHovering OnHovering;
 };

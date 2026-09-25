@@ -9,11 +9,16 @@ ABook::ABook()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	PageRoot = CreateDefaultSubobject<USceneComponent>(TEXT("PageRoot"));
-	PageRoot->SetupAttachment(RootComponent);
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
 
-	BookCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoolCollison"));
-	BookCollision->SetupAttachment(RootComponent);
+	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BookMesh"));
+	MeshComp->SetupAttachment(RootComponent);
+
+	PageRoot = CreateDefaultSubobject<USceneComponent>(TEXT("PageRoot"));
+	PageRoot->SetupAttachment(MeshComp);
+
+	BookCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BookCollison"));
+	BookCollision->SetupAttachment(MeshComp);
 }
 
 void ABook::BeginPlay()
@@ -22,10 +27,7 @@ void ABook::BeginPlay()
 
 	InitializeBook();
 
-	if (USkeletalMeshComponent* Mesh = GetSkeletalMeshComponent())
-	{
-		Mesh->OnClicked.AddDynamic(this, &ABook::OnBookCliked);
-	}
+	MeshComp->OnClicked.AddDynamic(this, &ABook::OnBookCliked);
 
 	BookCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
@@ -39,7 +41,7 @@ void ABook::OnBookCliked(UPrimitiveComponent* TouchedComponent, FKey ButtonPress
 	FHitResult hitResult;
 	if (GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(VisibilityTrace, false, hitResult))
 	{
-		if (hitResult.Component == GetSkeletalMeshComponent())
+		if (hitResult.Component == MeshComp)
 		{
 			if (hitResult.BoneName == BookData->Cover->BoneToDetect_Side_R)
 			{
@@ -81,10 +83,7 @@ void ABook::InitializeBook()
 {
 	if (BookData)
 	{
-		if (USkeletalMeshComponent* Mesh = GetSkeletalMeshComponent())
-		{
-			Mesh->SetSkeletalMesh(BookData->Cover->SM_Cover);
-		}
+		MeshComp->SetSkeletalMesh(BookData->Cover->SM_Cover);
 	}
 
 	CurrentWindowSize = DefaultWindowSize;
@@ -151,6 +150,8 @@ void ABook::OnOpenBook_Implementation()
 {
 	CurrentWindowSize = DefaultWindowSize;
 
+	bCanFlipPage = true;
+
 	BookCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	UpdateWindow();
@@ -163,6 +164,8 @@ void ABook::OnCloseBook_Implementation()
 	StopOffsetPageProcess();
 
 	CurrentWindowSize = 2;
+
+	bCanFlipPage = false;
 
 	UpdateWindow();
 
@@ -543,7 +546,7 @@ void ABook::UpdatePageRoot()
 {
 	bool sign = CurPageNumber < 0 || CurPageNumber > TotalPageCount;
 
-	PageRoot->SetRelativeLocation(FVector::UpVector * (sign ? -1.0f : 3.0f));
+	PageRoot->SetRelativeLocation(FVector::UpVector * (sign ? RootOffsetClosed : RootOffsetOpened));
 }
 
 void ABook::StartOffsetPageProcess()

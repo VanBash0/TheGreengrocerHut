@@ -69,7 +69,7 @@ void APageBookmark::AttachToBook()
 
 	UCoverData* Cover = OwningBook->BookData->Cover;
 	FName SoketName = bOnRightSide ? Cover->BoneToAttachBookmark_Side_R : Cover->BoneToAttachBookmark_Side_L;
-	AttachToComponent(OwningBook->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale, SoketName);
+	AttachToComponent(OwningBook->MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, SoketName);
 
 	if (bIsFixedBookmark)
 	{

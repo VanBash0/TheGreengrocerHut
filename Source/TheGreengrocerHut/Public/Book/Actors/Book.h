@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/SkeletalMeshActor.h"
 #include "Components/BoxComponent.h"
 #include "Book.generated.h"
 
@@ -30,7 +29,7 @@ public:
 };
 
 UCLASS(BlueprintType)
-class THEGREENGROCERHUT_API ABook : public ASkeletalMeshActor
+class THEGREENGROCERHUT_API ABook : public AActor
 {
 	GENERATED_BODY()
 
@@ -166,6 +165,9 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
+	TObjectPtr<USkeletalMeshComponent> MeshComp;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
 	TObjectPtr<USceneComponent> PageRoot;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
@@ -189,6 +191,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	FVector PageOffsetDirLeft;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	float RootOffsetClosed = -1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	float RootOffsetOpened = 3.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	float DefaultOffsetSpeed = 7.5f;
