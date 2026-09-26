@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SymptomStructures.h"
+#include "Symptom/SymptomStructures.h"
 #include "ClientStruct.h"
 #include "NewsPaperStructures.generated.h"
 

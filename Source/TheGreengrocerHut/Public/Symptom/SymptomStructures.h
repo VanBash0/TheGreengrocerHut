@@ -36,10 +36,10 @@ struct FBodyPartViewData : public FTableRowBase
 
 public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Mesh", MakeStructureDefaultValue = "None"))
-    TObjectPtr<UStaticMesh> Mesh;
+    TSoftObjectPtr<UStaticMesh> Mesh;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "RGB_Mask", MakeStructureDefaultValue = "None"))
-    TObjectPtr<UTexture2D> RGB_Mask;
+    TSoftObjectPtr<UTexture2D> RGB_Mask;
 };
 
 USTRUCT(BlueprintType)
@@ -67,10 +67,10 @@ struct FVisualOverlay : public FVisualBase
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UMaterialInterface> Material;
+    TSoftObjectPtr<UMaterialInterface> Material;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
+    TSoftObjectPtr<USubstanceGraphInstance> SubstanceGraph = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector4 LayerChannel;

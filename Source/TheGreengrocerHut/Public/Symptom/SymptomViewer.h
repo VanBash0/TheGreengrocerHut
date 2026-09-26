@@ -3,11 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "SymptomStructures.h"
+#include "Symptom/SymptomStructures.h"
 #include "ClientStruct.h"
 #include "GameProjectSettings.h"
 #include "GameSettings.h"
 #include "SubstanceCoreHelpers.h"
+#include "Engine/StreamableManager.h"
 #include "SymptomViewer.generated.h"
 
 USTRUCT()
@@ -46,7 +47,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRenderComplete);
 UCLASS(BlueprintType, Blueprintable)
 class THEGREENGROCERHUT_API ASymptomViewer : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
     ASymptomViewer();
@@ -87,15 +88,26 @@ private:
     void InitializeViewer();
 
     FVisualOverlayPoolEntry* GetPoolEntry(UStaticMeshComponent* Root, UMaterialInterface* Material);
-    USubstanceGraphInstance* CopyGraphAndSetMaterial(
-        USubstanceGraphInstance* graph,
-        UMaterialInterface* mainMaterial,
-        UMaterialInstanceDynamic* dimMaterial
-    );
+
+    USubstanceGraphInstance* CopyGraphAndSetMaterial(USubstanceGraphInstance* graph, UMaterialInterface* mainMaterial, UMaterialInstanceDynamic* dimMaterial);
+
     const std::pair<std::pair<bool, FVisualDeformation>, TArray<FVisualOverlay>> SelectBodySymptomsByType(const TArray<FSymptomRow>& Symptoms);
+
+    struct FPendingSymptomBodyPart
+    {
+        EBodyPart PartType = EBodyPart::None;
+        TSoftObjectPtr<UStaticMesh> Mesh;
+        TSoftObjectPtr<UTexture2D> Mask;
+        TArray<FVisualOverlay> Overlays;
+    };
+
+    void OnSettingsTablesLoaded(TSoftObjectPtr<UDataTable> SymptomTableSoft, TSoftObjectPtr<UDataTable> DefaultBodyPartTableSoft);
+
+    void FinishSetNewSymptoms(TArray<FPendingSymptomBodyPart> PendingParts, uint32 RequestId);
 
     UPROPERTY()
     TMap<EBodyPart, FBodyPartData> _bodyParts;
+
     UPROPERTY()
     TArray<FVisualOverlayPoolEntry> _pool;
 
@@ -106,4 +118,11 @@ private:
 
     UPROPERTY()
     TArray<TObjectPtr<USubstanceGraphInstance>> _toRender;
+
+private:
+    static void ReleaseSubstanceGraphInstance(USubstanceGraphInstance* Instance);
+
+    TSharedPtr<FStreamableHandle> _tablesStreamableHandle;
+    TSharedPtr<FStreamableHandle> _streamableHandle;
+    uint32 _renderRequestId = 0;
 };

@@ -1,5 +1,5 @@
 #include "ClientsGenerator.h"
-#include "SymptomStructures.h"
+#include "Symptom/SymptomStructures.h"
 #include "IngredientFunctionLibary.h"
 #include "Algo/RandomShuffle.h"
 
