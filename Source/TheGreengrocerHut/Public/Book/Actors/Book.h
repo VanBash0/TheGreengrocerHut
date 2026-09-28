@@ -11,6 +11,7 @@ class UPageData;
 class UBookPageBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPageChanged, int32, PrevPageN, int32, CurPageN);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBookInteracted, bool IsOpening);
 
 USTRUCT(BlueprintType)
 struct FChapterRuntimeInfo
@@ -291,4 +292,7 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Default")
 	FOnPageChanged OnPageChanged;
+
+	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Default")
+	FOnBookInteracted OnBookInteracted;
 };
