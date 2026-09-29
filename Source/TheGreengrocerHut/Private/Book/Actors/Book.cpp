@@ -31,6 +31,7 @@ void ABook::BeginPlay()
 	MeshComp->OnClicked.AddDynamic(this, &ABook::OnBookCliked);
 
 	BookCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UpdateBoxCollisionExtent();
 }
 
 void ABook::OnBookCliked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
@@ -76,6 +77,7 @@ void ABook::OnBookCliked(UPrimitiveComponent* TouchedComponent, FKey ButtonPress
 			}
 
 			UpdatePageRoot();
+			UpdateBoxCollisionExtent();
 		}
 	}
 }
@@ -562,6 +564,12 @@ void ABook::UpdatePageRoot()
 	bool sign = CurPageNumber < 0 || CurPageNumber > TotalPageCount;
 
 	PageRoot->SetRelativeLocation(FVector::UpVector * (sign ? RootOffsetClosed : RootOffsetOpened));
+}
+
+void ABook::UpdateBoxCollisionExtent()
+{
+	bool sign = CurPageNumber < 0 || CurPageNumber > TotalPageCount;
+	BookCollision->SetBoxExtent(sign ? BookCollisionExtentClosed : BookCollisionExtentOpened);
 }
 
 void ABook::StartOffsetPageProcess()

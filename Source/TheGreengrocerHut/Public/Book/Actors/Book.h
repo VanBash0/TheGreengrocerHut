@@ -151,6 +151,9 @@ public:
 	void UpdatePageRoot();
 
 	UFUNCTION(BlueprintCallable, Category = "Page|Fade")
+	void UpdateBoxCollisionExtent();
+
+	UFUNCTION(BlueprintCallable, Category = "Page|Fade")
 	void StartOffsetPageProcess();
 
 	UFUNCTION(BlueprintCallable, Category = "Page|Fade")
@@ -209,6 +212,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	float RootOffsetOpened = 3.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	FVector BookCollisionExtentClosed;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
+	FVector BookCollisionExtentOpened;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual")
 	float DefaultOffsetSpeed = 7.5f;

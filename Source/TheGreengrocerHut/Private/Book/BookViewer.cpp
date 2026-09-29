@@ -6,6 +6,7 @@
 #include "Components/PointLightComponent.h"
 #include "Components/SceneComponent.h"
 
+#include "Engine/EngineTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
@@ -50,10 +51,28 @@ void ABookViewer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentState != EBookViewerState::Active) { return; }
+	APlayerController* PC = ActivePC.Get();
+	const bool bActive = PC && CurrentState == EBookViewerState::Active;
+	const bool bLightOn = PC && (CurrentState == EBookViewerState::Entering || CurrentState == EBookViewerState::Active);
 
-	UpdateFocusFromCursor();
-	UpdateCameraRig(DeltaTime);
+	if (bActive)
+	{
+		UpdateFocusFromCursor();
+		UpdateCameraRig(DeltaTime);
+		UpdateLightTarget(PC);
+	}
+	else
+	{
+		ParallaxInput = FVector2D::ZeroVector;
+	}
+
+	UpdateParallax(DeltaTime);
+	UpdateLight(DeltaTime, bLightOn);
+
+	if (CurrentState == EBookViewerState::Inactive && LightIntensity <= 0.0f && ParallaxCurrent.IsNearlyZero(0.001))
+	{
+		SetActorTickEnabled(false);
+	}
 }
 
 bool ABookViewer::TryEnter(ABook* StartBook)
@@ -80,6 +99,10 @@ bool ABookViewer::TryEnter(ABook* StartBook)
 
 	bPendingExit = false;
 	bSwitchArmed = false;
+
+	ParallaxInput = FVector2D::ZeroVector;
+	ParallaxCurrent = FVector2D::ZeroVector;
+	InitLightAtFocus();
 
 	for (const auto& slot : BookSlots)
 	{
@@ -159,7 +182,7 @@ void ABookViewer::FinishExit()
 	if (CurrentState != EBookViewerState::Exiting) { return; }
 
 	CurrentState = EBookViewerState::Inactive;
-	
+
 	for (const auto& slot : BookSlots)
 	{
 		if (!slot.Book) { continue; }
@@ -170,8 +193,6 @@ void ABookViewer::FinishExit()
 
 	ActivePC.Reset();
 	PreviousViewTarget.Reset();
-
-	SetActorTickEnabled(false);
 }
 
 void ABookViewer::SnapCameraToFocus()
@@ -221,7 +242,10 @@ void ABookViewer::UpdateFocusFromCursor()
 
 	int32 NearestIndex = INDEX_NONE;
 	float NearestDistance = TNumericLimits<float>::Max();
+
 	float FocusedDistance = TNumericLimits<float>::Max();
+	FBox2D FocusedRect(ForceInit);
+	bool bHasFocusedRect = false;
 
 	for (int32 i = 0; i < BookSlots.Num(); ++i)
 	{
@@ -233,6 +257,8 @@ void ABookViewer::UpdateFocusFromCursor()
 		if (i == FocusedIndex)
 		{
 			FocusedDistance = Distance;
+			FocusedRect = Rect;
+			bHasFocusedRect = true;
 		}
 
 		if (Distance < NearestDistance)
@@ -242,21 +268,26 @@ void ABookViewer::UpdateFocusFromCursor()
 		}
 	}
 
-	if (FocusedDistance == TNumericLimits<float>::Max()) { return; }
+	if (!bHasFocusedRect) { return; }
 
 	if (FocusedDistance <= 0.0f)
 	{
 		bSwitchArmed = true;
 	}
 
-	if (bRequireHoverBeforeSwitch && !bSwitchArmed) { return; }
-
-	if (NearestIndex != INDEX_NONE
+	if ((bSwitchArmed || !bRequireHoverBeforeSwitch)
+		&& NearestIndex != INDEX_NONE
 		&& NearestIndex != FocusedIndex
 		&& NearestDistance + SwitchHysteresis < FocusedDistance)
 	{
 		SetFocusedIndex(NearestIndex);
 	}
+
+	const FVector2D Center = FocusedRect.GetCenter();
+	const FVector2D Half = FocusedRect.GetExtent();
+
+	ParallaxInput.X = FMath::Clamp((Cursor.X - Center.X) / FMath::Max(Half.X, 1.0), -1.0, 1.0);
+	ParallaxInput.Y = FMath::Clamp((Cursor.Y - Center.Y) / FMath::Max(Half.Y, 1.0), -1.0, 1.0);
 }
 
 void ABookViewer::UpdateCameraRig(float DeltaTime)
@@ -269,6 +300,59 @@ void ABookViewer::UpdateCameraRig(float DeltaTime)
 	RigRotation = FMath::QInterpTo(RigRotation, Pose.GetRotation().GetNormalized(), DeltaTime, CameraSwitchSpeed);
 
 	CameraRoot->SetRelativeLocationAndRotation(RigLocation, RigRotation);
+}
+
+void ABookViewer::UpdateParallax(float DeltaTime)
+{
+	ParallaxCurrent = FMath::Vector2DInterpTo(ParallaxCurrent, ParallaxInput, DeltaTime, ParallaxInterpSpeed);
+
+	const FVector2D P(ParallaxCurrent.X * ParallaxSign.X, ParallaxCurrent.Y * ParallaxSign.Y);
+
+	Camera->SetRelativeLocationAndRotation(
+		FVector(0.0, P.X * ParallaxAmplitude.X, -P.Y * ParallaxAmplitude.Y),
+		FRotator(-P.Y * ParallaxMaxAngle.Y, P.X * ParallaxMaxAngle.X, 0.0));
+}
+
+void ABookViewer::InitLightAtFocus()
+{
+	const ABook* Focused = GetFocusedBook();
+
+	LightTarget = (Focused ? Focused->GetActorLocation() : GetActorLocation()) + FVector::UpVector * LightSurfaceOffset;
+	Light->SetWorldLocation(LightTarget);
+}
+
+void ABookViewer::UpdateLightTarget(APlayerController* PC)
+{
+	FHitResult Hit;
+	if (!PC->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), false, Hit)) { return; }
+
+	if (!FindBookAtWorldPoint(Hit.ImpactPoint)) { return; }
+
+	LightTarget = Hit.ImpactPoint + FVector::UpVector * LightSurfaceOffset;
+}
+
+void ABookViewer::UpdateLight(float DeltaTime, bool bOn)
+{
+	if (bOn)
+	{
+		Light->SetWorldLocation(FMath::VInterpTo(Light->GetComponentLocation(), LightTarget, DeltaTime, LightFollowSpeed));
+	}
+
+	const float TargetIntensity = bOn ? LightMaxIntensity : 0.0f;
+	LightIntensity = FMath::FInterpTo(LightIntensity, TargetIntensity, DeltaTime, LightFadeSpeed);
+
+	if (TargetIntensity <= 0.0f && LightIntensity < 1.0f)
+	{
+		LightIntensity = 0.0f;
+	}
+
+	Light->SetIntensity(LightIntensity);
+
+	const bool bShouldBeVisible = LightIntensity > 0.0f;
+	if (Light->GetVisibleFlag() != bShouldBeVisible)
+	{
+		Light->SetVisibility(bShouldBeVisible);
+	}
 }
 
 bool ABookViewer::GetBookScreenRect(const ABook* Book, APlayerController* PC, FBox2D& OutRect) const
@@ -306,4 +390,23 @@ float ABookViewer::DistanceToRect(const FBox2D& Rect, const FVector2D& Point)
 	const double DY = FMath::Max3<double>(Rect.Min.Y - Point.Y, 0.0, Point.Y - Rect.Max.Y);
 
 	return static_cast<float>(FMath::Sqrt(DX * DX + DY * DY));
+}
+
+const ABook* ABookViewer::FindBookAtWorldPoint(const FVector& Point) const
+{
+	for (const FBookSlot& Slot : BookSlots)
+	{
+		const UBoxComponent* Box = Slot.Book ? Slot.Book->BookCollision.Get() : nullptr;
+		if (!Box) { continue; }
+
+		const FVector Local = Box->GetComponentTransform().InverseTransformPosition(Point);
+		const FVector Extent = Box->GetUnscaledBoxExtent();
+
+		if (FMath::Abs(Local.X) <= Extent.X && FMath::Abs(Local.Y) <= Extent.Y && FMath::Abs(Local.Z) <= Extent.Z)
+		{
+			return Slot.Book;
+		}
+	}
+
+	return nullptr;
 }
