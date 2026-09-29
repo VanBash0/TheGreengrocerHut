@@ -31,7 +31,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<ABook> Book;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (MakeEditWidget = true))
+	UPROPERTY()
 	FTransform ViewTransfrom;
 };
 

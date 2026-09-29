@@ -36,6 +36,16 @@ void ABookViewer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	for (FBookSlot& Slot : BookSlots)
+	{
+		if (!Slot.Book) { continue; }
+
+		const UCameraComponent* BookCamera = Slot.Book->FindComponentByClass<UCameraComponent>();
+		if (!BookCamera) { continue; }
+
+		Slot.ViewTransfrom = BookCamera->GetComponentTransform().GetRelativeTransform(Root->GetComponentTransform());
+	}
+
 	Camera->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
 
 	for (const FBookSlot& Slot : BookSlots)
