@@ -81,6 +81,14 @@ bool ABookViewer::TryEnter(ABook* StartBook)
 	bPendingExit = false;
 	bSwitchArmed = false;
 
+	for (const auto& slot : BookSlots)
+	{
+		if (!slot.Book) { continue; }
+		slot.Book->OnOpenBook();
+	}
+
+	OnStartEntering();
+
 	CurrentState = EBookViewerState::Entering;
 	SetActorTickEnabled(true);
 
@@ -151,6 +159,14 @@ void ABookViewer::FinishExit()
 	if (CurrentState != EBookViewerState::Exiting) { return; }
 
 	CurrentState = EBookViewerState::Inactive;
+	
+	for (const auto& slot : BookSlots)
+	{
+		if (!slot.Book) { continue; }
+		slot.Book->OnCloseBook();
+	}
+
+	OnFinishExiting();
 
 	ActivePC.Reset();
 	PreviousViewTarget.Reset();

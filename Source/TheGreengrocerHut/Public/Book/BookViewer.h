@@ -52,8 +52,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnterExit")
 	bool TryEnter(ABook* StartBook);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "EnterExit")
+	void OnStartEntering();
+
 	UFUNCTION(BlueprintCallable, Category = "EnterExit")
 	bool TryExit();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "EnterExit")
+	void OnFinishExiting();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "InitializeState")
@@ -87,24 +93,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Bind")
 	TArray<FBookSlot> BookSlots;
 
-	// Длительность въезда и выезда камеры (сек).
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Blend", meta = (ClampMin = "0.0"))
 	float EnterBlendTime = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Blend", meta = (ClampMin = "0.0"))
 	float ExitBlendTime = 0.5f;
 
-	// Скорость, с которой камера едет к новой книге (больше - резче).
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Switching", meta = (ClampMin = "0.0"))
 	float CameraSwitchSpeed = 4.0f;
 
-	// Насколько (px) другая книга должна быть ближе к курсору, чем текущая, чтобы фокус перешёл.
-	// Внутри границ текущей книги фокус не переключается никогда.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Switching", meta = (ClampMin = "0.0"))
 	float SwitchHysteresis = 20.0f;
 
-	// Пока курсор не побывал над текущей книгой, фокус не переключается. Иначе сразу после входа курсор
-	// (оставшийся там, где был клик) может оказаться над соседней книгой, и камера уедет с кликнутой.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Switching")
 	bool bRequireHoverBeforeSwitch = true;
 
