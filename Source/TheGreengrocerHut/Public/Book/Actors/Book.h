@@ -6,12 +6,12 @@
 
 class APage;
 class APageBookmark;
+class ABookViewer;
 class UBookData;
 class UPageData;
 class UBookPageBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPageChanged, int32, PrevPageN, int32, CurPageN);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBookInteracted, bool IsOpening);
 
 USTRUCT(BlueprintType)
 struct FChapterRuntimeInfo
@@ -62,6 +62,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Base")
 	void OnCloseBook();
 	void OnCloseBook_Implementation();
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "BookViewer")
+	bool TryEnterByViewer();
+
+	UFUNCTION(BlueprintCallable, Category = "BookViewer")
+	bool TryExitByViewer();
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Page|Control")
@@ -173,6 +180,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Component")
 	TObjectPtr<UBoxComponent> BookCollision;
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "BookViewer")
+	TObjectPtr<ABookViewer> OwnerViewer;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Base")
@@ -292,7 +303,4 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Default")
 	FOnPageChanged OnPageChanged;
-
-	UPROPERTY(BlueprintAssignable, EditDefaultsOnly, Category = "Default")
-	FOnBookInteracted OnBookInteracted;
 };

@@ -1,5 +1,6 @@
 #include "Book/Actors/Book.h"
 #include "Book/Actors/Page.h"
+#include "Book/BookViewer.h"
 #include "Book/Actors/PageBookmark.h"
 #include "Book/Widget/BookPageBase.h"
 #include "Book/Data/BookData.h"
@@ -171,6 +172,20 @@ void ABook::OnCloseBook_Implementation()
 
 	bool IsBookClosed = CurPageNumber == -1 || CurPageNumber > TotalPageCount;
 	BookCollision->SetCollisionEnabled(IsBookClosed ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
+}
+
+bool ABook::TryEnterByViewer()
+{
+	if (!OwnerViewer) { return false; }
+
+	return OwnerViewer->TryEnter(this);
+}
+
+bool ABook::TryExitByViewer()
+{
+	if (!OwnerViewer) { return false; }
+
+	return OwnerViewer->TryExit();
 }
 
 int32 ABook::GetNextPageNumber(int32 From) const
