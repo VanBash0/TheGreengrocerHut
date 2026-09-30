@@ -30,6 +30,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Book Anim")
 	TObjectPtr<ABook> OwningBook;
 
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings")
+	float FakePageInterpolateSpeedDefault = 0.5f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings")
+	float FakePageInterpolateSpeedFast = 3.0f;
+
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Book Anim")
 	int32 KeyCount;

@@ -17,7 +17,8 @@ void UBookAnimationInstance::NativeUpdateAnimation(float DeltaTimeX)
 {
 	Super::NativeUpdateAnimation(DeltaTimeX);
 
-	CurrentFadeTime = FMath::FInterpTo(CurrentFadeTime, TargetFadeTime, DeltaTimeX, 1.0f);
+	const float InterpSpeed = OwningBook->bIsFlippingSequenceActive ? FakePageInterpolateSpeedFast : FakePageInterpolateSpeedDefault;
+	CurrentFadeTime = FMath::FInterpTo(CurrentFadeTime, TargetFadeTime, DeltaTimeX, InterpSpeed);
 }
 
 void UBookAnimationInstance::OnPageChanged(int32 PrevPage, int32 CurPage)
@@ -48,7 +49,8 @@ void UBookAnimationInstance::OnPageChanged(int32 PrevPage, int32 CurPage)
 	}
 	else
 	{
-		OwningBook->PageFlipProgress(TargetFadeTime);
+		const float Denominator = FMath::Max(1.0f, static_cast<float>((OwningBook->TotalPageCount - 2) - 2));
+		TargetFadeTime = FMath::Clamp((OwningBook->CurPageNumber - 2) / Denominator, 0.0f, 1.0f);
 		Montage_Stop(0.0f);
 	}
 }

@@ -254,6 +254,7 @@ void ABook::GoToPage(int32 TargetPage)
 	{
 		NextPage();
 		UpdatePageRoot();
+		UpdateBoxCollisionExtent();
 
 		bCanFlipPage = false;
 
@@ -265,6 +266,8 @@ void ABook::GoToPage(int32 TargetPage)
 	{
 		PreviousPage();
 		UpdatePageRoot();
+		UpdateBoxCollisionExtent();
+
 		bCanFlipPage = false;
 		WaitForCoverThenFlip();
 		return;
@@ -299,11 +302,6 @@ void ABook::StartFlippingSequence()
 	CurrentWindowSize = FMath::Max(CurrentWindowSize, FlippingWindowSize);
 
 	FlipToTargetPageProcess();
-}
-
-void ABook::PageFlipProgress(float& Progress)
-{
-	Progress = CurPageNumber / (float)(TotalPageCount - 2);
 }
 
 UPageData* ABook::GetPageInitializeData(int32 PageN)
@@ -680,7 +678,7 @@ FVector ABook::GetBookmarkLocationForPage(int32 StartPage, float YOffset) const
 
 	int32 ClampedCurrentPage = FMath::Clamp(CurPageNumber, 0, TotalPageCount);
 
-	float Boundary = FMath::Lerp(BookmarkZInterval.X, BookmarkZInterval.Y, CurPageNumber / (float)TotalPageCount);
+	float Boundary = FMath::Lerp(BookmarkZInterval.X, BookmarkZInterval.Y, ClampedCurrentPage / (float)TotalPageCount);
 
 	float from = 0.0f;
 	float to = 0.0f;

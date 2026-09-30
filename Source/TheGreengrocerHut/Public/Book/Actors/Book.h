@@ -95,10 +95,6 @@ protected:
 	void StartFlippingSequence();
 
 public:
-	UFUNCTION(BlueprintPure, Category = "Page|Metrics")
-	void PageFlipProgress(float& Progress);
-
-public:
 	UFUNCTION(BlueprintPure, Category = "Page|Pool|Helpers")
 	UPageData* GetPageInitializeData(int32 PageN);
 
