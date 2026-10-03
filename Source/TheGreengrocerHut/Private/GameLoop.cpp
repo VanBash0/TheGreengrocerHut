@@ -174,6 +174,16 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     else {
         _metrics.KillingFactor += GameSettings->DeltaKillingFactor;
     }
+
+    // ÓÁÐÀÒÜ ÊÎÃÄÀ ÂÅÐÍÅÌ ÍÎÐÌÀËÜÍÓÞ ÃÅÍÅÐÀÖÈÞ
+
+    if (_currentDaySnapshot.VillageInfectionRate >= 100.0f) {
+        _currentDaySnapshot.VillageInfectionRate = 99.f;
+    }
+
+    if (_currentDaySnapshot.VillageInfectionRate <= -100.0f) {
+        _currentDaySnapshot.VillageInfectionRate = -99.f;
+    }
 }
 
 void UGameLoop::LoadSave()
