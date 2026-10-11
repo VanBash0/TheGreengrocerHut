@@ -70,6 +70,13 @@ public:
     bool IsRendering() const { return _toRender.Num() > 0; }
 
 public:
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Symptom Viewer")
+    void Enable();
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Symptom Viewer")
+    void Disable();
+
+public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
     TObjectPtr<UDataTable> SymptomsTable;
 

@@ -1,11 +1,16 @@
 #pragma once
+
 #include "CoreMinimal.h"
+#include "Dialog/GuestDialogStructs.h"
 #include "ClientStruct.generated.h" 
 
 USTRUCT(BlueprintType)
 struct FClient
 {
     GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TArray<TSoftObjectPtr<UGuestData>> Guests;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TArray<FName> Symptoms;

@@ -34,6 +34,7 @@ public class DlgSystem : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Projects", // IPluginManager
+				"GameplayTags", // SpeakerState suggestions
 
 				// UI
 				"SlateCore",

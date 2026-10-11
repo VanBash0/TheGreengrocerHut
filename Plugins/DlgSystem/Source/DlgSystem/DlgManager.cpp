@@ -16,6 +16,8 @@
 #include "DlgContext.h"
 #include "Logging/DlgLogger.h"
 #include "DlgHelper.h"
+#include "DlgSystemSettings.h"
+#include "GameplayTagsManager.h"
 #include "NYReflectionHelper.h"
 
 TWeakObjectPtr<const UObject> UDlgManager::UserWorldContextObjectPtr = nullptr;
@@ -462,10 +464,29 @@ TArray<FName> UDlgManager::GetDialoguesParticipantNames()
 
 TArray<FName> UDlgManager::GetDialoguesSpeakerStates()
 {
-	TSet<FName> UniqueNames;
-	for (const UDlgDialogue* Dialogue : GetAllDialoguesFromMemory())
+	// SpeakerState suggestions come from registered GameplayTags, not from states already used in dialogues
+	const FName Root = GetDefault<UDlgSystemSettings>()->SpeakerStateTagRoot;
+
+	FGameplayTagContainer Tags;
+	const UGameplayTagsManager& TagsManager = UGameplayTagsManager::Get();
+	if (Root.IsNone())
 	{
-		UniqueNames.Append(Dialogue->GetSpeakerStates());
+		TagsManager.RequestAllGameplayTags(Tags, true);
+	}
+	else
+	{
+		const FGameplayTag RootTag = TagsManager.RequestGameplayTag(Root, false);
+		Tags = TagsManager.RequestGameplayTagChildren(RootTag);
+		if (RootTag.IsValid())
+		{
+			Tags.AddTag(RootTag);
+		}
+	}
+
+	TSet<FName> UniqueNames;
+	for (const FGameplayTag& Tag : Tags)
+	{
+		UniqueNames.Add(Tag.GetTagName());
 	}
 
 	TArray<FName> Array;

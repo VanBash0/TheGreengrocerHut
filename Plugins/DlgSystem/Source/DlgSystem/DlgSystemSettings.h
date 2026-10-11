@@ -288,6 +288,11 @@ public:
 	UPROPERTY(Category = "Dialogue Node Data", Config, EditAnywhere, DisplayName = "SpeakerState Visibility")
 	EDlgSpeakerStateVisibility DialogueSpeakerStateVisibility = EDlgSpeakerStateVisibility::ShowOnNodeAndEdge;
 
+	// If not empty, SpeakerState suggestions only include GameplayTags under this root (e.g. "Speaker.State").
+	// If empty, all registered GameplayTags are suggested.
+	UPROPERTY(Category = "Dialogue Node Data", Config, EditAnywhere, DisplayName = "SpeakerState GameplayTag Root")
+	FName SpeakerStateTagRoot;
+
 	// What Voice fields to show in the Dialogue Editor, if any.
 	UPROPERTY(Category = "Dialogue Node Data", Config, EditAnywhere, DisplayName = "Displayed Voice Fields")
 	EDlgVoiceDisplayedFields DialogueDisplayedVoiceFields = EDlgVoiceDisplayedFields::None;
