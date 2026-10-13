@@ -21,8 +21,43 @@ enum class EGameState : uint8
     GameEnd UMETA(DisplayName = "Game End")
 };
 
+USTRUCT(BlueprintType)
+struct FReputationChange
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(BlueprintReadOnly)
+    EGuestFraction Fraction = EGuestFraction::Peasant;
+
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "На сколько изменилась репутация"))
+    int32 Delta = 0;
+
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Значение репутации после изменения"))
+    int32 NewValue = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FGuestOutcomeResult
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Жив ли гость после этого поступка"))
+    bool bGuestAlive = true;
+
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Что изменилось в репутации (пусто, если правила для этого исхода нет)"))
+    TArray<FReputationChange> ReputationChanges;
+
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Множитель полученный в диалоге"))
+    float AppliedMultiplier = 1.0f;
+
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReputationChanged, EGuestFraction, Fraction, int32, Delta, int32, NewValue);
 
 UCLASS(BlueprintType, Blueprintable)
 class THEGREENGROCERHUT_API UGameLoop : public UWorldSubsystem
@@ -59,23 +94,15 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Client")
     bool IsFirstClient() const { return currentClientIndex_ == 0; }
 
+public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     void GetDaySnapshot(FDaySnapshot& OutSnapshot) const { OutSnapshot = _currentDaySnapshot; }
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    USaveGameData* GetSavedData() const { return _savedData.Get(); }
-
-    UFUNCTION(BlueprintCallable, BlueprintPure)
     void GetGameMetrics(FGameMetrics& OutMetrics) const { OutMetrics = _metrics; }
 
-    UFUNCTION(BlueprintCallable, Category = "Infection Rate")
-    void UpdateInfectionRate(float DeltaInfectionRate, bool IsGood);
-
-    UFUNCTION(BlueprintCallable, Category = "Save")
-    void SaveGame();
-
-    UFUNCTION(BlueprintCallable, Category = "Save")
-    void ResetGameData();
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    USaveGameData* GetSavedData() const { return _savedData.Get(); }
 
     UFUNCTION(BlueprintCallable, Category = "Save")
     const FGameMetrics GetPreviousDayMetrics() const { return _savedData->LastDayMetrics; }
@@ -83,9 +110,36 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Save")
     const TArray<FName> GetPreviousDaySymptoms() const { return _savedData->DaySnapshots.Num() > 0 ? _savedData->DaySnapshots.Last().DaySymptoms : TArray<FName>(); }
 
-public: //TO DELETE (ПОЛНАЯ ХУЙНЯ)
-    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASS")
-    bool DidPlayerWin();
+public:
+    UFUNCTION(BlueprintPure, Category = "Dialog")
+    bool TryGetGuestMetrics(FName Key, FGuestMetrics& Out) const;
+
+    UFUNCTION(BlueprintPure, Category = "Dialog")
+    FGuestMetrics GetGuestMetrics(const UGuestData* Data) const;
+
+    UFUNCTION(BlueprintCallable, Category = "Dialog")
+    void SetGuestMetrics(const UGuestData* Data, const FGuestMetrics& Metrics);
+
+public:
+    UFUNCTION(BlueprintPure, Category = "Reputation")
+    int32 GetReputation(EGuestFraction Fraction) const;
+
+    UPROPERTY(BlueprintAssignable, Category = "Reputation")
+    FOnReputationChanged OnReputationChanged;
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Update Stats")
+    void UpdateInfectionRate(float DeltaInfectionRate, bool IsGood);
+
+    UFUNCTION(BlueprintCallable, Category = "Update Stats")
+    FGuestOutcomeResult UpdateGuestOutcome(const UGuestData* Guest, EGuestOutcome Outcome, const TArray<FGuestReputationModifier>& Modifiers);
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    void SaveGame();
+
+    UFUNCTION(BlueprintCallable, Category = "Save")
+    void ResetGameData();
 
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Settings")
@@ -95,9 +149,17 @@ private:
     using StateDelegatePtr = FGameStateChanged UGameLoop::*;
     static const TMap<EGameState, StateDelegatePtr> StateEventMap;
     static TMap<EGameState, StateDelegatePtr> InitStateEventMap();
+
     void TriggerStateEvent(EGameState State);
-    void LoadSave();
     void TriggerDayStart();
+
+    void LoadSave();
+    FGameMetrics GetDefaultGameMetrics() const;
+
+private:
+    const FReputationDelta* FindReputationDelta(const UGuestData* Guest, EGuestFraction Fraction, EGuestOutcome Outcome) const;
+
+    float GetDeathChance(const UGuestData* Guest, EGuestOutcome Outcome) const;
 
 private:
     FDaySnapshot _currentDaySnapshot;

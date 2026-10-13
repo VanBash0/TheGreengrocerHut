@@ -2,6 +2,7 @@
 #include <IngredientFunctionLibary.h>
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "DlgManager.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -176,75 +177,193 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
     }
 }
 
-void UGameLoop::LoadSave()
+FGuestOutcomeResult UGameLoop::UpdateGuestOutcome(const UGuestData* Guest, EGuestOutcome Outcome, const TArray<FGuestReputationModifier>& Modifiers)
 {
-    USaveGame* loadedGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0);
-    if (!loadedGame)
+    FGuestOutcomeResult Result;
+    if (!Guest || !_savedData || !GameSettings) { return Result; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    Metrics.Outcomes.Add(Outcome);
+
+    const float DeathChance = GetDeathChance(Guest, Outcome);
+    if (DeathChance > 0.0f && FMath::FRand() < DeathChance) { Metrics.GuestAlive = false; }
+
+    SetGuestMetrics(Guest, Metrics);
+    Result.bGuestAlive = Metrics.GuestAlive;
+
+    const FReputationDelta* Delta = FindReputationDelta(Guest, Metrics.GuestFraction, Outcome);
+    if (!Delta) { return Result; }
+
+    float Multiplier = 1.0f;
+    for (const FGuestReputationModifier& Modifier : Modifiers)
     {
-        UE_LOG(LogTemp, Warning, TEXT("No save data found."));
-
-        _currentDaySnapshot.VillageInfectionRate = 0;
-        _metrics.DayNumber = 1;
-        _metrics.HealingFactor = GameSettings->StartHealingFactor;
-        _metrics.KillingFactor = GameSettings->StartKillingFactor;
-        _metrics.HasDemonPrevious = false;
-        _metrics.MaxClientSymptomCount = 0;
-
-        _savedData = NewObject<USaveGameData>(this);
-
-        return;
+        if (Modifier.TriggerOutcome == Outcome)
+        {
+            Multiplier *= Modifier.Multiplier;
+        }
     }
 
-    USaveGameData* save = Cast<USaveGameData>(loadedGame);
+    Result.AppliedMultiplier = Multiplier;
+
+    auto ApplyReputation = [this, &Result](EGuestFraction Fraction, int32 DeltaValue, float Mult)
+        {
+            const int32 Scaled = FMath::RoundToInt(DeltaValue * Mult);
+            if (Scaled == 0) { return; }
+
+            int32& Value = _savedData->Reputation.FindOrAdd(Fraction);
+            Value += Scaled;
+
+            FReputationChange& Change = Result.ReputationChanges.AddDefaulted_GetRef();
+            Change.Fraction = Fraction;
+            Change.Delta = Scaled;
+            Change.NewValue = Value;
+
+            OnReputationChanged.Broadcast(Fraction, Scaled, Value);
+        };
+
+    ApplyReputation(Metrics.GuestFraction, Delta->Own, Multiplier);
+    ApplyReputation(GetOppositeFraction(Metrics.GuestFraction), Delta->Opposing, 1.0f);
+
+    return Result;
+}
+
+const FReputationDelta* UGameLoop::FindReputationDelta(const UGuestData* Guest, EGuestFraction Fraction, EGuestOutcome Outcome) const
+{
+    if (Guest->bOverrideReputation)
+    {
+        if (const FReputationDelta* Override = Guest->OverrideReputationRules.ByOutcome.Find(Outcome)) { return Override; }
+    }
+
+    const FFractionReputationRules* Rules = GameSettings->ReputationRules.Find(Fraction);
+    return Rules ? Rules->ByOutcome.Find(Outcome) : nullptr;
+}
+
+float UGameLoop::GetDeathChance(const UGuestData* Guest, EGuestOutcome Outcome) const
+{
+    if (Guest->bOverrideDeathChance)
+    {
+        if (const float* Override = Guest->OverrideDeathChance.Find(Outcome)) { return *Override; }
+    }
+
+    const float* Global = GameSettings->GuestDeathChance.Find(Outcome);
+    return Global ? *Global : 0.f;
+}
+
+void UGameLoop::LoadSave()
+{
+    USaveGameData* save = Cast<USaveGameData>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
     if (!save)
     {
-        UE_LOG(LogTemp, Error, TEXT("Loaded data is not of type USaveGameData"));
-        _savedData = NewObject<USaveGameData>(this);
-        return;
+        UE_LOG(LogTemp, Warning, TEXT("No valid save data found, starting a new game."));
+        save = NewObject<USaveGameData>(this);
     }
 
     _savedData = save;
 
-    if (save->DaySnapshots.Num() != 0)
+    if (save->DaySnapshots.IsEmpty())
+    {
+        _currentDaySnapshot.VillageInfectionRate = 0;
+        _metrics = GetDefaultGameMetrics();
+    }
+    else
     {
         _currentDaySnapshot.VillageInfectionRate = save->DaySnapshots.Last().VillageInfectionRate;
         _metrics = save->LastDayMetrics;
         _metrics.DayNumber++;
     }
-    else
-    {
-        _currentDaySnapshot.VillageInfectionRate = 0;
-        _metrics.DayNumber = 1;
-        _metrics.HealingFactor = GameSettings->StartHealingFactor;
-        _metrics.KillingFactor = GameSettings->StartKillingFactor;
-        _metrics.HasDemonPrevious = false;
-        _metrics.MaxClientSymptomCount = 0;
-    }
+
+    UDlgManager::SetDialogueHistory(save->DialogHistory);
 }
 
 void UGameLoop::SaveGame()
 {
+    if (!_savedData)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[GameLoop] SaveGame: _savedData is null, nothing to save."));
+        return;
+    }
+
     _savedData->DaySnapshots.Add(_currentDaySnapshot);
     _savedData->LastDayMetrics = _metrics;
 
-    bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, SaveSlotName, 0);
+    _savedData->DialogHistory = UDlgManager::GetDialogueHistory();
+
+    const bool bSaved = UGameplayStatics::SaveGameToSlot(_savedData, SaveSlotName, 0);
     if (!bSaved)
     {
-        UE_LOG(LogTemp, Log, TEXT("Saving failed!"));
+        UE_LOG(LogTemp, Error, TEXT("[GameLoop] SaveGame: SaveGameToSlot failed for slot '%s'."), *SaveSlotName);
     }
     else
     {
-        UE_LOG(LogTemp, Log, TEXT("Saving successful!"));
+        UE_LOG(LogTemp, Log, TEXT("[GameLoop] SaveGame: saved to slot '%s'."), *SaveSlotName);
     }
 }
 
 void UGameLoop::ResetGameData()
 {
     UGameplayStatics::DeleteGameInSlot(SaveSlotName, 0);
+
     _savedData = NewObject<USaveGameData>(this);
+
+    UDlgManager::ClearDialogueHistory();
 }
 
-bool UGameLoop::DidPlayerWin()
+FGameMetrics UGameLoop::GetDefaultGameMetrics() const
 {
-    return _currentDaySnapshot.VillageInfectionRate >= 100.0f;
+    FGameMetrics metrics = FGameMetrics();
+
+    metrics.DayNumber = 1;
+    metrics.HealingFactor = GameSettings->StartHealingFactor;
+    metrics.KillingFactor = GameSettings->StartKillingFactor;
+    metrics.HasDemonPrevious = false;
+    metrics.MaxClientSymptomCount = 0;
+
+    return metrics;
+}
+
+bool UGameLoop::TryGetGuestMetrics(FName Key, FGuestMetrics& Out) const
+{
+    Out = FGuestMetrics();
+
+    if (!_savedData) { return false; }
+
+    const FGuestMetrics* Found = _savedData->GuestMetrics.Find(Key);
+
+    if (Found)
+    {
+        Out = *Found;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+FGuestMetrics UGameLoop::GetGuestMetrics(const UGuestData* Data) const
+{
+    FGuestMetrics Result = {};
+    if (!Data) { return Result; }
+
+    if (TryGetGuestMetrics(Data->GetFName(), Result)) { return Result; }
+
+    Result = Data->DefaultMetrics;
+
+    return Result;
+}
+
+void UGameLoop::SetGuestMetrics(const UGuestData* Data, const FGuestMetrics& Metrics)
+{
+    if (!Data || !_savedData) { return; }
+
+    _savedData->GuestMetrics.Add(Data->GetFName(), Metrics);
+}
+
+int32 UGameLoop::GetReputation(EGuestFraction Fraction) const
+{
+    if (!_savedData) { return 0; }
+    
+    int32* Found = _savedData->Reputation.Find(Fraction);
+    return Found ? *Found : 0;
 }

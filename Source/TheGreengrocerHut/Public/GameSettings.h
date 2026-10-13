@@ -172,6 +172,18 @@ public:
     TMap<EPotionResult, float> PotionResultDeltaMap;
 
 public:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reputation",
+        meta = (DisplayName = "Reputation Rules",
+            ToolTip = "Правила изменения репутации. Ключ: фракция гостя, с которым игрок имел дело. Значение: таблица исходов (вылечил, недолечил, отравил, не принял) и для каждого изменение репутации у фракции гостя (Own) и у противоположной ей (Opposing). Если для фракции или исхода записи нет, репутация не меняется"))
+    TMap<EGuestFraction, FFractionReputationRules> ReputationRules;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guest Outcome",
+        meta = (DisplayName = "DeathChance",
+            ToolTip = "Шанс (0..1), что гость, умрёт после такого поступка (GuestAlive станет false)",
+            ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    TMap<EGuestOutcome, float> GuestDeathChance;
+
+public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Language", meta = (DisplayName = "Language Bind"))
     TMap<FName, FLanguageData> LanguageBind;
 };

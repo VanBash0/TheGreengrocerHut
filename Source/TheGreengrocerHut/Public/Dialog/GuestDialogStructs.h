@@ -17,6 +17,28 @@ enum class EGuestFraction : uint8
 	Sorcerer   UMETA(DisplayName = "Ведуны")
 };
 
+inline EGuestFraction GetOppositeFraction(EGuestFraction In)
+{
+	switch (In)
+	{
+		case EGuestFraction::Peasant:   return EGuestFraction::Boyar;
+		case EGuestFraction::Boyar:     return EGuestFraction::Peasant;
+		case EGuestFraction::Righteous: return EGuestFraction::Sorcerer;
+		case EGuestFraction::Sorcerer:  return EGuestFraction::Righteous;
+	}
+
+	return In;
+}
+
+UENUM(BlueprintType)
+enum class EGuestOutcome : uint8
+{
+	Healed    UMETA(DisplayName = "Вылечил"),
+	NotHealed UMETA(DisplayName = "Недолечил"),
+	Poisoned  UMETA(DisplayName = "Отравил"),
+	Rejected  UMETA(DisplayName = "Непринял")
+};
+
 USTRUCT(BlueprintType)
 struct FGuestMetrics
 { 
@@ -24,10 +46,13 @@ struct FGuestMetrics
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EGuestFraction GuestFraction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool GuestAlive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EGuestFraction GuestFraction;
+	TArray<EGuestOutcome> Outcomes;
 };
 
 USTRUCT(BlueprintType)
@@ -54,6 +79,45 @@ struct FGuestVariationSprite : public FGuestSpriteBase
 	TArray<TSoftObjectPtr<UPaperSprite>> Sprites;
 };
 
+USTRUCT(BlueprintType)
+struct FReputationDelta
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta = (DisplayName = "Own", ToolTip = "Изменение репутации у самой фракции гостя"))
+	int32 Own = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta = (DisplayName = "Opposing", ToolTip = "Изменение репутации у противоположной фракции (Крестьяне и Бояре, Праведники и Ведуны)"))
+	int32 Opposing = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FFractionReputationRules
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta = (DisplayName = "By Outcome",
+			ToolTip = "Как меняется репутация в зависимости от того, как игрок поступил с гостем этой фракции. Если исхода нет в таблице, репутация не меняется"))
+	TMap<EGuestOutcome, FReputationDelta> ByOutcome;
+};
+
+USTRUCT(BlueprintType)
+struct FGuestReputationModifier
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "Для какого исхода применяется множитель"))
+	EGuestOutcome TriggerOutcome = EGuestOutcome::Healed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "Множитель дельты репутации (1.15 = на 15% больше, 0.75 = штраф на 25% мягче)"))
+	float Multiplier = 1.0f;
+};
+
 UCLASS(BlueprintType)
 class UGuestData : public UPrimaryDataAsset
 {
@@ -72,6 +136,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "DialogEmotion", ExcludeBaseStruct))
 	TMap<FGameplayTag, TInstancedStruct<FGuestSpriteBase>> Emotions;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UDlgDialogue> GuestDialogue;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reputation", meta = (InlineEditConditionToggle))
+	bool bOverrideReputation = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reputation", meta = (EditCondition = "bOverrideReputation"))
+	FFractionReputationRules OverrideReputationRules;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guest Outcome", meta = (InlineEditConditionToggle))
+	bool bOverrideDeathChance = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guest Outcome", meta = (EditCondition = "bOverrideDeathChance"))
+	TMap<EGuestOutcome, float> OverrideDeathChance;
 };

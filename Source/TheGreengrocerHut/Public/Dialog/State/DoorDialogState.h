@@ -40,6 +40,9 @@ public:
 	TObjectPtr<UGuestEmotionPicker> EmotionPicker;
 
 	UPROPERTY(BlueprintReadOnly)
+	TArray<FGuestReputationModifier> Modifiers;
+
+	UPROPERTY(BlueprintReadOnly)
 	bool bLeft = false;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -98,6 +101,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	UDlgContext* GetCurrentContext() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Dialog")
+	void AddReputationModifier(const FGuestReputationModifier& ReputationModifier);
+
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	void GetGuests(TArray<FGuestEntry>& OutGuests) const { OutGuests = Guests; }
 
@@ -127,7 +133,7 @@ protected:
 	void ReleaseAll();
 
 protected:
-	FGuestMetrics GetGuestMetrics(UGuestData* InGuestData);
+	FGuestMetrics GetGuestRealMetrics(UGuestData* InGuestData) const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Settings")

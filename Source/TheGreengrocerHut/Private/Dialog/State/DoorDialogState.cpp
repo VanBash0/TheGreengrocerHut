@@ -6,6 +6,7 @@
 #include "Dialog/State/DoorPlayerParticipant.h"
 #include "Dialog/GuestEmotionPicker.h"
 #include "Dialog/GuestDialogStructs.h"
+#include <GameLoop.h>
 
 namespace
 {
@@ -33,6 +34,8 @@ void UDoorDialogState::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: no UDoorPlayerParticipant component found on actor '%s'. "
 			"Add a component UDoorPlayerParticipant."), *GetName(), *GetNameSafe(GetOwner()));
 	}
+
+	UDlgManager::GetDialogueHistory();
 
 	Super::BeginPlay();
 }
@@ -121,9 +124,16 @@ void UDoorDialogState::AcceptCurrentGuest()
 
 void UDoorDialogState::RejectCurrentGuest()
 {
+	if (bRejectPending) { return; }
+
 	if (!CanReject() || !Guests.IsValidIndex(CurrentGuestIndex)) { return; }
 
 	bRejectPending = true;
+
+	UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>();
+	if (!Loop) { return; }
+
+	Loop->UpdateGuestOutcome(Guests[CurrentGuestIndex].GuestData, EGuestOutcome::Rejected, Guests[CurrentGuestIndex].Modifiers);
 }
 
 void UDoorDialogState::StartGuestLeave(int32 GuestIndex)
@@ -142,8 +152,6 @@ void UDoorDialogState::FinishGuestLeave(int32 GuestIndex)
 	if (!Guests.IsValidIndex(GuestIndex)) { return; }
 	if (!Guests[GuestIndex].bLeaving) { return; }
 
-	// TODO: подсчёт метрик гостя
-
 	const bool bWasCurrent = (GuestIndex == CurrentGuestIndex);
 	if (bWasCurrent) { CurrentGuestIndex = INDEX_NONE; }
 
@@ -155,6 +163,13 @@ void UDoorDialogState::FinishGuestLeave(int32 GuestIndex)
 UDlgContext* UDoorDialogState::GetCurrentContext() const
 {
 	return Guests.IsValidIndex(CurrentGuestIndex) ? Guests[CurrentGuestIndex].Context.Get() : nullptr;
+}
+
+void UDoorDialogState::AddReputationModifier(const FGuestReputationModifier& ReputationModifier)
+{
+	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
+
+	Guests[CurrentGuestIndex].Modifiers.Add(ReputationModifier);
 }
 
 bool UDoorDialogState::CanReject() const
@@ -255,9 +270,12 @@ void UDoorDialogState::SelectDialogOption(int32 OptionIndex)
 	}
 }
 
-FGuestMetrics UDoorDialogState::GetGuestMetrics(UGuestData* InGuestData)
+FGuestMetrics UDoorDialogState::GetGuestRealMetrics(UGuestData* InGuestData) const
 {
-	return InGuestData->DefaultMetrics;
+	UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>();
+	if (!Loop) { return InGuestData->DefaultMetrics; }
+	
+	return Loop->GetGuestMetrics(InGuestData);
 }
 
 void UDoorDialogState::OnGuestsLoaded()
@@ -273,7 +291,7 @@ void UDoorDialogState::OnGuestsLoaded()
 
 		FGuestEntry& Entry = Guests.AddDefaulted_GetRef();
 		Entry.GuestData = Data;
-		Entry.GuestMetrics = GetGuestMetrics(Data);
+		Entry.GuestMetrics = GetGuestRealMetrics(Data);
 
 		Entry.EmotionPicker = NewObject<UGuestEmotionPicker>(this);
 		Entry.EmotionPicker->OnLoaded.AddDynamic(this, &UDoorDialogState::OnPickerLoaded);

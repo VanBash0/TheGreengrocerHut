@@ -4,6 +4,7 @@
 #include "GameFramework/SaveGame.h"
 #include "ClientStruct.h"
 #include "SymptomStructures.h"
+#include "DlgMemory.h"
 #include "SaveGameData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -74,4 +75,13 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GameData")
 	FGameMetrics LastDayMetrics;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "DialogData")
+	TMap<FName, FGuestMetrics> GuestMetrics;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "DialogData")
+	TMap<FGuid, FDlgHistory> DialogHistory;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Reputation")
+	TMap<EGuestFraction, int32> Reputation;
 };
