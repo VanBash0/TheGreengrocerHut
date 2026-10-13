@@ -86,7 +86,6 @@ void UGameLoop::SetNewState(EGameState NewState)
         *UEnum::GetValueAsString(CurrentState),
         *UEnum::GetValueAsString(NewState));
 
-    // Стек вызовов
     UE_LOG(LogTemp, Warning, TEXT("%s"), *FFrame::GetScriptCallstack());
 
     EGameState oldState = CurrentState;
@@ -113,7 +112,6 @@ void UGameLoop::IncrementCurrentClient()
                 {
                     currentClientIndex_++;
 
-                    // Логирование симптомов
                     if (_currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_))
                     {
                         const FClient& Client = _currentDaySnapshot.DayClients[currentClientIndex_];
@@ -126,14 +124,13 @@ void UGameLoop::IncrementCurrentClient()
 
                         if (!SymptomsString.IsEmpty())
                         {
-                            SymptomsString.LeftChopInline(2); // убрать последнюю ", "
+                            SymptomsString.LeftChopInline(2);
                         }
                         else
                         {
                             SymptomsString = TEXT("No symptoms");
                         }
 
-                        // Print String
                         if (GEngine)
                         {
                             GEngine->AddOnScreenDebugMessage(
@@ -146,7 +143,6 @@ void UGameLoop::IncrementCurrentClient()
                             );
                         }
 
-                        // И в Output Log тоже
                         UE_LOG(LogTemp, Warning, TEXT("Client %d symptoms: %s"),
                             currentClientIndex_,
                             *SymptomsString);
@@ -185,8 +181,10 @@ FGuestOutcomeResult UGameLoop::UpdateGuestOutcome(const UGuestData* Guest, EGues
     FGuestMetrics Metrics = GetGuestMetrics(Guest);
     Metrics.Outcomes.Add(Outcome);
 
+    const bool bDeathAllowed = Metrics.VisitCount > Guest->MinVisitsBeforeDeath;
+
     const float DeathChance = GetDeathChance(Guest, Outcome);
-    if (DeathChance > 0.0f && FMath::FRand() < DeathChance) { Metrics.GuestAlive = false; }
+    if (bDeathAllowed && DeathChance > 0.0f && FMath::FRand() < DeathChance) { Metrics.GuestAlive = false; }
 
     SetGuestMetrics(Guest, Metrics);
     Result.bGuestAlive = Metrics.GuestAlive;
@@ -358,6 +356,15 @@ void UGameLoop::SetGuestMetrics(const UGuestData* Data, const FGuestMetrics& Met
     if (!Data || !_savedData) { return; }
 
     _savedData->GuestMetrics.Add(Data->GetFName(), Metrics);
+}
+
+void UGameLoop::RegisterGuestVisit(const UGuestData* Guest)
+{
+    if (!Guest || !_savedData) { return; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    ++Metrics.VisitCount;
+    SetGuestMetrics(Guest, Metrics);
 }
 
 int32 UGameLoop::GetReputation(EGuestFraction Fraction) const

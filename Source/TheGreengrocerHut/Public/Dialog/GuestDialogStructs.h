@@ -53,6 +53,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EGuestOutcome> Outcomes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 VisitCount = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -145,6 +148,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reputation", meta = (EditCondition = "bOverrideReputation"))
 	FFractionReputationRules OverrideReputationRules;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guest Outcome",
+		meta = (ClampMin = "0", ToolTip = "Сколько визитов гость гарантированно выживает. Шанс смерти начинает действовать со следующего визита (при 2: визиты 1 и 2 безопасны). 0 = шанс смерти действует всегда"))
+	int32 MinVisitsBeforeDeath = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guest Outcome", meta = (InlineEditConditionToggle))
 	bool bOverrideDeathChance = false;

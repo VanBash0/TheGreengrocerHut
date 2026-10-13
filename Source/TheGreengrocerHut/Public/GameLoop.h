@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
@@ -30,10 +30,10 @@ public:
     UPROPERTY(BlueprintReadOnly)
     EGuestFraction Fraction = EGuestFraction::Peasant;
 
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "На сколько изменилась репутация"))
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "РќР° СЃРєРѕР»СЊРєРѕ РёР·РјРµРЅРёР»Р°СЃСЊ СЂРµРїСѓС‚Р°С†РёСЏ"))
     int32 Delta = 0;
 
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Значение репутации после изменения"))
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Р—РЅР°С‡РµРЅРёРµ СЂРµРїСѓС‚Р°С†РёРё РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёСЏ"))
     int32 NewValue = 0;
 };
 
@@ -43,15 +43,14 @@ struct FGuestOutcomeResult
     GENERATED_BODY()
 
 public:
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Жив ли гость после этого поступка"))
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Р–РёРІ Р»Рё РіРѕСЃС‚СЊ РїРѕСЃР»Рµ СЌС‚РѕРіРѕ РїРѕСЃС‚СѓРїРєР°"))
     bool bGuestAlive = true;
 
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Что изменилось в репутации (пусто, если правила для этого исхода нет)"))
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Р§С‚Рѕ РёР·РјРµРЅРёР»РѕСЃСЊ РІ СЂРµРїСѓС‚Р°С†РёРё (РїСѓСЃС‚Рѕ, РµСЃР»Рё РїСЂР°РІРёР»Р° РґР»СЏ СЌС‚РѕРіРѕ РёСЃС…РѕРґР° РЅРµС‚)"))
     TArray<FReputationChange> ReputationChanges;
 
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Множитель полученный в диалоге"))
+    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "РњРЅРѕР¶РёС‚РµР»СЊ, РїСЂРёРјРµРЅС‘РЅРЅС‹Р№ Рє СЂРµРїСѓС‚Р°С†РёРё СЃРІРѕРµР№ С„СЂР°РєС†РёРё РіРѕСЃС‚СЏ"))
     float AppliedMultiplier = 1.0f;
-
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
@@ -133,6 +132,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Update Stats")
     FGuestOutcomeResult UpdateGuestOutcome(const UGuestData* Guest, EGuestOutcome Outcome, const TArray<FGuestReputationModifier>& Modifiers);
+
+    // Counts one more visit of the guest (call once per arrival). Not exposed to BP on purpose.
+    void RegisterGuestVisit(const UGuestData* Guest);
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Save")

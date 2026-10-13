@@ -289,6 +289,11 @@ void UDoorDialogState::OnGuestsLoaded()
 			continue;
 		}
 
+		if (UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>())
+		{
+			Loop->RegisterGuestVisit(Data);
+		}
+
 		FGuestEntry& Entry = Guests.AddDefaulted_GetRef();
 		Entry.GuestData = Data;
 		Entry.GuestMetrics = GetGuestRealMetrics(Data);
