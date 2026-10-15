@@ -121,6 +121,11 @@ class UIngredientFunctionLibary : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 
+public:
+    UFUNCTION(BlueprintPure) static FVector2D GetSpriteSize(UPaperSprite* Sprite)
+    {
+        return Sprite ? FVector2D(Sprite->GetSourceSize()) : FVector2D::ZeroVector;
+    }
     // ============================================================
     // ИНГРЕДИЕНТЫ — без хэша (прямой доступ по FName / индексу)
     // ============================================================

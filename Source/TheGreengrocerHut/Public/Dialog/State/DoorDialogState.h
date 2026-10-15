@@ -97,6 +97,9 @@ public:
 public:
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	FGuestEntry GetCurrentGuest() const { return Guests.IsValidIndex(CurrentGuestIndex) ? Guests[CurrentGuestIndex] : FGuestEntry(); }
+	
+	UFUNCTION(BlueprintPure, Category = "Manage")
+	bool IsGuestAccepted() const { return bGuestAccepted; }
 
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	UDlgContext* GetCurrentContext() const;
@@ -158,6 +161,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Manage")
 	int32 CurrentGuestIndex = INDEX_NONE;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Manage")
+	bool bGuestAccepted = false;
 
 private:
 	TArray<TSoftObjectPtr<UGuestData>> PendingGuestRefs;

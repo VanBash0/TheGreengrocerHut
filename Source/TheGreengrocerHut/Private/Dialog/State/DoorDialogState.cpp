@@ -84,6 +84,8 @@ void UDoorDialogState::Reset_Implementation()
 {
 	Super::Reset_Implementation();
 
+	bGuestAccepted = false;
+
 	ReleaseAll();
 }
 
@@ -115,6 +117,8 @@ void UDoorDialogState::Enter()
 void UDoorDialogState::AcceptCurrentGuest()
 {
 	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
+
+	bGuestAccepted = true;
 
 	for (int32 i = 0; i < Guests.Num(); ++i)
 	{
