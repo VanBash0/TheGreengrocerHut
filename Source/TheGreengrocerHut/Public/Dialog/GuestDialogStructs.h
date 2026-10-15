@@ -51,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool GuestAlive;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<EGuestOutcome> Outcomes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
