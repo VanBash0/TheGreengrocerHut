@@ -215,6 +215,16 @@ UPaperSprite* UDoorDialogState::GetActiveSpeakerSprite() const
 	return Guest.EmotionPicker->GetEmotionSprite(Guest.Context->GetActiveNodeSpeakerState());
 }
 
+UPaperSprite* UDoorDialogState::GetGuestEmotionSprite(int32 InGuestIndex, FName EmotionState) const
+{
+	if (!Guests.IsValidIndex(InGuestIndex)) { return nullptr; }
+
+	const FGuestEntry& Guest = Guests[InGuestIndex];
+	if (!Guest.EmotionPicker) { return nullptr; }
+
+	return Guest.EmotionPicker->GetEmotionSprite(EmotionState);
+}
+
 void UDoorDialogState::SelectGuest(int32 InGuestIndex)
 {
 	if (CurrentGuestIndex != INDEX_NONE) { return; }

@@ -15,7 +15,7 @@ public class TheGreengrocerHut : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[]
 		{ "Core", "CoreUObject", "Engine", "InputCore", "StructUtils",
 			"SubstanceCore", "DeveloperSettings", "UMG", "GameplayTags",
-            "Paper2D", "DlgSystem"});
+            "Paper2D", "DlgSystem", "Slate", "SlateCore"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "AssetRegistry" });
 

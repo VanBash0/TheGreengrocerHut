@@ -94,10 +94,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Dialog")
 	virtual UPaperSprite* GetActiveSpeakerSprite() const;
 
+	// Sprite of any guest for the given emotion (the guests list cards use it before a guest is selected)
+	UFUNCTION(BlueprintCallable, Category = "Dialog")
+	UPaperSprite* GetGuestEmotionSprite(int32 GuestIndex, FName EmotionState) const;
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	FGuestEntry GetCurrentGuest() const { return Guests.IsValidIndex(CurrentGuestIndex) ? Guests[CurrentGuestIndex] : FGuestEntry(); }
 	
+	UFUNCTION(BlueprintPure, Category = "Manage")
+	int32 GetCurrentGuestIndex() const { return CurrentGuestIndex; }
+
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	bool IsGuestAccepted() const { return bGuestAccepted; }
 
