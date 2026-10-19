@@ -21,38 +21,6 @@ enum class EGameState : uint8
     GameEnd UMETA(DisplayName = "Game End")
 };
 
-USTRUCT(BlueprintType)
-struct FReputationChange
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(BlueprintReadOnly)
-    EGuestFraction Fraction = EGuestFraction::Peasant;
-
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "На сколько изменилась репутация"))
-    int32 Delta = 0;
-
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Значение репутации после изменения"))
-    int32 NewValue = 0;
-};
-
-USTRUCT(BlueprintType)
-struct FGuestOutcomeResult
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Жив ли гость после этого поступка"))
-    bool bGuestAlive = true;
-
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Что изменилось в репутации (пусто, если правила для этого исхода нет)"))
-    TArray<FReputationChange> ReputationChanges;
-
-    UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Множитель, применённый к репутации своей фракции гостя"))
-    float AppliedMultiplier = 1.0f;
-};
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameStateChangedWithArgs, EGameState, OldState, EGameState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
 
@@ -157,11 +125,6 @@ private:
 
     void LoadSave();
     FGameMetrics GetDefaultGameMetrics() const;
-
-private:
-    const FReputationDelta* FindReputationDelta(const UGuestData* Guest, EGuestFraction Fraction, EGuestOutcome Outcome) const;
-
-    float GetDeathChance(const UGuestData* Guest, EGuestOutcome Outcome) const;
 
 private:
     FDaySnapshot _currentDaySnapshot;

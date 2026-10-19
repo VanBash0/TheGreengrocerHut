@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "DlgManager.h"
+#include "Dialog/ReputationLibrary.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -114,38 +115,7 @@ void UGameLoop::IncrementCurrentClient()
 
                     if (_currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_))
                     {
-                        const FClient& Client = _currentDaySnapshot.DayClients[currentClientIndex_];
-
-                        FString SymptomsString;
-                        for (const FName& Symptom : Client.Symptoms)
-                        {
-                            SymptomsString += Symptom.ToString() + TEXT(", ");
-                        }
-
-                        if (!SymptomsString.IsEmpty())
-                        {
-                            SymptomsString.LeftChopInline(2);
-                        }
-                        else
-                        {
-                            SymptomsString = TEXT("No symptoms");
-                        }
-
-                        if (GEngine)
-                        {
-                            GEngine->AddOnScreenDebugMessage(
-                                -1,
-                                8.f,
-                                FColor::Green,
-                                FString::Printf(TEXT("Client %d: %s"),
-                                    currentClientIndex_,
-                                    *SymptomsString)
-                            );
-                        }
-
-                        UE_LOG(LogTemp, Warning, TEXT("Client %d symptoms: %s"),
-                            currentClientIndex_,
-                            *SymptomsString);
+                        UReputationLibrary::LogClientArrival(currentClientIndex_, _currentDaySnapshot.DayClients[currentClientIndex_]);
                     }
 
                     SetNewState(EGameState::SpawnClient);
@@ -175,76 +145,20 @@ void UGameLoop::UpdateInfectionRate(float DeltaInfectionRate, bool IsGood)
 
 FGuestOutcomeResult UGameLoop::UpdateGuestOutcome(const UGuestData* Guest, EGuestOutcome Outcome, const TArray<FGuestReputationModifier>& Modifiers)
 {
-    FGuestOutcomeResult Result;
-    if (!Guest || !_savedData || !GameSettings) { return Result; }
+    if (!Guest || !_savedData || !GameSettings) { return FGuestOutcomeResult(); }
+
+    const bool bIsDemon = _currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_) && _currentDaySnapshot.DayClients[currentClientIndex_].IsDemon;
 
     FGuestMetrics Metrics = GetGuestMetrics(Guest);
-    Metrics.Outcomes.Add(Outcome);
-
-    const bool bDeathAllowed = Metrics.VisitCount > Guest->MinVisitsBeforeDeath;
-
-    const float DeathChance = GetDeathChance(Guest, Outcome);
-    if (bDeathAllowed && DeathChance > 0.0f && FMath::FRand() < DeathChance) { Metrics.GuestAlive = false; }
-
+    const FGuestOutcomeResult Result = UReputationLibrary::ApplyOutcome(GameSettings, Guest, bIsDemon, Outcome, Modifiers, Metrics, _savedData->Reputation);
     SetGuestMetrics(Guest, Metrics);
-    Result.bGuestAlive = Metrics.GuestAlive;
 
-    const FReputationDelta* Delta = FindReputationDelta(Guest, Metrics.GuestFraction, Outcome);
-    if (!Delta) { return Result; }
-
-    float Multiplier = 1.0f;
-    for (const FGuestReputationModifier& Modifier : Modifiers)
+    for (const FReputationChange& Change : Result.ReputationChanges)
     {
-        if (Modifier.TriggerOutcome == Outcome)
-        {
-            Multiplier *= Modifier.Multiplier;
-        }
+        OnReputationChanged.Broadcast(Change.Fraction, Change.Delta, Change.NewValue);
     }
-
-    Result.AppliedMultiplier = Multiplier;
-
-    auto ApplyReputation = [this, &Result](EGuestFraction Fraction, int32 DeltaValue, float Mult)
-        {
-            const int32 Scaled = FMath::RoundToInt(DeltaValue * Mult);
-            if (Scaled == 0) { return; }
-
-            int32& Value = _savedData->Reputation.FindOrAdd(Fraction);
-            Value += Scaled;
-
-            FReputationChange& Change = Result.ReputationChanges.AddDefaulted_GetRef();
-            Change.Fraction = Fraction;
-            Change.Delta = Scaled;
-            Change.NewValue = Value;
-
-            OnReputationChanged.Broadcast(Fraction, Scaled, Value);
-        };
-
-    ApplyReputation(Metrics.GuestFraction, Delta->Own, Multiplier);
-    ApplyReputation(GetOppositeFraction(Metrics.GuestFraction), Delta->Opposing, 1.0f);
 
     return Result;
-}
-
-const FReputationDelta* UGameLoop::FindReputationDelta(const UGuestData* Guest, EGuestFraction Fraction, EGuestOutcome Outcome) const
-{
-    if (Guest->bOverrideReputation)
-    {
-        if (const FReputationDelta* Override = Guest->OverrideReputationRules.ByOutcome.Find(Outcome)) { return Override; }
-    }
-
-    const FFractionReputationRules* Rules = GameSettings->ReputationRules.Find(Fraction);
-    return Rules ? Rules->ByOutcome.Find(Outcome) : nullptr;
-}
-
-float UGameLoop::GetDeathChance(const UGuestData* Guest, EGuestOutcome Outcome) const
-{
-    if (Guest->bOverrideDeathChance)
-    {
-        if (const float* Override = Guest->OverrideDeathChance.Find(Outcome)) { return *Override; }
-    }
-
-    const float* Global = GameSettings->GuestDeathChance.Find(Outcome);
-    return Global ? *Global : 0.f;
 }
 
 void UGameLoop::LoadSave()

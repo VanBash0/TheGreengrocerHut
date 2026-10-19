@@ -42,6 +42,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FGuestReputationModifier> Modifiers;
 
+	// Copied from the client: the guest is a demon (a changeling or a real one)
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDemon = false;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool bLeft = false;
 
@@ -174,6 +178,8 @@ protected:
 
 private:
 	TArray<TSoftObjectPtr<UGuestData>> PendingGuestRefs;
+
+	bool bPendingIsDemon = false;
 
 	TSharedPtr<FStreamableHandle> GuestsHandle;
 

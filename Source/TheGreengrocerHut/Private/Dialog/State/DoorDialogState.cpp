@@ -52,6 +52,7 @@ void UDoorDialogState::Initialize_Implementation(const FClient& InClient)
 	Super::Initialize_Implementation(InClient);
 
 	PendingGuestRefs = InClient.Guests;
+	bPendingIsDemon = InClient.IsDemon;
 
 	TArray<FSoftObjectPath> Paths;
 	for (const TSoftObjectPtr<UGuestData>& Guest : PendingGuestRefs)
@@ -311,6 +312,7 @@ void UDoorDialogState::OnGuestsLoaded()
 		FGuestEntry& Entry = Guests.AddDefaulted_GetRef();
 		Entry.GuestData = Data;
 		Entry.GuestMetrics = GetGuestRealMetrics(Data);
+		Entry.bIsDemon = bPendingIsDemon;
 
 		Entry.EmotionPicker = NewObject<UGuestEmotionPicker>(this);
 		Entry.EmotionPicker->OnLoaded.AddDynamic(this, &UDoorDialogState::OnPickerLoaded);

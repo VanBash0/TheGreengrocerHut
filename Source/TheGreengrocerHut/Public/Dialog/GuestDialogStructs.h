@@ -14,21 +14,9 @@ enum class EGuestFraction : uint8
 	Peasant    UMETA(DisplayName = "Крестьянин"),
 	Boyar      UMETA(DisplayName = "Боярин"),
 	Righteous  UMETA(DisplayName = "Праведник"),
-	Sorcerer   UMETA(DisplayName = "Ведуны")
+	Sorcerer   UMETA(DisplayName = "Ведуны"),
+	Demon      UMETA(DisplayName = "Демон")
 };
-
-inline EGuestFraction GetOppositeFraction(EGuestFraction In)
-{
-	switch (In)
-	{
-		case EGuestFraction::Peasant:   return EGuestFraction::Boyar;
-		case EGuestFraction::Boyar:     return EGuestFraction::Peasant;
-		case EGuestFraction::Righteous: return EGuestFraction::Sorcerer;
-		case EGuestFraction::Sorcerer:  return EGuestFraction::Righteous;
-	}
-
-	return In;
-}
 
 UENUM(BlueprintType)
 enum class EGuestOutcome : uint8
@@ -88,13 +76,8 @@ struct FReputationDelta
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta = (DisplayName = "Own", ToolTip = "Изменение репутации у самой фракции гостя"))
-	int32 Own = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta = (DisplayName = "Opposing", ToolTip = "Изменение репутации у противоположной фракции (Крестьяне и Бояре, Праведники и Ведуны)"))
-	int32 Opposing = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Reaction", ToolTip = "Реакция фракций на событие", InvalidEnumValues = "Demon"))
+	TMap<EGuestFraction, int32> Reaction;
 };
 
 USTRUCT(BlueprintType)
@@ -104,9 +87,40 @@ struct FFractionReputationRules
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta = (DisplayName = "By Outcome",
-			ToolTip = "Как меняется репутация в зависимости от того, как игрок поступил с гостем этой фракции. Если исхода нет в таблице, репутация не меняется"))
+		meta = (DisplayName = "By Outcome", ToolTip = "Как меняется репутация в зависимости от того, как игрок поступил с гостем этой фракции. Если исхода нет в таблице, репутация не меняется"))
 	TMap<EGuestOutcome, FReputationDelta> ByOutcome;
+};
+
+USTRUCT(BlueprintType)
+struct FReputationChange
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	EGuestFraction Fraction = EGuestFraction::Peasant;
+
+	UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "На сколько изменилась репутация"))
+	int32 Delta = 0;
+
+	UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Значение репутации после изменения"))
+	int32 NewValue = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FGuestOutcomeResult
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Жив ли гость после этого поступка"))
+	bool bGuestAlive = true;
+
+	UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Что изменилось в репутации (пусто, если правила для этого исхода нет)"))
+	TArray<FReputationChange> ReputationChanges;
+
+	UPROPERTY(BlueprintReadOnly, meta = (ToolTip = "Множитель, применённый ко всем изменениям репутации от этого поступка"))
+	float AppliedMultiplier = 1.0f;
 };
 
 USTRUCT(BlueprintType)
