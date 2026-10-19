@@ -157,6 +157,11 @@ public:
 	TSoftObjectPtr<UDlgDialogue> GuestDialogue;
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Generation",
+		meta = (ToolTip = "Может ли гость стать подменышем: когда он умер (GuestAlive = false), клиент-демон может прийти под его видом. Гостям с фракцией Demon не нужно"))
+	bool bCanBecomeDemon = false;
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reputation", meta = (InlineEditConditionToggle))
 	bool bOverrideReputation = false;
 

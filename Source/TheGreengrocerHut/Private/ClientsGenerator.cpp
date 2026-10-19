@@ -1,7 +1,9 @@
-#include "ClientsGenerator.h"
+п»ї#include "ClientsGenerator.h"
 #include "SymptomStructures.h"
 #include "IngredientFunctionLibary.h"
 #include "Algo/RandomShuffle.h"
+#include "Engine/AssetManager.h"
+#include "GameLoop.h"
 
 namespace
 {
@@ -35,6 +37,7 @@ void ClientsGenerator::Process(FDaySnapshot& OutSnapshot, FGameMetrics& OutMetri
         UpdateSymptomPool();
         InitializeClients();
         FillSymptoms();
+        AssignGuests();
     }
 
     gameMetrics.SymptomMetrics.GenerateKeyArray(daySnapshot.DaySymptoms);
@@ -285,7 +288,7 @@ void ClientsGenerator::InitializeClients()
 #if !UE_BUILD_SHIPPING
     if (maxAvailableSymptoms < gameSettings->MinSymptoms)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] День %d: доступно только %d уникальных BodyPart, а MinSymptoms=%d. Баланс новых симптомов не поспевает за сложностью."), gameMetrics.DayNumber, maxAvailableSymptoms, gameSettings->MinSymptoms);
+        UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] Р”РµРЅСЊ %d: РґРѕСЃС‚СѓРїРЅРѕ С‚РѕР»СЊРєРѕ %d СѓРЅРёРєР°Р»СЊРЅС‹С… BodyPart, Р° MinSymptoms=%d. Р‘Р°Р»Р°РЅСЃ РЅРѕРІС‹С… СЃРёРјРїС‚РѕРјРѕРІ РЅРµ РїРѕСЃРїРµРІР°РµС‚ Р·Р° СЃР»РѕР¶РЅРѕСЃС‚СЊСЋ."), gameMetrics.DayNumber, maxAvailableSymptoms, gameSettings->MinSymptoms);
     }
 #endif
 }
@@ -342,7 +345,31 @@ bool ClientsGenerator::TryHandleTutorialDay()
 
     daySnapshot.DemonSymptoms = demonSymptomsSet.Array();
 
+    ValidateTutorialGuests();
+
     return true;
+}
+
+void ClientsGenerator::ValidateTutorialGuests() const
+{
+    for (int32 i = 0; i < daySnapshot.DayClients.Num(); ++i)
+    {
+        const FClient& client = daySnapshot.DayClients[i];
+
+        if (client.Guests.IsEmpty())
+        {
+            UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] Tutorial day %d: client %d has no guests in the table."), gameMetrics.DayNumber, i);
+            continue;
+        }
+
+        for (const TSoftObjectPtr<UGuestData>& guest : client.Guests)
+        {
+            if (guest.IsNull())
+            {
+                UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] Tutorial day %d: client %d has an empty guest slot."), gameMetrics.DayNumber, i);
+            }
+        }
+    }
 }
 
 FName ClientsGenerator::SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon)
@@ -392,8 +419,6 @@ void ClientsGenerator::FillSymptoms()
 {
     GenerateDemonSymptoms();
 
-    // demonSymptomCount мог быть посчитан оптимистично,
-    // а GenerateDemonSymptoms мог реально набрать меньше — синхронизируем.
     demonSymptomCount = daySnapshot.DemonSymptoms.Num();
 
     float recoveryRate = gameSettings->WeightRecoveryRate;
@@ -402,8 +427,6 @@ void ClientsGenerator::FillSymptoms()
     {
         if (daySnapshot.DayClients[i].IsDemon)
         {
-            // Обрезаем массив демона под реально собранный список DemonSymptoms —
-            // никаких "хвостов" из None.
             daySnapshot.DayClients[i].Symptoms.SetNum(demonSymptomCount);
             for (int j = 0; j < demonSymptomCount; ++j)
             {
@@ -466,7 +489,7 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 {
     if (client.Symptoms.Num() == 0 || client.Symptoms.Num() != daySnapshot.DemonSymptoms.Num())
     {
-        return; // разное количество симптомов — совпасть как множество не может
+        return;
     }
 
     TSet<FName> clientSet(client.Symptoms);
@@ -474,10 +497,9 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 
     if (clientSet.Num() != demonSet.Num() || clientSet.Difference(demonSet).Num() != 0)
     {
-        return; // не совпадает — всё ок
+        return;
     }
 
-    // Полное совпадение — подменяем один случайный симптом клиента на что-то другое.
     TSet<EBodyPart> occupiedParts;
     for (const FName& Symptom : client.Symptoms)
     {
@@ -492,7 +514,6 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 
     if (const FSymptomWithWeightsData* OldData = gameMetrics.SymptomMetrics.Find(OldSymptom))
     {
-        occupiedParts.Remove(OldData->BodyPart); // освобождаем часть тела, чтобы можно было выбрать замену
     }
 
     FName NewSymptom = SelectSymptomFromPool(occupiedParts, false);
@@ -513,4 +534,133 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
         UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] EnsureSymptomsDontMatchDemon: could not find a replacement symptom, client may still match the demon"));
     }
 #endif
+}
+
+TArray<const UGuestData*> ClientsGenerator::LoadGuestPool() const
+{
+    TArray<const UGuestData*> pool;
+
+    UAssetManager* assetManager = UAssetManager::GetIfInitialized();
+    if (!assetManager) { return pool; }
+
+    TArray<FPrimaryAssetId> assetIds;
+    assetManager->GetPrimaryAssetIdList(FPrimaryAssetType(TEXT("GuestData")), assetIds);
+
+    for (const FPrimaryAssetId& assetId : assetIds)
+    {
+        if (const UGuestData* guest = Cast<UGuestData>(assetManager->GetPrimaryAssetPath(assetId).TryLoad()))
+        {
+            pool.Add(guest);
+        }
+    }
+
+    return pool;
+}
+
+bool ClientsGenerator::IsGuestAvailable(const UGuestData* guest, bool isDemon) const
+{
+    const UGameLoop* gameLoop = Cast<UGameLoop>(worldContextObject);
+    const bool bAlive = gameLoop ? gameLoop->GetGuestMetrics(guest).GuestAlive : guest->DefaultMetrics.GuestAlive;
+
+    if (isDemon)
+    {
+        return guest->DefaultMetrics.GuestFraction == EGuestFraction::Demon || (guest->bCanBecomeDemon && !bAlive);
+    }
+
+    return guest->DefaultMetrics.GuestFraction != EGuestFraction::Demon && bAlive;
+}
+
+float ClientsGenerator::GetGuestWeight(const UGuestData* guest, bool isDemon) const
+{
+    const FGuestWeightData* data = gameMetrics.GuestWeights.Find(guest->GetFName());
+    if (!data) { return 1.0f; }
+
+    return isDemon ? data->DemonWeight : data->Weight;
+}
+
+const UGuestData* ClientsGenerator::SelectGuest(const TArray<const UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const
+{
+    TArray<const UGuestData*> candidates;
+    float totalWeight = 0.0f;
+
+    for (const UGuestData* guest : pool)
+    {
+        if (usedToday.Contains(guest->GetFName()) || !IsGuestAvailable(guest, isDemon)) { continue; }
+
+        candidates.Add(guest);
+        totalWeight += FMath::Max(0.0f, GetGuestWeight(guest, isDemon));
+    }
+
+    if (candidates.IsEmpty()) { return nullptr; }
+
+    if (totalWeight <= 0.0f)
+    {
+        return candidates[FMath::RandRange(0, candidates.Num() - 1)];
+    }
+
+    const float roll = FMath::RandRange(0.0f, totalWeight);
+    float accumulatedWeight = 0.0f;
+
+    for (const UGuestData* guest : candidates)
+    {
+        accumulatedWeight += FMath::Max(0.0f, GetGuestWeight(guest, isDemon));
+        if (roll <= accumulatedWeight && GetGuestWeight(guest, isDemon) > 0.0f)
+        {
+            return guest;
+        }
+    }
+
+    return candidates.Last();
+}
+
+void ClientsGenerator::PickGuestsForClient(FClient& client, const TArray<const UGuestData*>& pool, TSet<FName>& usedToday)
+{
+    const int32 minCount = client.IsDemon ? gameSettings->MinDemonGuests : gameSettings->MinGuests;
+    const int32 maxCount = client.IsDemon ? gameSettings->MaxDemonGuests : gameSettings->MaxGuests;
+    const int32 wantedCount = FMath::RandRange(minCount, FMath::Max(minCount, maxCount));
+
+    client.Guests.Reset();
+
+    for (int32 i = 0; i < wantedCount; ++i)
+    {
+        const UGuestData* guest = SelectGuest(pool, client.IsDemon, usedToday);
+        if (!guest) { break; }
+
+        client.Guests.Add(TSoftObjectPtr<UGuestData>(FSoftObjectPath(guest)));
+        usedToday.Add(guest->GetFName());
+
+        FGuestWeightData& weight = gameMetrics.GuestWeights.FindOrAdd(guest->GetFName());
+        (client.IsDemon ? weight.DemonWeight : weight.Weight) = gameSettings->WeightMinValue;
+    }
+
+#if !UE_BUILD_SHIPPING
+    if (client.Guests.Num() < minCount)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[ClientsGenerator] Day %d: %s client got %d guest(s) instead of %d, the pool is too small."),
+            gameMetrics.DayNumber, client.IsDemon ? TEXT("demon") : TEXT("human"), client.Guests.Num(), minCount);
+    }
+#endif
+}
+
+void ClientsGenerator::AssignGuests()
+{
+    const TArray<const UGuestData*> pool = LoadGuestPool();
+    if (pool.IsEmpty())
+    {
+        UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] No guests found: check the GuestData type in the Asset Manager settings."));
+        return;
+    }
+
+    TSet<FName> usedToday;
+    for (FClient& client : daySnapshot.DayClients)
+    {
+        PickGuestsForClient(client, pool, usedToday);
+    }
+
+    for (const UGuestData* guest : pool)
+    {
+        FGuestWeightData& weight = gameMetrics.GuestWeights.FindOrAdd(guest->GetFName());
+        weight.Weight += gameSettings->WeightRecoveryRate;
+        weight.DemonWeight += gameSettings->WeightRecoveryRate;
+    }
 }

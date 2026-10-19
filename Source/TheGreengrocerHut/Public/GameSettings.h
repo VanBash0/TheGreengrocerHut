@@ -90,6 +90,26 @@ public:
             ClampMin = "0.0", UIMin = "1.0"))
     float DemonContinueChance;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Guests",
+        meta = (DisplayName = "Min Guests", ToolTip = "Минимальное количество гостей у обычного клиента",
+            ClampMin = "1", UIMin = "1"))
+    int MinGuests = 1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Guests",
+        meta = (DisplayName = "Max Guests", ToolTip = "Максимальное количество гостей у обычного клиента",
+            ClampMin = "1", UIMin = "1"))
+    int MaxGuests = 1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Guests",
+        meta = (DisplayName = "Min Demon Guests", ToolTip = "Минимальное количество гостей у клиента-демона",
+            ClampMin = "1", UIMin = "1"))
+    int MinDemonGuests = 1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Guests",
+        meta = (DisplayName = "Max Demon Guests", ToolTip = "Максимальное количество гостей у клиента-демона",
+            ClampMin = "1", UIMin = "1"))
+    int MaxDemonGuests = 1;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Client Generator Settings|Symptoms",
         meta = (DisplayName = "Min Symptoms", ToolTip = "Минимальное количество симптомов у клиента",
             ClampMin = "1", UIMin = "1"))

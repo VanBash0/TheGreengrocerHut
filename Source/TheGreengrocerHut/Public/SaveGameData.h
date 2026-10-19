@@ -41,12 +41,28 @@ struct FSymptomWithWeightsData
 };
 
 USTRUCT(BlueprintType)
+struct FGuestWeightData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Weight = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float DemonWeight = 1.0f;
+};
+
+USTRUCT(BlueprintType)
 struct FGameMetrics
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TMap<FName, FSymptomWithWeightsData> SymptomMetrics;
+
+	// Weight of every guest (key = name of the UGuestData): how likely he comes as a person / as a demon
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TMap<FName, FGuestWeightData> GuestWeights;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	int MaxClientSymptomCount;

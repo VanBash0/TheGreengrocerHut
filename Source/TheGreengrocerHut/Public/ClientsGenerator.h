@@ -18,26 +18,43 @@ public:
     void Process(FDaySnapshot& OutSnapshot, FGameMetrics& OutMetrics);
 
 private:
-    void GenerateDemonSymptoms();
+    bool TryHandleTutorialDay();
 
+private:
     void UpdateSymptomPool();
     void InitializeClients();
     void FillSymptoms();
+
+    void GenerateDemonSymptoms();
     void GenerateSymptomsForClient(FClient& client);
-    bool TryHandleTutorialDay();
-    FName SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon);
     void EnsureSymptomsDontMatchDemon(FClient& client);
 
+    FName SelectSymptomFromPool(const TSet<EBodyPart>& occupiedParts, bool isDemon);
+
+private:
+    void AssignGuests();
+    void PickGuestsForClient(FClient& client, const TArray<const UGuestData*>& pool, TSet<FName>& usedToday);
+    const UGuestData* SelectGuest(const TArray<const UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const;
+
+    TArray<const UGuestData*> LoadGuestPool() const;
+    bool IsGuestAvailable(const UGuestData* guest, bool isDemon) const;
+    float GetGuestWeight(const UGuestData* guest, bool isDemon) const;
+
+    void ValidateTutorialGuests() const;
+
+private:
+    const UObject* worldContextObject = nullptr;
+    const UGameProjectSettings* projectSettings = nullptr;
+    const UGameSettings* gameSettings = nullptr;
+
+private:
     FGameMetrics gameMetrics;
     FDaySnapshot daySnapshot;
 
-    int demonsNum;
-    int demonSymptomCount;
+private:
+    float infectionRateNormalized = 0.f;
+    float progressionMultiplier = 0.f;
 
-    float infectionRateNormalized;
-    float progressionMultiplier;
-
-    const UGameSettings* gameSettings;
-    const UGameProjectSettings* projectSettings;
-    const UObject* worldContextObject;
+    int demonsNum = 0;
+    int demonSymptomCount = 0;
 };
