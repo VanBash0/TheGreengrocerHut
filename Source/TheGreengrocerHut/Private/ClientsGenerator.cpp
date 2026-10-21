@@ -1,5 +1,5 @@
-﻿#include "ClientsGenerator.h"
-#include "SymptomStructures.h"
+#include "ClientsGenerator.h"
+#include "Symptom/SymptomStructures.h"
 #include "IngredientFunctionLibary.h"
 #include "Algo/RandomShuffle.h"
 #include "Engine/AssetManager.h"
@@ -252,7 +252,9 @@ void ClientsGenerator::InitializeClients()
 
     int peopleNum = clientsNum - demonsNum;
 
-    float expectedValue = gameSettings->MinSymptoms + (gameSettings->MaxSymptoms - gameSettings->MinSymptoms) * (1 - infectionRateNormalized);
+    const float symptomInfluence = FMath::Clamp(gameSettings->SymptomInfectionInfluence, 0.0f, 1.0f);
+    const float smoothedInfectionRate = 0.5f + (infectionRateNormalized - 0.5f) * symptomInfluence;
+    float expectedValue = gameSettings->MinSymptoms + (gameSettings->MaxSymptoms - gameSettings->MinSymptoms) * (1 - smoothedInfectionRate);
 
     TSet<EBodyPart> distinctUnlockedParts;
     for (const auto& pair : gameMetrics.SymptomMetrics)
@@ -514,6 +516,7 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 
     if (const FSymptomWithWeightsData* OldData = gameMetrics.SymptomMetrics.Find(OldSymptom))
     {
+        occupiedParts.Remove(OldData->BodyPart);
     }
 
     FName NewSymptom = SelectSymptomFromPool(occupiedParts, false);

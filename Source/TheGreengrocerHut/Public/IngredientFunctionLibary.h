@@ -10,7 +10,7 @@
 
 #include "IngredientStructures.h"
 #include "GardenStructures.h"
-#include "SymptomStructures.h"
+#include "Symptom/SymptomStructures.h"
 #include "Converter.h"
 #include "ConverterRecipe.h"
 #include "GameSettings.h"

@@ -3,8 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "ClientStruct.h"
-#include "SymptomStructures.h"
 #include "DlgMemory.h"
+#include "Symptom/SymptomStructures.h"
 #include "SaveGameData.generated.h"
 
 USTRUCT(BlueprintType)
