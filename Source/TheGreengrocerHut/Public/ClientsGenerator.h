@@ -33,10 +33,10 @@ private:
 
 private:
     void AssignGuests();
-    void PickGuestsForClient(FClient& client, const TArray<const UGuestData*>& pool, TSet<FName>& usedToday);
-    const UGuestData* SelectGuest(const TArray<const UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const;
+    void PickGuestsForClient(FClient& client, const TArray<UGuestData*>& pool, TSet<FName>& usedToday);
+    UGuestData* SelectGuest(const TArray<UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const;
 
-    TArray<const UGuestData*> LoadGuestPool() const;
+    TArray<UGuestData*> LoadGuestPool() const;
     bool IsGuestAvailable(const UGuestData* guest, bool isDemon) const;
     float GetGuestWeight(const UGuestData* guest, bool isDemon) const;
 

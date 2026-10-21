@@ -2,7 +2,9 @@
 #include "Symptom/SymptomStructures.h"
 #include "IngredientFunctionLibary.h"
 #include "Algo/RandomShuffle.h"
-#include "Engine/AssetManager.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+#include "Dialog/GuestSubsystem.h"
 #include "GameLoop.h"
 
 namespace
@@ -364,9 +366,9 @@ void ClientsGenerator::ValidateTutorialGuests() const
             continue;
         }
 
-        for (const TSoftObjectPtr<UGuestData>& guest : client.Guests)
+        for (const TObjectPtr<UGuestData>& guest : client.Guests)
         {
-            if (guest.IsNull())
+            if (!guest)
             {
                 UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] Tutorial day %d: client %d has an empty guest slot."), gameMetrics.DayNumber, i);
             }
@@ -539,22 +541,20 @@ void ClientsGenerator::EnsureSymptomsDontMatchDemon(FClient& client)
 #endif
 }
 
-TArray<const UGuestData*> ClientsGenerator::LoadGuestPool() const
+TArray<UGuestData*> ClientsGenerator::LoadGuestPool() const
 {
-    TArray<const UGuestData*> pool;
+    TArray<UGuestData*> pool;
 
-    UAssetManager* assetManager = UAssetManager::GetIfInitialized();
-    if (!assetManager) { return pool; }
+    const UWorld* world = worldContextObject ? worldContextObject->GetWorld() : nullptr;
+    const UGameInstance* gameInstance = world ? world->GetGameInstance() : nullptr;
+    UGuestSubsystem* guestSubsystem = gameInstance ? gameInstance->GetSubsystem<UGuestSubsystem>() : nullptr;
+    if (!guestSubsystem) { return pool; }
 
-    TArray<FPrimaryAssetId> assetIds;
-    assetManager->GetPrimaryAssetIdList(FPrimaryAssetType(TEXT("GuestData")), assetIds);
+    guestSubsystem->EnsureLoaded();
 
-    for (const FPrimaryAssetId& assetId : assetIds)
+    for (UGuestData* guest : guestSubsystem->GetAllGuests())
     {
-        if (const UGuestData* guest = Cast<UGuestData>(assetManager->GetPrimaryAssetPath(assetId).TryLoad()))
-        {
-            pool.Add(guest);
-        }
+        if (guest) { pool.Add(guest); }
     }
 
     return pool;
@@ -581,12 +581,12 @@ float ClientsGenerator::GetGuestWeight(const UGuestData* guest, bool isDemon) co
     return isDemon ? data->DemonWeight : data->Weight;
 }
 
-const UGuestData* ClientsGenerator::SelectGuest(const TArray<const UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const
+UGuestData* ClientsGenerator::SelectGuest(const TArray<UGuestData*>& pool, bool isDemon, const TSet<FName>& usedToday) const
 {
-    TArray<const UGuestData*> candidates;
+    TArray<UGuestData*> candidates;
     float totalWeight = 0.0f;
 
-    for (const UGuestData* guest : pool)
+    for (UGuestData* guest : pool)
     {
         if (usedToday.Contains(guest->GetFName()) || !IsGuestAvailable(guest, isDemon)) { continue; }
 
@@ -604,7 +604,7 @@ const UGuestData* ClientsGenerator::SelectGuest(const TArray<const UGuestData*>&
     const float roll = FMath::RandRange(0.0f, totalWeight);
     float accumulatedWeight = 0.0f;
 
-    for (const UGuestData* guest : candidates)
+    for (UGuestData* guest : candidates)
     {
         accumulatedWeight += FMath::Max(0.0f, GetGuestWeight(guest, isDemon));
         if (roll <= accumulatedWeight && GetGuestWeight(guest, isDemon) > 0.0f)
@@ -616,7 +616,7 @@ const UGuestData* ClientsGenerator::SelectGuest(const TArray<const UGuestData*>&
     return candidates.Last();
 }
 
-void ClientsGenerator::PickGuestsForClient(FClient& client, const TArray<const UGuestData*>& pool, TSet<FName>& usedToday)
+void ClientsGenerator::PickGuestsForClient(FClient& client, const TArray<UGuestData*>& pool, TSet<FName>& usedToday)
 {
     const int32 minCount = client.IsDemon ? gameSettings->MinDemonGuests : gameSettings->MinGuests;
     const int32 maxCount = client.IsDemon ? gameSettings->MaxDemonGuests : gameSettings->MaxGuests;
@@ -626,10 +626,10 @@ void ClientsGenerator::PickGuestsForClient(FClient& client, const TArray<const U
 
     for (int32 i = 0; i < wantedCount; ++i)
     {
-        const UGuestData* guest = SelectGuest(pool, client.IsDemon, usedToday);
+        UGuestData* guest = SelectGuest(pool, client.IsDemon, usedToday);
         if (!guest) { break; }
 
-        client.Guests.Add(TSoftObjectPtr<UGuestData>(FSoftObjectPath(guest)));
+        client.Guests.Add(guest);
         usedToday.Add(guest->GetFName());
 
         FGuestWeightData& weight = gameMetrics.GuestWeights.FindOrAdd(guest->GetFName());
@@ -647,10 +647,10 @@ void ClientsGenerator::PickGuestsForClient(FClient& client, const TArray<const U
 
 void ClientsGenerator::AssignGuests()
 {
-    const TArray<const UGuestData*> pool = LoadGuestPool();
+    const TArray<UGuestData*> pool = LoadGuestPool();
     if (pool.IsEmpty())
     {
-        UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] No guests found: check the GuestData type in the Asset Manager settings."));
+        UE_LOG(LogTemp, Error, TEXT("[ClientsGenerator] The guest pool is empty: check the GuestData type in the Asset Manager settings."));
         return;
     }
 
@@ -660,7 +660,7 @@ void ClientsGenerator::AssignGuests()
         PickGuestsForClient(client, pool, usedToday);
     }
 
-    for (const UGuestData* guest : pool)
+    for (UGuestData* guest : pool)
     {
         FGuestWeightData& weight = gameMetrics.GuestWeights.FindOrAdd(guest->GetFName());
         weight.Weight += gameSettings->WeightRecoveryRate;

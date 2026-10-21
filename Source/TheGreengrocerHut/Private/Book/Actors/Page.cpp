@@ -101,11 +101,15 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 
 	const int32 ThisGeneration = WidgetInitGeneration;
 
+	UnbindRefresh(Front);
+	UnbindRefresh(Back);
+
 	if (Front && InWidgetPageR)
 	{
 		if (UBookPageBase* RightWidget = CreateWidget<UBookPageBase>(GetWorld(), InWidgetPageR))
 		{
 			RightWidget->Initialize(PageIndex);
+			RightWidget->OnRefreshRequested.AddDynamic(this, &APage::RefreshWidgets);
 
 			Front->SetWidget(RightWidget);
 
@@ -118,6 +122,7 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 		if (UBookPageBase* LeftWidget = CreateWidget<UBookPageBase>(GetWorld(), InWidgetPageL))
 		{
 			LeftWidget->Initialize(PageIndex + 1);
+			LeftWidget->OnRefreshRequested.AddDynamic(this, &APage::RefreshWidgets);
 
 			Back->SetWidget(LeftWidget);
 
@@ -125,6 +130,46 @@ void APage::InitializeWidgets(int32 InPageIndex, TSubclassOf<UBookPageBase> InWi
 		}
 	}
 
+	FinishWidgetRender(ThisGeneration);
+}
+
+void APage::RefreshWidgets()
+{
+	if (!OwnerBook) { return; }
+
+	UBookPageBase* RightWidget = Front ? Cast<UBookPageBase>(Front->GetWidget()) : nullptr;
+	UBookPageBase* LeftWidget = Back ? Cast<UBookPageBase>(Back->GetWidget()) : nullptr;
+	if (!RightWidget && !LeftWidget) { return; }
+
+	const int32 ThisGeneration = ++WidgetInitGeneration;
+
+	if (RightWidget)
+	{
+		RightWidget->Initialize(PageIndex);
+		Front->SetVisibility(true);
+	}
+
+	if (LeftWidget)
+	{
+		LeftWidget->Initialize(PageIndex + 1);
+		Back->SetVisibility(true);
+	}
+
+	FinishWidgetRender(ThisGeneration);
+}
+
+void APage::UnbindRefresh(UWidgetComponent* Component)
+{
+	if (!Component) { return; }
+
+	if (UBookPageBase* Widget = Cast<UBookPageBase>(Component->GetWidget()))
+	{
+		Widget->OnRefreshRequested.RemoveDynamic(this, &APage::RefreshWidgets);
+	}
+}
+
+void APage::FinishWidgetRender(int32 ThisGeneration)
+{
 	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, ThisGeneration]()
 		{
 			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, ThisGeneration]()

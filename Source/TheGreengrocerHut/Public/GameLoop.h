@@ -26,6 +26,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStateChanged);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReputationChanged, EGuestFraction, Fraction, int32, Delta, int32, NewValue);
 
+class UGuestSubsystem;
+
 UCLASS(BlueprintType, Blueprintable)
 class THEGREENGROCERHUT_API UGameLoop : public UWorldSubsystem
 {
@@ -104,6 +106,21 @@ public:
     // Counts one more visit of the guest (call once per arrival). Not exposed to BP on purpose.
     void RegisterGuestVisit(const UGuestData* Guest);
 
+    // Opens a block of the guest page in the book (Index = index in UGuestData Description / Notes)
+    UFUNCTION(BlueprintCallable, Category = "Dialog")
+    void UnlockDescription(const UGuestData* Guest, int32 Index);
+
+    UFUNCTION(BlueprintCallable, Category = "Dialog")
+    void UnlockNote(const UGuestData* Guest, int32 Index);
+
+    // The player has seen the guest (the guest appears in the book)
+    UFUNCTION(BlueprintCallable, Category = "Dialog")
+    void MarkGuestSeen(const UGuestData* Guest);
+
+    // The player has learned the name of the guest
+    UFUNCTION(BlueprintCallable, Category = "Dialog")
+    void MarkNameKnown(const UGuestData* Guest);
+
 public:
     UFUNCTION(BlueprintCallable, Category = "Save")
     void SaveGame();
@@ -135,6 +152,9 @@ private:
 private:
     UPROPERTY()
     TObjectPtr<USaveGameData> _savedData;
+
+private:
+    UGuestSubsystem* GetGuestSubsystem() const;
 
 private:
     FTimerHandle ClientSpawnTimerHandle;

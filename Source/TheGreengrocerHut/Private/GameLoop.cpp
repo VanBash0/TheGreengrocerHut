@@ -3,7 +3,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "DlgManager.h"
-#include "Dialog/ReputationLibrary.h"
+#include "Dialog/GuestLibrary.h"
+#include "Dialog/GuestSubsystem.h"
+#include "Engine/GameInstance.h"
 
 void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -29,8 +31,13 @@ void UGameLoop::Initialize(FSubsystemCollectionBase& Collection)
     FString MapName = World->GetMapName();
     if (!MapName.Contains(TEXT("GAME_LEVEL"))) { return; }
 
+    UGuestSubsystem* GuestSubsystem = World->GetGameInstance() ? World->GetGameInstance()->GetSubsystem<UGuestSubsystem>() : nullptr;
+    if (GuestSubsystem) { GuestSubsystem->EnsureLoaded(); }
+
     ClientsGenerator clientsGenerator(this, ProjectSettings, GameSettings, _currentDaySnapshot, _metrics);
     clientsGenerator.Process(_currentDaySnapshot, _metrics);
+
+    if (GuestSubsystem) { GuestSubsystem->Trim(_currentDaySnapshot.DayClients, _savedData); }
 
     World->GetTimerManager().SetTimerForNextTick(this, &UGameLoop::TriggerDayStart);
 }
@@ -115,7 +122,7 @@ void UGameLoop::IncrementCurrentClient()
 
                     if (_currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_))
                     {
-                        UReputationLibrary::LogClientArrival(currentClientIndex_, _currentDaySnapshot.DayClients[currentClientIndex_]);
+                        UGuestLibrary::LogClientArrival(currentClientIndex_, _currentDaySnapshot.DayClients[currentClientIndex_]);
                     }
 
                     SetNewState(EGameState::SpawnClient);
@@ -150,7 +157,7 @@ FGuestOutcomeResult UGameLoop::UpdateGuestOutcome(const UGuestData* Guest, EGues
     const bool bIsDemon = _currentDaySnapshot.DayClients.IsValidIndex(currentClientIndex_) && _currentDaySnapshot.DayClients[currentClientIndex_].IsDemon;
 
     FGuestMetrics Metrics = GetGuestMetrics(Guest);
-    const FGuestOutcomeResult Result = UReputationLibrary::ApplyOutcome(GameSettings, Guest, bIsDemon, Outcome, Modifiers, Metrics, _savedData->Reputation);
+    const FGuestOutcomeResult Result = UGuestLibrary::ApplyOutcome(GameSettings, Guest, bIsDemon, Outcome, Modifiers, Metrics, _savedData->Reputation);
     SetGuestMetrics(Guest, Metrics);
 
     for (const FReputationChange& Change : Result.ReputationChanges)
@@ -270,6 +277,19 @@ void UGameLoop::SetGuestMetrics(const UGuestData* Data, const FGuestMetrics& Met
     if (!Data || !_savedData) { return; }
 
     _savedData->GuestMetrics.Add(Data->GetFName(), Metrics);
+
+    // A visit, an opened block, the name, the outcome: the page of the book that shows this guest has to know
+    if (UGuestSubsystem* GuestSubsystem = GetGuestSubsystem())
+    {
+        GuestSubsystem->NotifyDataChanged(Data->GetFName());
+    }
+}
+
+UGuestSubsystem* UGameLoop::GetGuestSubsystem() const
+{
+    const UWorld* World = GetWorld();
+    UGameInstance* GameInstance = World ? World->GetGameInstance() : nullptr;
+    return GameInstance ? GameInstance->GetSubsystem<UGuestSubsystem>() : nullptr;
 }
 
 void UGameLoop::RegisterGuestVisit(const UGuestData* Guest)
@@ -278,6 +298,50 @@ void UGameLoop::RegisterGuestVisit(const UGuestData* Guest)
 
     FGuestMetrics Metrics = GetGuestMetrics(Guest);
     ++Metrics.VisitCount;
+    SetGuestMetrics(Guest, Metrics);
+}
+
+void UGameLoop::UnlockDescription(const UGuestData* Guest, int32 Index)
+{
+    if (!Guest || !_savedData || Index < 0) { return; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    if (Metrics.UnlockedDescription.Contains(Index)) { return; }
+
+    Metrics.UnlockedDescription.Add(Index);
+    SetGuestMetrics(Guest, Metrics);
+}
+
+void UGameLoop::UnlockNote(const UGuestData* Guest, int32 Index)
+{
+    if (!Guest || !_savedData || Index < 0) { return; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    if (Metrics.UnlockedNotes.Contains(Index)) { return; }
+
+    Metrics.UnlockedNotes.Add(Index);
+    SetGuestMetrics(Guest, Metrics);
+}
+
+void UGameLoop::MarkGuestSeen(const UGuestData* Guest)
+{
+    if (!Guest || !_savedData) { return; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    if (Metrics.bSeen) { return; }
+
+    Metrics.bSeen = true;
+    SetGuestMetrics(Guest, Metrics);
+}
+
+void UGameLoop::MarkNameKnown(const UGuestData* Guest)
+{
+    if (!Guest || !_savedData) { return; }
+
+    FGuestMetrics Metrics = GetGuestMetrics(Guest);
+    if (Metrics.bNameKnown) { return; }
+
+    Metrics.bNameKnown = true;
     SetGuestMetrics(Guest, Metrics);
 }
 

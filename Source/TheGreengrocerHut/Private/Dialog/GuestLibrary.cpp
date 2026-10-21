@@ -1,8 +1,36 @@
-#include "Dialog/ReputationLibrary.h"
+#include "Dialog/GuestLibrary.h"
 
 #include "GameSettings.h"
 
-EGuestOutcome UReputationLibrary::ToGuestOutcome(EPotionResult Result)
+namespace
+{
+	TArray<FString> BuildParts(const TArray<FText>& Parts, const TArray<int32>& Unlocked, FName FakeStyle)
+	{
+		TArray<FString> Result;
+		Result.Reserve(Parts.Num());
+
+		for (int32 i = 0; i < Parts.Num(); ++i)
+		{
+			FString Text = Parts[i].ToString();
+
+			if (!Unlocked.Contains(i))
+			{
+				Text = Text.Left(Text.Len() / 2);
+
+				if (!FakeStyle.IsNone())
+				{
+					Text = FString::Printf(TEXT("<%s>%s</>"), *FakeStyle.ToString(), *Text);
+				}
+			}
+
+			Result.Add(Text);
+		}
+
+		return Result;
+	}
+}
+
+EGuestOutcome UGuestLibrary::ToGuestOutcome(EPotionResult Result)
 {
 	switch (Result)
 	{
@@ -22,12 +50,12 @@ EGuestOutcome UReputationLibrary::ToGuestOutcome(EPotionResult Result)
 	return EGuestOutcome::NotHealed;
 }
 
-EGuestFraction UReputationLibrary::GetRealFraction(EGuestFraction DisplayFraction, bool bIsDemon)
+EGuestFraction UGuestLibrary::GetRealFraction(EGuestFraction DisplayFraction, bool bIsDemon)
 {
 	return bIsDemon ? EGuestFraction::Demon : DisplayFraction;
 }
 
-const FReputationDelta* UReputationLibrary::FindDelta(const UGameSettings* Settings, const UGuestData* Guest, EGuestFraction RealFraction, EGuestOutcome Outcome)
+const FReputationDelta* UGuestLibrary::FindDelta(const UGameSettings* Settings, const UGuestData* Guest, EGuestFraction RealFraction, EGuestOutcome Outcome)
 {
 	if (Guest && Guest->bOverrideReputation)
 	{
@@ -40,7 +68,7 @@ const FReputationDelta* UReputationLibrary::FindDelta(const UGameSettings* Setti
 	return Rules ? Rules->ByOutcome.Find(Outcome) : nullptr;
 }
 
-float UReputationLibrary::GetDeathChance(const UGameSettings* Settings, const UGuestData* Guest, EGuestOutcome Outcome)
+float UGuestLibrary::GetDeathChance(const UGameSettings* Settings, const UGuestData* Guest, EGuestOutcome Outcome)
 {
 	if (Guest && Guest->bOverrideDeathChance)
 	{
@@ -51,7 +79,7 @@ float UReputationLibrary::GetDeathChance(const UGameSettings* Settings, const UG
 	return Global ? *Global : 0.f;
 }
 
-FGuestOutcomeResult UReputationLibrary::ApplyOutcome(const UGameSettings* Settings, const UGuestData* Guest, bool bIsDemon, EGuestOutcome Outcome,
+FGuestOutcomeResult UGuestLibrary::ApplyOutcome(const UGameSettings* Settings, const UGuestData* Guest, bool bIsDemon, EGuestOutcome Outcome,
 	const TArray<FGuestReputationModifier>& Modifiers, FGuestMetrics& Metrics, TMap<EGuestFraction, int32>& Reputation)
 {
 	FGuestOutcomeResult Result;
@@ -95,7 +123,7 @@ FGuestOutcomeResult UReputationLibrary::ApplyOutcome(const UGameSettings* Settin
 	return Result;
 }
 
-void UReputationLibrary::LogClientArrival(int32 ClientIndex, const FClient& Client)
+void UGuestLibrary::LogClientArrival(int32 ClientIndex, const FClient& Client)
 {
 	TArray<FString> Symptoms;
 	for (const FName& Symptom : Client.Symptoms)
@@ -111,4 +139,22 @@ void UReputationLibrary::LogClientArrival(int32 ClientIndex, const FClient& Clie
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Client %d symptoms: %s"), ClientIndex, *SymptomsString);
+}
+
+FText UGuestLibrary::GetDescription(const FGuestInfo& Info, FName FakeStyle, const FString& Separator)
+{
+	const TArray<FString> Parts = BuildParts(Info.DescriptionParts, Info.Metrics.UnlockedDescription, FakeStyle);
+	return FText::FromString(FString::Join(Parts, *Separator));
+}
+
+FText UGuestLibrary::GetNotes(const FGuestInfo& Info, FName FakeStyle, const FString& Bullet)
+{
+	FString Result;
+
+	for (const FString& Part : BuildParts(Info.NotesParts, Info.Metrics.UnlockedNotes, FakeStyle))
+	{
+		Result += Bullet + Part + TEXT("\n");
+	}
+
+	return FText::FromString(Result);
 }

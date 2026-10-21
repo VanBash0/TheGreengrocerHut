@@ -1,10 +1,12 @@
 #include "Dialog/State/DoorDialogState.h"
 #include "GameFramework/Actor.h"
-#include "Engine/AssetManager.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
 #include "DlgContext.h"
 #include "DlgManager.h"
 #include "Dialog/State/DoorPlayerParticipant.h"
 #include "Dialog/GuestEmotionPicker.h"
+#include "Dialog/GuestSubsystem.h"
 #include "Dialog/GuestDialogStructs.h"
 #include <GameLoop.h>
 
@@ -51,34 +53,17 @@ void UDoorDialogState::Initialize_Implementation(const FClient& InClient)
 {
 	Super::Initialize_Implementation(InClient);
 
-	PendingGuestRefs = InClient.Guests;
+	PendingGuests = InClient.Guests;
 	bPendingIsDemon = InClient.IsDemon;
 
-	TArray<FSoftObjectPath> Paths;
-	for (const TSoftObjectPtr<UGuestData>& Guest : PendingGuestRefs)
+	if (PendingGuests.IsEmpty())
 	{
-		if (!Guest.IsNull())
-		{
-			Paths.AddUnique(Guest.ToSoftObjectPath());
-		}
-	}
-
-	if (Paths.IsEmpty())
-	{
-		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: the client has no guests to load."), *GetName());
-		PendingGuestRefs.Reset();
+		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: the client has no guests."), *GetName());
 		NotifyStateReady();
 		return;
 	}
 
-	GuestsHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths,
-		FStreamableDelegate::CreateWeakLambda(this, [this, Generation = LoadGeneration]()
-		{
-			if (Generation == LoadGeneration)
-			{
-				OnGuestsLoaded();
-			}
-		}));
+	OnGuestsLoaded();
 }
 
 void UDoorDialogState::Reset_Implementation()
@@ -93,6 +78,15 @@ void UDoorDialogState::Reset_Implementation()
 void UDoorDialogState::Enter()
 {
 	Super::Enter();
+
+	// The window is open: the player sees the guests of the client
+	if (UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>())
+	{
+		for (const FGuestEntry& Entry : Guests)
+		{
+			if (!Entry.bLeft && !Entry.bLeaving && Entry.GuestData) { Loop->MarkGuestSeen(Entry.GuestData); }
+		}
+	}
 
 	if (CurrentGuestIndex != INDEX_NONE)
 	{
@@ -175,6 +169,42 @@ void UDoorDialogState::AddReputationModifier(const FGuestReputationModifier& Rep
 	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
 
 	Guests[CurrentGuestIndex].Modifiers.Add(ReputationModifier);
+}
+
+void UDoorDialogState::SeeName()
+{
+	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
+
+	FGuestEntry& Entry = Guests[CurrentGuestIndex];
+	UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>();
+	if (!Entry.GuestData || !Loop) { return; }
+
+	Loop->MarkNameKnown(Entry.GuestData);
+	Entry.GuestMetrics = GetGuestRealMetrics(Entry.GuestData);
+}
+
+void UDoorDialogState::OpenDescription(int32 Index)
+{
+	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
+
+	FGuestEntry& Entry = Guests[CurrentGuestIndex];
+	UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>();
+	if (!Entry.GuestData || !Loop) { return; }
+
+	Loop->UnlockDescription(Entry.GuestData, Index);
+	Entry.GuestMetrics = GetGuestRealMetrics(Entry.GuestData);
+}
+
+void UDoorDialogState::OpenNote(int32 Index)
+{
+	if (!Guests.IsValidIndex(CurrentGuestIndex)) { return; }
+
+	FGuestEntry& Entry = Guests[CurrentGuestIndex];
+	UGameLoop* Loop = GetWorld()->GetSubsystem<UGameLoop>();
+	if (!Entry.GuestData || !Loop) { return; }
+
+	Loop->UnlockNote(Entry.GuestData, Index);
+	Entry.GuestMetrics = GetGuestRealMetrics(Entry.GuestData);
 }
 
 bool UDoorDialogState::CanReject() const
@@ -295,12 +325,22 @@ FGuestMetrics UDoorDialogState::GetGuestRealMetrics(UGuestData* InGuestData) con
 
 void UDoorDialogState::OnGuestsLoaded()
 {
-	for (const TSoftObjectPtr<UGuestData>& Soft : PendingGuestRefs)
+	const UWorld* World = GetWorld();
+	const UGameInstance* GameInstance = World ? World->GetGameInstance() : nullptr;
+	UGuestSubsystem* GuestSubsystem = GameInstance ? GameInstance->GetSubsystem<UGuestSubsystem>() : nullptr;
+	if (!GuestSubsystem)
 	{
-		UGuestData* Data = Soft.Get();
+		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: no UGuestSubsystem, the dialogues can't be loaded."), *GetName());
+		PendingGuests.Reset();
+		NotifyStateReady();
+		return;
+	}
+
+	for (UGuestData* Data : PendingGuests)
+	{
 		if (!Data)
 		{
-			UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: guest '%s' failed to load, skipped."), *GetName(), *Soft.ToString());
+			UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: the client has an empty guest slot, skipped."), *GetName());
 			continue;
 		}
 
@@ -315,16 +355,15 @@ void UDoorDialogState::OnGuestsLoaded()
 		Entry.bIsDemon = bPendingIsDemon;
 
 		Entry.EmotionPicker = NewObject<UGuestEmotionPicker>(this);
-		Entry.EmotionPicker->OnLoaded.AddDynamic(this, &UDoorDialogState::OnPickerLoaded);
-		++PendingLoads;
 
+		++PendingLoads;
 		if (!Data->GuestDialogue.IsNull()) { ++PendingLoads; }
 	}
-	PendingGuestRefs.Reset();
+	PendingGuests.Reset();
 
 	if (Guests.IsEmpty())
 	{
-		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: no guest was loaded."), *GetName());
+		UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: no guest was added."), *GetName());
 		NotifyStateReady();
 		return;
 	}
@@ -335,37 +374,40 @@ void UDoorDialogState::OnGuestsLoaded()
 
 		Entry.EmotionPicker->Initialize(Entry.GuestData);
 
-		const TSoftObjectPtr<UDlgDialogue>& Dialogue = Entry.GuestData->GuestDialogue;
-		if (!Dialogue.IsNull())
+		Entry.EmotionsHandle = GuestSubsystem->LoadEmotions(Entry.GuestData, this,
+			[this, Generation = LoadGeneration]()
+			{
+				if (Generation == LoadGeneration)
+				{
+					FinishLoadStep();
+				}
+			});
+
+		if (!Entry.GuestData->GuestDialogue.IsNull())
 		{
-			Entry.DialogueHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(Dialogue.ToSoftObjectPath(),
-				FStreamableDelegate::CreateWeakLambda(this, [this, Index, Generation = LoadGeneration]()
+			Entry.DialogueHandle = GuestSubsystem->LoadDialogue(Entry.GuestData, this,
+				[this, Index, Generation = LoadGeneration](UDlgDialogue* Dialogue)
 				{
 					if (Generation == LoadGeneration)
 					{
-						OnDialogueLoaded(Index);
+						OnDialogueLoaded(Index, Dialogue);
 					}
-				}));
+				});
 		}
 	}
 }
 
-void UDoorDialogState::OnDialogueLoaded(int32 GuestIndex)
+void UDoorDialogState::OnDialogueLoaded(int32 GuestIndex, UDlgDialogue* Dialogue)
 {
 	if (Guests.IsValidIndex(GuestIndex))
 	{
 		FGuestEntry& Entry = Guests[GuestIndex];
 		if (!Entry.bLeft && Entry.GuestData)
 		{
-			Entry.Dialogue = Entry.GuestData->GuestDialogue.Get();
+			Entry.Dialogue = Dialogue;
 		}
 	}
 
-	FinishLoadStep();
-}
-
-void UDoorDialogState::OnPickerLoaded()
-{
 	FinishLoadStep();
 }
 
@@ -380,11 +422,11 @@ void UDoorDialogState::ReleaseGuest(FGuestEntry& Entry)
 {
 	if (Entry.EmotionPicker)
 	{
-		Entry.EmotionPicker->OnLoaded.RemoveDynamic(this, &UDoorDialogState::OnPickerLoaded);
 		Entry.EmotionPicker->Release();
 		Entry.EmotionPicker = nullptr;
 	}
 
+	ReleaseStreamHandle(Entry.EmotionsHandle);
 	ReleaseStreamHandle(Entry.DialogueHandle);
 
 	Entry.Context = nullptr;
@@ -398,12 +440,10 @@ void UDoorDialogState::ReleaseAll()
 {
 	++LoadGeneration;
 	PendingLoads = 0;
-	PendingGuestRefs.Reset();
+	PendingGuests.Reset();
 	CurrentGuestIndex = INDEX_NONE;
 	bRejectPending = false;
 
 	for (FGuestEntry& Entry : Guests) { ReleaseGuest(Entry); }
 	Guests.Empty();
-
-	ReleaseStreamHandle(GuestsHandle);
 }

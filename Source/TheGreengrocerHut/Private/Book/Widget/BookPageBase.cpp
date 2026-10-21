@@ -7,6 +7,11 @@ void UBookPageBase::NativeConstruct()
     Super::NativeConstruct();
 }
 
+void UBookPageBase::RequestRefresh()
+{
+    OnRefreshRequested.Broadcast();
+}
+
 void UBookPageBase::Initialize_Implementation(const int32& InPageIndex)
 {
     PageIndex = InPageIndex - 1;

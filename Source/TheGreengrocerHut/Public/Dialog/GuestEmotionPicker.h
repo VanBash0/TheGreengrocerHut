@@ -3,14 +3,13 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "GameplayTagContainer.h"
-#include "Engine/StreamableManager.h"
 #include "GuestEmotionPicker.generated.h"
 
 class UGuestData;
 class UPaperSprite;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGuestEmotionsLoaded);
-
+// Picks the sprite of the guest for an emotion (no repeat of the same variation twice in a row).
+// Does not load anything: the sprites are loaded by UGuestSubsystem::LoadEmotions, an unloaded sprite gives nullptr
 UCLASS(BlueprintType)
 class THEGREENGROCERHUT_API UGuestEmotionPicker : public UObject
 {
@@ -26,23 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Guest")
 	UPaperSprite* GetEmotionSprite(const FName& StateName);
 
-	UFUNCTION(BlueprintPure, Category = "Guest")
-	bool IsLoaded() const { return bLoaded; }
-
-	UPROPERTY(BlueprintAssignable, Category = "Guest")
-	FOnGuestEmotionsLoaded OnLoaded;
-
-	virtual void BeginDestroy() override;
-
 private:
-	void OnLoadCompleted();
-
-	bool bLoaded = false;
-
 	TMap<FGameplayTag, int32> LastIndexByState;
 
 	UPROPERTY()
 	TObjectPtr<const UGuestData> Data;
-
-	TSharedPtr<FStreamableHandle> LoadHandle;
 };

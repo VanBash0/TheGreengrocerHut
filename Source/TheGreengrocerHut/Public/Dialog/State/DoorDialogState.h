@@ -52,6 +52,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bLeaving = false;
 
+	TSharedPtr<FStreamableHandle> EmotionsHandle;
+
 	TSharedPtr<FStreamableHandle> DialogueHandle;
 };
 
@@ -118,6 +120,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dialog")
 	void AddReputationModifier(const FGuestReputationModifier& ReputationModifier);
 
+	// The current guest has told his name: the player knows it now (the book shows it)
+	UFUNCTION(BlueprintCallable, Category = "Dialog")
+	void SeeName();
+
+	// Opens a block of the current guest page in the book (Index = index in UGuestData Description / Notes)
+	UFUNCTION(BlueprintCallable, Category = "Dialog")
+	void OpenDescription(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Dialog")
+	void OpenNote(int32 Index);
+
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	void GetGuests(TArray<FGuestEntry>& OutGuests) const { OutGuests = Guests; }
 
@@ -134,10 +147,7 @@ public:
 protected:
 	void OnGuestsLoaded();
 
-	void OnDialogueLoaded(int32 GuestIndex);
-
-	UFUNCTION()
-	void OnPickerLoaded();
+	void OnDialogueLoaded(int32 GuestIndex, UDlgDialogue* Dialogue);
 
 	void FinishLoadStep();
 
@@ -177,11 +187,10 @@ protected:
 	bool bGuestAccepted = false;
 
 private:
-	TArray<TSoftObjectPtr<UGuestData>> PendingGuestRefs;
+	UPROPERTY()
+	TArray<TObjectPtr<UGuestData>> PendingGuests;
 
 	bool bPendingIsDemon = false;
-
-	TSharedPtr<FStreamableHandle> GuestsHandle;
 
 	int32 PendingLoads = 0;
 

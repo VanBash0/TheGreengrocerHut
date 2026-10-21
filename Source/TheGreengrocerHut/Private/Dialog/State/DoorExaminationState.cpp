@@ -1,6 +1,6 @@
 #include "Dialog/State/DoorExaminationState.h"
 #include "Kismet/GameplayStatics.h"
-#include "SymptomViewer.h"
+#include "Symptom/SymptomViewer.h"
 
 void UDoorExaminationState::BeginPlay()
 {

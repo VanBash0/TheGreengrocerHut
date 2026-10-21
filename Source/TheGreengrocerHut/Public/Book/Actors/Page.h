@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
 	void InitializeWidgets(int32 PageIndex, TSubclassOf<UBookPageBase> InWidgetPageR, TSubclassOf<UBookPageBase> InWidgetPageL);
 
+	UFUNCTION(BlueprintCallable, Category = "Base|Main")
+	void RefreshWidgets();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Base|Main")
 	void ReleasePage();
@@ -115,6 +118,10 @@ public:
 	FOnFinishFlip OnFinishFlip;
 
 private:
+	void UnbindRefresh(UWidgetComponent* Component);
+
+	void FinishWidgetRender(int32 ThisGeneration);
+
 	UFUNCTION()
 	void HandleClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 

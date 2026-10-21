@@ -10,7 +10,7 @@ struct FClient
     GENERATED_BODY()
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    TArray<TSoftObjectPtr<UGuestData>> Guests;
+    TArray<TObjectPtr<UGuestData>> Guests;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TArray<FName> Symptoms;
@@ -36,26 +36,18 @@ struct FPotionCompareResult
 {
     GENERATED_BODY()
 
-    // Ряд ингредиентов, которые фактически дал игрок (индекс 0 — база), в виде RowName
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     TArray<FName> GivenIngredients;
 
-    // Валидность каждого ингредиента из GivenIngredients (по индексу, для подсветки в UI).
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     TArray<bool> IngredientValidity;
 
-    // Единая оценка зелья 0.0..1.0 — доля ингредиентов, положенных на своё место
-    // с соблюдением неубывающего порядка приоритетов (-1 База, 0 Основной, 1 Дополнительный, 2 Связывающий).
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     float ValidFraction = 0.f;
 
-    // Первый ингредиент (база) — это отрава
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     bool IsPoison = false;
 
-    // Совпадение по каждому уровню приоритета отдельно — для UI-фидбека игроку.
-    // Ключ = Priority (-1 База, 0 Основной, 1 Дополнительный, 2 Связывающий и т.д., см. GameSettings->IngredientPriorityData).
-    // Значение = все ингредиенты игрока на этом уровне совпали (как мультимножество) с нужными.
     UPROPERTY(BlueprintReadOnly, Category = "Potion Compare")
     TMap<int32, bool> TierMatchResults;
 };
@@ -80,7 +72,6 @@ struct FClientResult
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     TArray<bool> IngredientValidity;
 
-    // Единая оценка зелья 0.0..1.0
     UPROPERTY(BlueprintReadOnly, Category = "Client Result")
     float ValidFraction = 0.f;
 

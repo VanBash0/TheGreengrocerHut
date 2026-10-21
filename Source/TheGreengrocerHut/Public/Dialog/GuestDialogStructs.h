@@ -34,16 +34,31 @@ struct FGuestMetrics
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EGuestFraction GuestFraction;
+	EGuestFraction GuestFraction = EGuestFraction::Peasant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool GuestAlive;
+	bool GuestAlive = true;
 
+	// Does the player know the name from the start. If not, the guest tells it in the dialogue (UDoorDialogState::SeeName)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bNameKnown = false;
+
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<EGuestOutcome> Outcomes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 VisitCount = 0;
+
+	// The player has seen the guest (the door window was opened with him): only then he is in the book
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bSeen = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<int32> UnlockedDescription;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<int32> UnlockedNotes;
 };
 
 USTRUCT(BlueprintType)
@@ -146,6 +161,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ETextGender GuestGeneder;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FText> DescriptionParts;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FText> NotesParts;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGuestMetrics DefaultMetrics;

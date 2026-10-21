@@ -8,6 +8,8 @@ class UWidgetSwitcher;
 class URetainerBox;
 class UNamedSlot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPageRefreshRequested);
+
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class THEGREENGROCERHUT_API UBookPageBase : public UUserWidget
 {
@@ -17,6 +19,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 protected:
+	UFUNCTION(BlueprintCallable, Category = "Base|Pipline")
+	void RequestRefresh();
+
 	UFUNCTION(BlueprintNativeEvent, Category = "Base|Pipline")
 	void ClearPage();
 	virtual void ClearPage_Implementation();
@@ -58,6 +63,9 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Base|Page")
 	int32 PageIndex = INDEX_NONE;
+
+	UPROPERTY(BlueprintAssignable, Category = "Base|Event")
+	FOnPageRefreshRequested OnRefreshRequested;
 
 protected:
 	UPROPERTY(meta = (BindWidgetOptional))
