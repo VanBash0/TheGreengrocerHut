@@ -42,7 +42,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FGuestReputationModifier> Modifiers;
 
-	// Copied from the client: the guest is a demon (a changeling or a real one)
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDemon = false;
 
@@ -134,6 +133,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Manage")
 	void GetGuests(TArray<FGuestEntry>& OutGuests) const { OutGuests = Guests; }
 
+	UFUNCTION(BlueprintPure, Category = "Manage")
+	void GetGuestByIndex(int32 index, FGuestEntry& OutGuest) const { OutGuest = Guests.IsValidIndex(index) ? Guests[index] : FGuestEntry(); }
+
 	UFUNCTION(BlueprintCallable, Category = "Manage")
 	void SelectGuest(int32 InGuestIndex);
 
@@ -156,7 +158,7 @@ protected:
 
 	void ReleaseAll();
 
-protected:
+public:
 	FGuestMetrics GetGuestRealMetrics(UGuestData* InGuestData) const;
 
 protected:

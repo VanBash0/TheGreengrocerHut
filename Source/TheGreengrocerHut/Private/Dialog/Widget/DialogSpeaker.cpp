@@ -1,9 +1,13 @@
 #include "Dialog/Widget/DialogSpeaker.h"
 
+
+#include "Components/PanelWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Dialog/State/DoorDialogState.h"
 #include "PaperSprite.h"
+#include "Dialog/GuestSubsystem.h"
+#include "Engine/GameInstance.h"
 
 void UDialogSpeaker::NativeOnInitialized()
 {
@@ -24,6 +28,14 @@ void UDialogSpeaker::NativeOnInitialized()
 	}
 }
 
+void UDialogSpeaker::NativePreConstruct()
+{
+	if (NamePanel)
+	{
+		NamePanel->SetVisibility(bShowSpeakerName ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	}
+}
+
 void UDialogSpeaker::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -31,6 +43,11 @@ void UDialogSpeaker::NativeConstruct()
 	if (Button)
 	{
 		Button->SetIsEnabled(bButtonClickable);
+	}
+
+	if (NamePanel)
+	{
+		NamePanel->SetVisibility(bShowSpeakerName ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -71,11 +88,26 @@ void UDialogSpeaker::SetGuest(UDoorDialogState* InState, int32 InGuestIndex)
 	{
 		State->OnDialogUpdated.AddDynamic(this, &UDialogSpeaker::HandleDialogUpdated);
 		State->OnGuestLeaving.AddDynamic(this, &UDialogSpeaker::HandleGuestLeaving);
+
+		FGuestEntry Entry;
+		State->GetGuestByIndex(GuestIndex, Entry);
+
+		CurrentGuestID = Entry.GuestData->GetFName();
 	}
 
 	if (State && DefaultEmotion.IsValid())
 	{
 		ApplySprite(State->GetGuestEmotionSprite(GuestIndex, DefaultEmotion.GetTagName()));
+	}
+
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		UGuestSubsystem* GuestSubsystem = World->GetGameInstance() ? World->GetGameInstance()->GetSubsystem<UGuestSubsystem>() : nullptr;
+		if (GuestSubsystem)
+		{
+			GuestSubsystem->OnGuestDataChanged.AddDynamic(this, &UDialogSpeaker::HandleGuestDataChanged);
+		}
 	}
 
 	OnGuestAssigned(GuestIndex);
@@ -89,6 +121,8 @@ void UDialogSpeaker::ReleaseGuest()
 	GuestIndex = INDEX_NONE;
 	bLeaving = false;
 
+	CurrentGuestID = FName();
+
 	ReleaseSprites();
 
 	OnRealese();
@@ -101,7 +135,6 @@ void UDialogSpeaker::NotifyLeaveFinished()
 	UDoorDialogState* LeavingState = State;
 	const int32 LeavingIndex = GuestIndex;
 
-	// Full release first (sprites, subscriptions, OnRealese -> Hide), only then the state may unload the guest
 	ReleaseGuest();
 
 	if (LeavingState)
@@ -154,6 +187,25 @@ void UDialogSpeaker::Unbind()
 		State->OnDialogUpdated.RemoveDynamic(this, &UDialogSpeaker::HandleDialogUpdated);
 		State->OnGuestLeaving.RemoveDynamic(this, &UDialogSpeaker::HandleGuestLeaving);
 	}
+
+	UWorld* World = GetWorld();
+	if (!World) { return; }
+
+	UGuestSubsystem* GuestSubsystem = World->GetGameInstance() ? World->GetGameInstance()->GetSubsystem<UGuestSubsystem>() : nullptr;
+	if (GuestSubsystem)
+	{
+		GuestSubsystem->OnGuestDataChanged.RemoveDynamic(this, &UDialogSpeaker::HandleGuestDataChanged);
+	}
+}
+
+void UDialogSpeaker::HandleGuestDataChanged(FName GuestID)
+{
+	if (GuestID != CurrentGuestID) { return; }
+
+	FGuestEntry Entry;
+	State->GetGuestByIndex(GuestIndex, Entry);
+
+	OnNameUpdated(Entry.GuestData->GuestName, State->GetGuestRealMetrics(Entry.GuestData).bNameKnown);
 }
 
 void UDialogSpeaker::HandleClicked()
