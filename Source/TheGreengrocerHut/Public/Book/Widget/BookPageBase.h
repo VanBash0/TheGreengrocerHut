@@ -26,7 +26,7 @@ protected:
 	void ClearPage();
 	virtual void ClearPage_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Base|Pipline")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Base|Pipline")
 	void Render();
 	virtual void Render_Implementation();
 

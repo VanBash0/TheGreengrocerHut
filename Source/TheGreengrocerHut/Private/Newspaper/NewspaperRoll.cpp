@@ -17,10 +17,15 @@ ANewspaperRoll::ANewspaperRoll()
 
 void ANewspaperRoll::BeginPlay()
 {
-	if (USkeletalMeshComponent* Mesh = GetSkeletalMeshComponent())
+	Super::BeginPlay();
+
+	if (NewspaperMaterials.Num() > 0)
 	{
-		int32 materialIndex = FMath::RandHelper(NewspaperMaterials.Num());
-		MID_Newspaper = Mesh->CreateDynamicMaterialInstance(0, NewspaperMaterials[materialIndex]);
+		if (USkeletalMeshComponent* Mesh = GetSkeletalMeshComponent())
+		{
+			int32 materialIndex = FMath::RandHelper(NewspaperMaterials.Num());
+			MID_Newspaper = Mesh->CreateDynamicMaterialInstance(0, NewspaperMaterials[materialIndex]);
+		}
 	}
 
 	if (WidgetCom && NewspaperWidgetClass)

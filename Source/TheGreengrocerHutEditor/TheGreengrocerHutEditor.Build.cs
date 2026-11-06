@@ -20,7 +20,10 @@ public class TheGreengrocerHutEditor : ModuleRules
 			"PropertyEditor",
 			"SlateCore",
 			"Slate",
-            "InputCore"
+            "InputCore",
+            "ContentBrowser",
+            "MeshDescription",
+            "SkeletalMeshDescription"
         });
 	}
 }

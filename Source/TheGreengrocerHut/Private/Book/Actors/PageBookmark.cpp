@@ -133,9 +133,10 @@ void APageBookmark::HandleBeginCursorOver(UPrimitiveComponent* TouchedComponent)
 {
 	if (bIsBookmarkHovering) { return; }
 
-	if (!OwningBook) { return; }
-
-	if (!CanBookmarkHovering()) { return; }
+	if (!OwningBook)
+	{
+		if (!CanBookmarkHovering()) { return; }
+	}
 
 	bIsBookmarkHovering = true;
 
