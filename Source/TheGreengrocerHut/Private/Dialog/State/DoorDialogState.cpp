@@ -276,7 +276,9 @@ void UDoorDialogState::SelectGuest(int32 InGuestIndex)
 			return;
 		}
 
-		Entry.Context = UDlgManager::StartDialogue2(Entry.Dialogue, this, PlayerParticipant);
+		Entry.Context = Entry.Dialogue->HasParticipant(PlayerParticipant->GetParticipantName_Implementation())
+						? UDlgManager::StartDialogue2(Entry.Dialogue, this, PlayerParticipant)
+						: UDlgManager::StartMonologue(Entry.Dialogue, this);
 		if (!Entry.Context)
 		{
 			UE_LOG(LogTemp, Error, TEXT("[UDoorDialogState] %s: StartDialogue2 failed for guest %d, check the participant names."),
